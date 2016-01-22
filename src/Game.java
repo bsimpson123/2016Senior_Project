@@ -23,8 +23,6 @@ public class Game {
 	private HashMap<String, Texture> textureMap = new HashMap<String, Texture>();
 	/** Hash map for referencing audio files that have been loaded. */
 	private HashMap<String, Audio> soundMap = new HashMap<String, Audio>();
-	/** True if game logic need to be applied this loop, normally as a result of a game event. */
-	private boolean logicRequiredThisLoop = false;
 	/** Indicates whether the game is to continue running and processing logic. Set to false to end the program. */
 	private boolean gameRunning = true;
 	/** The time at which the last rendering loop started from the point of view of the game logic. */
@@ -43,12 +41,18 @@ public class Game {
 	/* Static game control and logic variables */
 	private static long timerTicksPerSecond = Sys.getTimerResolution();
 	
-	/* Static texture variables. These should only be altered during program startup and shutdown/cleanup */
-	private static Texture blocks;
+	/**
+	 * Enumeration for the current game mode when determining logic control within the main loop.
+	 * Additional values can be added as new game modes are developed.
+	 * @author John Ojala
+	 */
+	public enum GameMode {
+		MainMenu,
+		BlockMatchStandard
+	}
 	
-	/** Sets which menu overlay is active in place of the main game draw. 
-	 * Use peek() to determine the current menu without discarding the value.*/
-	private static Stack<Integer> activeMenu = new Stack<Integer>();
+	/** The current game mode within the main logic loop. */
+	GameMode activeGameMode = GameMode.MainMenu;
 	
 	/* game control settings */
 	/** Indicates whether the keyboard can be for input in the game */
@@ -122,7 +126,7 @@ public class Game {
 
 	
 	/**
-	 * Initialize OpenGL components
+	 * Initialize OpenGL components and set OpenGL environment variables.
 	 */
 	private void initGL() {
 		try {
@@ -177,11 +181,6 @@ public class Game {
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_ESCAPE);
 		
 		
-		
-		
-		activeMenu.push(0);
-		activeMenu.push(1);
-		
 		// Load all used textures into memory so the game will not be slowed down by loading textures later
 		Texture tex;
 		String type; // holds file type extension
@@ -232,38 +231,22 @@ public class Game {
 
 	
 	/**
-	 * Attempts to get a preloaded texture. If the file reference has not already been loaded
-	 * as a texture the game attempts to do so and adds the new texture to the texture map
+	 * Attempts to get a preloaded texture. Attempting to request a texture that
+	 * has not been loaded will return null.
 	 * @param reference File reference to the texture to load.
-	 * @return The loaded OpenGL texture
+	 * @return The loaded OpenGL texture, null if the referenced texture was not available.
 	 */
 	public Texture getTexture(String reference) {
-		Texture tex = null;
-		String ref, type;
-		
-		
-		
-		try {
-			ref = FileResource.requestResource(reference);
-			tex = textureMap.get(reference);
-			if (tex != null) { return tex; }
-			type = ref.substring(ref.lastIndexOf('.')).toUpperCase();
-			tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref));
-		} catch (IOException e) {
-			System.out.println("Unable to load resource.");
-			e.printStackTrace();
-			System.exit(-1);
+		if (textureMap.containsKey(reference)) {
+			return textureMap.get(reference);
 		}
-		textureMap.put(reference, tex);
-		return tex;
-		
+		return null;
 	}
 	
-
-	/**
-	 * Handles input actions for the main loop
-	 */
 	private void processInput() {
+		// Input needs will vary between game modes, and menus within each mode, so input handling will
+		// need to be checked in each specific section.
+		
 		/* Get mouse movement on the X and Y axis
 		 * Can only call getDX and getDY once each per game loop.
 		 * Additional calls will return 0 or a very small value as there will have been 
@@ -275,10 +258,9 @@ public class Game {
 			int moveX = 0;
 			int moveY = 0;
 		}
-
 		
-		// TODO: add required input checks and game response to actions
-		// basic up/down/left/right movement checks plus a fire/shoot action:
+		// This code, in whole or part, should be used in individual control loops 
+		// to check against registered input for processing
 		if (Global.getControlActive(Global.GameControl.LEFT)) { 
 			;
 		}
@@ -300,7 +282,6 @@ public class Game {
 		if (Global.getControlActive(Global.GameControl.SPECIAL)) {
 			;
 		}
-		// TODO: any additional process logic that needs to be performed
 		
 	}
 	
@@ -335,16 +316,34 @@ public class Game {
 		 * function is responsible for changing the activeMenu variable to represent
 		 * the current function call
 		 */
-		if (activeMenu.isEmpty()) { activeMenu.push(0); }
-		switch (activeMenu.peek()) {
-		case 0: 
+		switch (activeGameMode) {
+		case MainMenu:
+			// TODO: Main menu draw and logic
+			if (Global.getControlActive(Global.GameControl.LEFT)) { 
+				;
+			}
+			if (Global.getControlActive(Global.GameControl.RIGHT)) { 
+				;
+			}
+			if (Global.getControlActive(Global.GameControl.UP)) {
+				;
+			}
+			if (Global.getControlActive(Global.GameControl.DOWN)) {
+				;
+			}
+			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				;
+			}
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				gameRunning = false;
+			}
+			if (Global.getControlActive(Global.GameControl.SPECIAL)) {
+				;
+			}
 			break;
-		case 1: // Title screen
-			// TODO: function call to display startup title screen
-			return ;
-		case 2: // Pause screen
-			// TODO: function call to display pause screen during gameplay
-			return ;
+		case BlockMatchStandard:
+			// TODO: function call to class handling this game mode.
+			break;
 		default:
 			break;
 		}
@@ -358,15 +357,6 @@ public class Game {
 		/* add new Entities that were created this loop */
 
 
-		/* If a game event has indicated that game logic should be
-		 * resolved, cycle though every entity requesting that each
-		 * one's logic be considered.
-		 */
-		if (logicRequiredThisLoop) {
-			// Perform special logic
-
-		}
-		
 		// an exit key is strongly recommended if mouse capture is enabled
 		if ( Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
 			gameRunning = false; // indicate that the game is no longer running
