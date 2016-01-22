@@ -9,8 +9,8 @@ public class Block {
 	}
 	public static Color[] BlockColors = new Color[] {
 			new Color(Color.BLUE),
-			new Color(Color.GREEN),
 			new Color(Color.YELLOW),
+			new Color(Color.GREEN),
 			new Color(Color.RED),
 			new Color(Color.PURPLE)
 	};
@@ -20,18 +20,18 @@ public class Block {
 	 * This value is independent from the texture size. */
 	protected final int drawHeight = 32;
 	protected final int drawWidth = 32;
-	
-	
+		
 	protected BlockType blockType;
-	private int colorID = -1;
+	protected int colorID = -1;
 	/** Collection of colors that will be used for standard blocks. */
-	private Texture texture;
-	private int texTop;
-	private int texHeight;
-	private int texLeft;
-	private int texWidth;
+	protected Texture texture;
+	protected int texTop;
+	protected int texHeight;
+	protected int texLeft;
+	protected int texWidth;
 	
-	/** Indicates whether the block has been checked for processing during a game loop */
+	/** Indicates whether the block has been checked for processing during a game loop.
+	 * This value should be reset to false before logic processing each game loop. */
 	private boolean checked = false;
 	
 	/* Constructors */
@@ -47,10 +47,11 @@ public class Block {
 	
 	public Block(BlockType type, int colorID) {
 		blockType = type;
-		this.colorID = colorID;
 		// check that provided colorID is within range
-		if (colorID < 0 || colorID >= BlockColors.length) {
-			colorID = Global.rand.nextInt(BlockColors.length);
+		if (colorID >= BlockColors.length) {
+			colorID = 0;
+		} else {
+			this.colorID = colorID;
 		}
 	}
 	
