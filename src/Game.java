@@ -91,11 +91,13 @@ public class Game {
 	/** All texture objects that will be used */
 	private final String[][] texLoadList = {
 			new String[] { "menubar", "media/mbar.png" },
-			new String[] { "menucursor", "media/menu_selector.png" }
+			new String[] { "menucursor", "media/menu_selector.png" },
+			new String[] { "blocksheet", "media/puzzleAssets_sheet.png" }
 	};
 	
 	private Sprite menuBar;
 	private Sprite cursor;
+	private Sprite testBlock;
 	
 	/**
 	 * Get the high resolution time in milliseconds
@@ -155,11 +157,12 @@ public class Game {
 			// Initialize GL matrices
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
+			// Sets 2D mode; no perspective
+			glOrtho(0, width, height, 0, -1, 1);
+
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 
-			// Sets 2D mode; no perspective
-			glOrtho(0, width, 0, height, -1, 1);
 
 			// disable the OpenGL depth test since only 2D graphics are used
 			glDisable(GL_DEPTH_TEST);
@@ -228,6 +231,12 @@ public class Game {
 		
 		menuBar = new Sprite( textureMap.get("menubar"), new int[] { 190, 48 } );
 		cursor = new Sprite( textureMap.get("menucursor"), new int[] { 39, 28 } );
+		testBlock = new Sprite (
+				textureMap.get("blocksheet"), 
+				new int[] { 212, 398 }, 
+				new int[] { 32, 32},
+				new int[] { 32, 32 }
+				);
 		
 		
 		Audio sound;
@@ -376,6 +385,7 @@ public class Game {
 			}
 			menuBar.draw(100, 100);
 			cursor.draw(150, 100);
+			testBlock.draw(200, 100);
 			
 			break;
 		case BlockMatchStandard:
