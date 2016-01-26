@@ -155,6 +155,7 @@ public class Block {
 		// draw a quad textured to match the sprite
 		glBegin(GL_QUADS);
 		{
+			
 			glTexCoord2f(texLeft, texTop);
 			glVertex2f(0, 0);
 			

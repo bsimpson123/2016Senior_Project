@@ -8,38 +8,47 @@ import org.newdawn.slick.opengl.Texture;
  *
  */
 public class Sprite {
-	protected int width, height;
-	/** Height/Width offset used to center the sprite when drawing */
-	protected int centerWidthOffset, centerHeightOffset;
-	/** The texture holding the image used for the sprite */
+	protected float width, height;
+	/** The texture containing the image used for the sprite */
 	protected Texture texture;
 	
-	public Sprite(Texture tex) {
+	/**
+	 * 
+	 * @param tex The Texture object containing the texture that needs to be drawn to the screen
+	 * @param left The leftmost pixel that will be drawn to the screen
+	 * @param top The topmost pixel that will be drawn to the screen
+	 * @param width The pixel width of the part of the texture that needs to be drawn
+	 * @param height The pixel height of the part of the texture that needs to be drawn
+	 */
+	public Sprite(Texture tex, int left, int top, int width, int height) {
 		if (tex == null) { throw new NullPointerException("Undefined texture object passed to Sprite constructor."); }
 		texture = tex;
 		width = texture.getImageWidth();
 		height = texture.getImageHeight();
-		centerWidthOffset = width / 2;
-		centerHeightOffset = height / 2;
 	}
 	
+	public Sprite(Texture tex) {
+		
+	}
 	
-	public int getWidth() { return texture.getImageWidth(); }
-	public int getHeight() { return texture.getImageHeight(); }
-	
+	public void setDrawDimensions(float[] dim) {
+		width = dim[0];
+		height = dim[1];
+	}
+		
 	public void draw(int x, int y)  {
 		// store the current model matrix
 		glPushMatrix();
-		// bind to the appropriate texture for this sprite
+		// bind the texture for drawing
 		texture.bind();
 		// translate to the right location and prepare to draw
-		glTranslatef(x - centerWidthOffset, y - centerHeightOffset, 0); // texture will be drawn centered at ( x, y )
+		glTranslatef(x, y, 0); // texture will be drawn at ( x, y )
 		
 		// draw a quad textured to match the sprite
 		glBegin(GL_QUADS);
 		{
-			glTexCoord2f(0, 0);
-			glVertex2f(0, 0);
+			glTexCoord2f(0f, 0f);
+			glVertex2f(0f, 0f);
 			
 			glTexCoord2f(0, texture.getHeight());
 			glVertex2f(0, height);
