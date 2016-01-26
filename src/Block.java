@@ -15,9 +15,17 @@ public class Block {
 			new Color(Color.PURPLE)
 	};
 
-	/* Private variables */
+	public static final int  
+		BLUE = 0,
+		YELLOW = 1,
+		GREEN = 2,
+		RED = 3,
+		PURPLE = 4
+	;
+	/* Protected variables */
 	/* Define the draw space that a block will take up in the grid.
-	 * This value is independent from the texture size. */
+	 * This value is independent from the texture size and will ensure
+	 * each block takes up the same space on the grid. */
 	protected final int drawHeight = 32;
 	protected final int drawWidth = 32;
 		
@@ -25,10 +33,10 @@ public class Block {
 	protected int colorID = -1;
 	/** Collection of colors that will be used for standard blocks. */
 	protected Texture texture;
-	protected int texTop;
-	protected int texHeight;
-	protected int texLeft;
-	protected int texWidth;
+	protected int texTop; protected float texTopf;
+	protected int texTopStop; protected float texTopStopf;
+	protected int texLeft; protected float texLeftf;
+	protected int texLeftStop; protected float texLeftStopf;
 	
 	/** Indicates whether the block has been checked for processing during a game loop.
 	 * This value should be reset to false before logic processing each game loop. */
@@ -42,17 +50,20 @@ public class Block {
 	
 	public Block(BlockType type) {
 		blockType = type;
-		setBlock();
+		setTextureSubset();
+		calculateDrawPoints();
 	}
 	
-	public Block(BlockType type, int colorID) {
-		blockType = type;
+	public Block(int colorID) {
+		blockType = BlockType.BLOCK;
 		// check that provided colorID is within range
 		if (colorID >= BlockColors.length) {
 			colorID = 0;
 		} else {
 			this.colorID = colorID;
 		}
+		setTextureSubset();
+		calculateDrawPoints();
 	}
 	
 	/* Class methods */
@@ -64,22 +75,43 @@ public class Block {
 		Block b = new Block();
 		b.blockType = this.blockType;
 		b.texTop = this.texTop;
-		b.texHeight = this.texHeight;
+		b.texTopf = this.texTopf;
+		b.texTopStop = this.texTopStop;
+		b.texTopStopf = this.texTopStopf;
 		b.texLeft = this.texLeft;
-		b.texWidth = this.texWidth;
+		b.texLeftf = this.texLeftf;
+		b.texLeftStop = this.texLeftStop;
+		b.texLeftStopf = this.texLeftStopf;
+		
 		b.colorID = this.colorID;
 		
 		return b;
 	}
 	
-	
-	/**Sets local variables to appropriate values for the specific block type
-	 * 
-	 */
-	private void setBlock() {
+	private void setTextureSubset() {
+		// TODO: set variables for draw range for the appropriate color block
 		switch (blockType) {
 		case BLOCK: // basic color block
-
+			switch (colorID) {
+				case BLUE:
+					
+					break;
+				case YELLOW:
+					
+					break;
+				case GREEN:
+					
+					break;
+				case RED:
+					
+					break;
+				case PURPLE:
+					
+					break;
+				default:
+					break;
+			}
+			
 			break;
 		case WEDGE:
 			
@@ -99,6 +131,19 @@ public class Block {
 		}
 	}
 	
+	private void calculateDrawPoints() {
+		texTopf = texTop / texture.getHeight();
+		texTopStopf = texTopStop / texture.getHeight();
+		texLeftf = texLeft / texture.getWidth();
+		texLeftStopf = texLeftStop / texture.getWidth();
+	}
+	
+	/**Sets local variables to appropriate values for the specific block type
+	 * 
+	 */
+	private void setBlock() {
+	}
+	
 	public void draw(float xc, float yc) {
 		// store the current model matrix
 		glPushMatrix();
@@ -113,13 +158,13 @@ public class Block {
 			glTexCoord2f(texLeft, texTop);
 			glVertex2f(0, 0);
 			
-			glTexCoord2f(0, texTop + texHeight);
+			glTexCoord2f(0, texTop + texTopStop);
 			glVertex2f(0, drawHeight);
 			
-			glTexCoord2f(texLeft + texWidth, texTop + texHeight);
+			glTexCoord2f(texLeft + texLeftStop, texTop + texTopStop);
 			glVertex2f(drawWidth, drawHeight);
 			
-			glTexCoord2f(texLeft + texWidth, 0);
+			glTexCoord2f(texLeft + texLeftStop, 0);
 			glVertex2f(drawWidth, 0);
 		}
 		glEnd();

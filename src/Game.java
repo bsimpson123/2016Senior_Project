@@ -16,7 +16,12 @@ import org.newdawn.slick.openal.SoundStore;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
-
+/**
+ * Base game class. This class is the first to run during program startup and acts
+ * as the root of the game control logic.
+ * @author John
+ *
+ */
 public class Game {
 	/* Base game variables. These are needed for the basics of the framework to function. */
 	/** Hash map for referencing textures that have been loaded. */
@@ -56,13 +61,17 @@ public class Game {
 	
 	/* game control settings */
 	/** Indicates whether the keyboard can be for input in the game */
+	@SuppressWarnings("unused")
 	private final boolean useKeyboard = true;
 	/** Indicates whether the mouse can be used for input in the game */
 	private final boolean useMouse = false;
 	/** Indicates whether a game controller can be used for input in the game */
+	@SuppressWarnings("unused")
 	private final boolean useController = false;
 	/** Set whether the mouse cursor should be captured during game play */
 	private final boolean captureMouse = true;
+	/** Indicates the currently selected option at the main menu */
+	private int mainMenuSelection = 0;
 
 	/* Game specific settings */
 	/** The text that is shown in the title of the window */
@@ -80,7 +89,10 @@ public class Game {
 	private String[] soundBackgroundResource = { };
 	
 	/** All texture objects that will be used */
-	private String[] texLoadList = { };
+	private final String[][] texLoadList = {
+			new String[] { "menubar", "media/mbar.png" },
+			new String[] { "menucursor", "media/menu_selector.png" }
+	};
 	
 	/**
 	 * Get the high resolution time in milliseconds
@@ -135,30 +147,35 @@ public class Game {
 			Display.setFullscreen(fullscreen);
 			Display.create();
 			
-			// enable textures since they are needed for sprites
-			glEnable(GL_TEXTURE_2D);
-			
-			glClearColor(0f, 0f, 0f, 0f);
-			
-			// disable the OpenGL depth test since only 2D graphics are used
-			glDisable(GL_DEPTH_TEST);
-			
+			glViewport(0, 0, width, height);
+
+			// Initialize GL matrices
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			
-			glOrtho(0, width, height, 1, -1, 1);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
-			glViewport(0, 0, width, height);
-			
-			// Enable Alpha graphics processing
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+			// Sets 2D mode; no perspective
+			glOrtho(0, width, 0, height, -1, 1);
+
+			// disable the OpenGL depth test since only 2D graphics are used
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_LIGHTING);
+			glDisable(GL_FOG);
+			glDisable(GL_CULL_FACE);
 			
-		} catch (LWJGLException le) {
+			// clear the screen
+			glClearColor(0f, 0f, 0f, 0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			// enable textures
+			glEnable(GL_TEXTURE_2D);
+			// Enable alpha processing for textures
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+		} catch (LWJGLException glErr) {
 			System.out.println("Game exiting - exception in initialization:");
-			le.printStackTrace();
+			glErr.printStackTrace();
 			System.exit(-1);
 		}
 	}
@@ -185,13 +202,19 @@ public class Game {
 		Texture tex;
 		String type; // holds file type extension
 		String source; // absolute file path to resource
-		for (String ref : texLoadList) {
-			type = ref.substring(ref.lastIndexOf('.')).toUpperCase();
+		for (String ref[] : texLoadList) {
+			
+			type = ref[1].substring(ref[1].lastIndexOf('.')).toUpperCase();
 			tex = null;
-			source = ref;
+			source = ref[1];
 			 try {
-				 source = FileResource.requestResource(ref);
-				 tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref));
+				 source = FileResource.requestResource(ref[1]);
+				 tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref[1]));
+				 if ( textureMap.putIfAbsent(ref[0], tex) != null) {
+					 // report error, attempting to add duplicate key entry
+					 System.out.printf("Attempting to load multiple textures to key [%s]", ref[0]);
+					 System.out.printf("Texture resource [%s] not loaded.", ref[1]);
+				 }
 			 } catch (IOException e) {
 				 System.out.printf("Unable to load texture resource %s\n", source);
 				 e.printStackTrace();
@@ -309,7 +332,10 @@ public class Game {
 		}
 
 		/* check and handle input controls */
-		processInput();
+		// processInput(); 
+		/* input checking is handled within individual game loops, where only the necessary
+		 * inputs will be checked.
+		 */
 		
 		/* Checks for an active menu that will be drawn in place of normal game code. 
 		 * Menu comments are only suggestions, and any number can be added. Each menu
