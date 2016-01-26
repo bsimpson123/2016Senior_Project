@@ -92,12 +92,21 @@ public class Game {
 	private final String[][] texLoadList = {
 			new String[] { "menubar", "media/mbar.png" },
 			new String[] { "menucursor", "media/menu_selector.png" },
-			new String[] { "blocksheet", "media/puzzleAssets_sheet.png" }
+			new String[] { "blocksheet", "media/puzzleAssets_sheet.png" },
+			new String[] { "menubartext", "media/mbartext.png" }
 	};
 	
 	private Sprite menuBar;
+	private Sprite menuBarWithText;
 	private Sprite cursor;
+	private int cursorPos = 0;
 	private Sprite testBlock;
+	
+	/** The time remaining (milliseconds) until the next movement input can be read. */
+	private long movementInputDelay = 0;
+	/** The minimum time (milliseconds) to wait after receiving movement input before processing further input.
+	 * This is the sensitivity of the input. */
+	private long movementInputDelayTimer = 150;   
 	
 	/**
 	 * Get the high resolution time in milliseconds
@@ -229,13 +238,18 @@ public class Game {
 			 textureMap.put(source, tex);
 		}
 		
+		// loading sprites where the complete texture will be drawn to the screen
 		menuBar = new Sprite( textureMap.get("menubar"), new int[] { 190, 48 } );
 		cursor = new Sprite( textureMap.get("menucursor"), new int[] { 39, 28 } );
-		testBlock = new Sprite (
+		menuBarWithText = new Sprite (textureMap.get("menubartext"), new int[] { 190, 48 } );
+		
+		
+		// loading sprites where only a subsection of the textures will be drawn on the screen
+		testBlock = new Sprite(
 				textureMap.get("blocksheet"), 
-				new int[] { 212, 398 }, 
-				new int[] { 32, 32},
-				new int[] { 32, 32 }
+				new int[] { 212, 398 }, // {top, left}
+				new int[] { 32, 32}, // {width, height} counting left, down
+				new int[] { 64, 64 } // draw size on screen
 				);
 		
 		
@@ -311,7 +325,8 @@ public class Game {
 			;
 		}
 		if (Global.getControlActive(Global.GameControl.DOWN)) {
-			;
+			cursorPos++;
+			
 		}
 		if (Global.getControlActive(Global.GameControl.SELECT)) {
 			;
@@ -362,17 +377,31 @@ public class Game {
 		switch (activeGameMode) {
 		case MainMenu:
 			// TODO: Main menu draw and logic
-			if (Global.getControlActive(Global.GameControl.LEFT)) { 
-				;
-			}
-			if (Global.getControlActive(Global.GameControl.RIGHT)) { 
-				;
-			}
-			if (Global.getControlActive(Global.GameControl.UP)) {
-				;
-			}
-			if (Global.getControlActive(Global.GameControl.DOWN)) {
-				;
+			
+			// This code acts as a proof-of-concept for adjusting screen output from control input
+			if (movementInputDelay <= 0) {
+				if (Global.getControlActive(Global.GameControl.LEFT)) { 
+					;
+				}
+				if (Global.getControlActive(Global.GameControl.RIGHT)) { 
+					;
+				}
+				if (Global.getControlActive(Global.GameControl.UP)) {
+					cursorPos--;
+					if (cursorPos < 0) {
+						cursorPos = 4;
+					}
+					movementInputDelay = movementInputDelayTimer;
+				}
+				if (Global.getControlActive(Global.GameControl.DOWN)) {
+					cursorPos++;
+					if (cursorPos > 4) {
+						cursorPos = 0;
+					}
+					movementInputDelay = movementInputDelayTimer;
+				}
+			} else if (movementInputDelay > 0) {
+				movementInputDelay -= delta;
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				;
@@ -384,7 +413,8 @@ public class Game {
 				;
 			}
 			menuBar.draw(100, 100);
-			cursor.draw(150, 100);
+			menuBarWithText.draw(100, 250);
+			cursor.draw(150, cursorPos * 50 + 100);
 			testBlock.draw(200, 100);
 			
 			break;
