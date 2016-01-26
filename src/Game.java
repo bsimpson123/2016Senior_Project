@@ -94,6 +94,9 @@ public class Game {
 			new String[] { "menucursor", "media/menu_selector.png" }
 	};
 	
+	private Sprite menuBar;
+	private Sprite cursor;
+	
 	/**
 	 * Get the high resolution time in milliseconds
 	 * @return The high resolution time in milliseconds
@@ -222,6 +225,11 @@ public class Game {
 			 }
 			 textureMap.put(source, tex);
 		}
+		
+		menuBar = new Sprite( textureMap.get("menubar"), new int[] { 190, 48 } );
+		cursor = new Sprite( textureMap.get("menucursor"), new int[] { 39, 28 } );
+		
+		
 		Audio sound;
 		for (String ref : soundEffectResource) {
 			sound = null;
@@ -366,6 +374,9 @@ public class Game {
 			if (Global.getControlActive(Global.GameControl.SPECIAL)) {
 				;
 			}
+			menuBar.draw(100, 100);
+			cursor.draw(150, 100);
+			
 			break;
 		case BlockMatchStandard:
 			// TODO: function call to class handling this game mode.
@@ -374,15 +385,6 @@ public class Game {
 			break;
 		}
 		
-		
-		
-		/* move and draw all entities */
-
-		/* remove any entity that has been marked for removal */
-
-		/* add new Entities that were created this loop */
-
-
 		// an exit key is strongly recommended if mouse capture is enabled
 		if ( Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
 			gameRunning = false; // indicate that the game is no longer running

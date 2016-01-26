@@ -8,37 +8,50 @@ import org.newdawn.slick.opengl.Texture;
  *
  */
 public class Sprite {
-	protected float width, height;
+	protected final float width, height, left, top;
+	protected final int[] drawSpace;
 	/** The texture containing the image used for the sprite */
-	protected Texture texture;
+	protected final Texture texture;
 	
 	/**
-	 * 
-	 * @param tex The Texture object containing the texture that needs to be drawn to the screen
-	 * @param left The leftmost pixel that will be drawn to the screen
-	 * @param top The topmost pixel that will be drawn to the screen
-	 * @param width The pixel width of the part of the texture that needs to be drawn
-	 * @param height The pixel height of the part of the texture that needs to be drawn
+	 * Defines a sprite for drawing on the screen using a subsection of the provided texture
+	 * @param tex The Texture object containing the sub-texture to be drawn 
+	 * @param texPos 2-element array indicating the pixel distance from the left and top, respectively, 
+	 * where the image to be drawn is located within the texture
+	 * @param texSize 2-element array indicating the pixel distance width and height, respectively, 
+	 * of the image to be drawn within the texture.
+	 * @param drawSize 2-element array defining width and height that the sprite will take up on the screen when drawn.
+	 * This value does not have to correlate to texture or sub-texture dimensions.
 	 */
-	public Sprite(Texture tex, int left, int top, int width, int height) {
+	public Sprite(Texture tex, int[] texPos, int[] texSize, int[] drawSize) {
 		if (tex == null) { throw new NullPointerException("Undefined texture object passed to Sprite constructor."); }
 		texture = tex;
-		width = texture.getImageWidth();
-		height = texture.getImageHeight();
+		this.width = (float) texSize[0] / texture.getImageWidth();
+		this.height = (float) texSize[1] / texture.getImageHeight();
+		this.top = (float) texPos[1] / texture.getImageHeight();
+		this.left = (float) texPos[0] / texture.getImageWidth();
+		this.drawSpace = drawSize.clone();
 	}
 	
-	public Sprite(Texture tex) {
-		
+	/**
+	 * Defines a sprite for drawing on the screen using all of the provided texture.
+	 * @param tex The Texture object containing the texture to draw
+	 * @param drawSize 2-element array defining width and height that the sprite will take up on the screen when drawn.
+	 * This value does not have to correlate to texture dimensions.
+	 */
+	public Sprite(Texture tex, int[] drawSize) {
+		texture = tex;
+		width = 1.0f;
+		height = 1.0f;
+		top = 0.0f;
+		left = 0.0f;
+		this.drawSpace = drawSize.clone();
 	}
 	
-	public void setDrawDimensions(float[] dim) {
-		width = dim[0];
-		height = dim[1];
-	}
-		
 	public void draw(int x, int y)  {
 		// store the current model matrix
 		glPushMatrix();
+		glMatrixMode(GL_MODELVIEW);
 		// bind the texture for drawing
 		texture.bind();
 		// translate to the right location and prepare to draw
@@ -47,17 +60,17 @@ public class Sprite {
 		// draw a quad textured to match the sprite
 		glBegin(GL_QUADS);
 		{
-			glTexCoord2f(0f, 0f);
-			glVertex2f(0f, 0f);
+			glTexCoord2f(left, top);
+			glVertex2i(0, 0);
 			
-			glTexCoord2f(0, texture.getHeight());
-			glVertex2f(0, height);
+			glTexCoord2f(left, top + height);
+			glVertex2i(0, drawSpace[1]);
 			
-			glTexCoord2f(texture.getWidth(), texture.getHeight());
-			glVertex2f(width, height);
+			glTexCoord2f(left + width, top + height);
+			glVertex2i(drawSpace[0], drawSpace[1]);
 			
-			glTexCoord2f(texture.getWidth(), 0);
-			glVertex2f(width, 0);
+			glTexCoord2f(left + width, top);
+			glVertex2i(drawSpace[0], 0);
 		}
 		glEnd();
 		
