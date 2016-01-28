@@ -10,6 +10,8 @@ import org.lwjgl.input.Keyboard;
  */
 public class Global {
 	public static Random rand = new Random();
+	/** The time in ms since the last frame update. */
+	public static long delta = 0;
 	
 	public enum GameControl {
 		RIGHT, LEFT, UP, DOWN,

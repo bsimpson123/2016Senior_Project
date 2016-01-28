@@ -10,6 +10,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.openal.SoundStore;
@@ -247,9 +248,9 @@ public class Game {
 		// loading sprites where only a subsection of the textures will be drawn on the screen
 		testBlock = new Sprite(
 				textureMap.get("blocksheet"), 
-				new int[] { 212, 398 }, // {top, left}
+				new int[] { 212, 431 }, // {top, left}
 				new int[] { 32, 32}, // {width, height} counting left, down
-				new int[] { 64, 64 } // draw size on screen
+				new int[] { 32, 32 } // draw size on screen
 				);
 		
 		
@@ -352,9 +353,9 @@ public class Game {
 		 * this will be used to calculate how far the entities
 		 * should move this loop  */
 		/* The time in milliseconds since the last update */
-		long delta = getTime() - lastLoopTime;
+		Global.delta = getTime() - lastLoopTime;
 		lastLoopTime = getTime();
-		lastFpsTime += delta;
+		lastFpsTime += Global.delta;
 		fps++;
 		// update the FPS counter if a second has passed
 		if (lastFpsTime >= 1000) {
@@ -401,7 +402,7 @@ public class Game {
 					movementInputDelay = movementInputDelayTimer;
 				}
 			} else if (movementInputDelay > 0) {
-				movementInputDelay -= delta;
+				movementInputDelay -= Global.delta;
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				;
