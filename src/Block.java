@@ -8,8 +8,8 @@ public class Block {
 		BLOCK, WEDGE, STAR, TRASH, ROCK
 	}
 
-	private static Sprite ColorBlocks[];
-	//private static Sprite 
+	protected static Sprite blockColor[];
+	protected static Sprite blockWedge, blockStar, blockTrash, blockRock; 
 	
 	public static final int  
 		BLUE = 0,
@@ -29,17 +29,13 @@ public class Block {
 	
 	protected BlockType blockType;
 	protected Sprite block;
-	protected int colorID = -1;
+	protected int colorID = 0;
 	/** Collection of colors that will be used for standard blocks. */
-	protected Texture texture;
-	protected int texTop; protected float texTopf;
-	protected int texTopStop; protected float texTopStopf;
-	protected int texLeft; protected float texLeftf;
-	protected int texLeftStop; protected float texLeftStopf;
 	
 	/** Indicates whether the block has been checked for processing during a game loop.
 	 * This value should be reset to false before logic processing each game loop. */
-	private boolean checked = false;
+	protected boolean checked = false;
+	protected boolean clearMark = false;
 	
 	/* Constructors */
 	/**
@@ -47,10 +43,12 @@ public class Block {
 	 */
 	private Block() { }
 	
+	/**
+	 * 
+	 * @param type
+	 */
 	public Block(BlockType type) {
 		blockType = type;
-		setTextureSubset();
-		calculateDrawPoints();
 	}
 	
 	public Block(int colorID) {
@@ -61,42 +59,48 @@ public class Block {
 		} else {
 			this.colorID = colorID;
 		}
-		setTextureSubset();
-		calculateDrawPoints();
 	}
 	
 	/* Class methods */
 	
 	public static void initializeBlocks(HashMap<String,Texture> texMap) {
-		ColorBlocks = new Sprite[5];
-		ColorBlocks[BLUE] = new Sprite(
-				texMap.get("blocksheet"),
-				new int[] {  },
+		blockColor = new Sprite[5];
+		Texture blockTex = texMap.get("blocksheet");
+		blockColor[BLUE] = new Sprite(
+				blockTex,
+				new int[] { 212, 266 },
 				new int[] { 32, 32 },
 				new int[] { 32, 32 }
 			);
-		ColorBlocks[YELLOW] = new Sprite(
-				texMap.get("blocksheet"),
-				new int[] {  },
+		blockColor[YELLOW] = new Sprite(
+				blockTex,
+				new int[] { 212, 332 },
 				new int[] { 32, 32 },
 				new int[] { 32, 32 }
 			);
-		ColorBlocks[GREEN] = new Sprite(
-				texMap.get("blocksheet"),
-				new int[] {  },
+		blockColor[GREEN] = new Sprite(
+				blockTex,
+				new int[] { 212, 299 },
 				new int[] { 32, 32 },
 				new int[] { 32, 32 }
 			);
-		ColorBlocks[RED] = new Sprite(
-				texMap.get("blocksheet"),
+		blockColor[RED] = new Sprite(
+				blockTex,
 				new int[] { 212, 431 },
 				new int[] { 32, 32 },
 				new int[] { 32, 32 }
 			);
-		ColorBlocks[PURPLE] = new Sprite(
-				texMap.get("blocksheet"),
-				new int[] {  },
+		blockColor[PURPLE] = new Sprite(
+				blockTex,
+				new int[] { 240, 33 },
 				new int[] { 32, 32 },
+				new int[] { 32, 32 }
+			);
+		blockTex = texMap.get("yellowtiles");
+		blockStar = new Sprite(
+				blockTex,
+				new int[] {  },
+				new int[] {  },
 				new int[] { 32, 32 }
 			);
 	}
@@ -107,104 +111,28 @@ public class Block {
 	public Block clone() {
 		Block b = new Block();
 		b.blockType = this.blockType;
-		b.texTop = this.texTop;
-		b.texTopf = this.texTopf;
-		b.texTopStop = this.texTopStop;
-		b.texTopStopf = this.texTopStopf;
-		b.texLeft = this.texLeft;
-		b.texLeftf = this.texLeftf;
-		b.texLeftStop = this.texLeftStop;
-		b.texLeftStopf = this.texLeftStopf;
-		
 		b.colorID = this.colorID;
+		b.block = this.block;
 		
 		return b;
 	}
 	
-	private void setTextureSubset() {
-		// TODO: set variables for draw range for the appropriate color block
+	public void draw(int xc, int yc) {
 		switch (blockType) {
-		case BLOCK: // basic color block
-			switch (colorID) {
-				case BLUE:
-					
-					break;
-				case YELLOW:
-					
-					break;
-				case GREEN:
-					
-					break;
-				case RED:
-					
-					break;
-				case PURPLE:
-					
-					break;
-				default:
-					break;
-			}
-			
-			break;
-		case WEDGE:
-			
-			break;
-		case STAR:
-			
-			break;
-		case TRASH:
-			
-			break;
-		case ROCK:
-			
-			break;
-		default: // should not happen
-			
-			break;	
+			case BLOCK:
+				blockColor[colorID].draw(xc, yc);
+			case ROCK:
+				
+				break;
+			case STAR:
+				break;
+			case TRASH:
+				break;
+			case WEDGE:
+				break;
+			default:
+				break;
 		}
-	}
-	
-	private void calculateDrawPoints() {
-		texTopf = texTop / texture.getHeight();
-		texTopStopf = texTopStop / texture.getHeight();
-		texLeftf = texLeft / texture.getWidth();
-		texLeftStopf = texLeftStop / texture.getWidth();
-	}
-	
-	/**Sets local variables to appropriate values for the specific block type
-	 * 
-	 */
-	private void setBlock() {
-	}
-	
-	public void draw(float xc, float yc) {
-		// store the current model matrix
-		glPushMatrix();
-		// bind to the appropriate texture for this sprite
-		texture.bind();
-		// translate to the right location and prepare to draw
-		glTranslatef(xc, yc, 0); // texture will be drawn from corner set at ( x, y )
-		
-		// draw a quad textured to match the sprite
-		glBegin(GL_QUADS);
-		{
-			
-			glTexCoord2f(texLeft, texTop);
-			glVertex2f(0, 0);
-			
-			glTexCoord2f(0, texTop + texTopStop);
-			glVertex2f(0, drawHeight);
-			
-			glTexCoord2f(texLeft + texLeftStop, texTop + texTopStop);
-			glVertex2f(drawWidth, drawHeight);
-			
-			glTexCoord2f(texLeft + texLeftStop, 0);
-			glVertex2f(drawWidth, 0);
-		}
-		glEnd();
-		
-		// restore the model view matrix to prevent contamination
-		glPopMatrix();
 	}
 	
 	/**

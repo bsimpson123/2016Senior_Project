@@ -89,11 +89,12 @@ public class Game {
 			new String[] { "menucursor", "media/menu_selector.png" },
 			new String[] { "blocksheet", "media/puzzleAssets_sheet.png" },
 			new String[] { "menubartext", "media/mbartext.png" },
-			new String[] { "bluesheet", "media/blueSheet.png" }, 
-			new String[] { "greensheet", "media/greenSheet.png" },
-			new String[] { "redsheet", "media/redSheet.png" },
-			new String[] { "yellowsheet", "media/yellowSheet.png" },
-			new String[] { "greysheet", "media/greysheet.png" }
+			new String[] { "blue_ui", "media/blueSheet.png" }, 
+			new String[] { "green_ui", "media/greenSheet.png" },
+			new String[] { "red_ui", "media/redSheet.png" },
+			new String[] { "yellow_ui", "media/yellowSheet.png" },
+			new String[] { "grey_ui", "media/greysheet.png" },
+			new String[] { "yellowtiles", "spritesheet_tilesYellow.png" }
 	};
 	
 	/* Menu display and control variables */
@@ -257,39 +258,39 @@ public class Game {
 			); //*/
 		// TODO: Load all Sprite objects for menu navigation
 		optionFrameTop = new Sprite(
-				textureMap.get("bluesheet"),
+				textureMap.get("blue_ui"),
 				new int[] { 0, 49 },
 				new int[] { 190, 20 },
 				new int[] { 250, 20 }
 			);
 		optionFrameMid = new Sprite(
-				textureMap.get("bluesheet"),
+				textureMap.get("blue_ui"),
 				new int[] { 0, 59 },
 				new int[] { 190, 20 },
 				new int[] { 250, 300 }
 			);
 		optionFrameBottom = new Sprite(
-				textureMap.get("bluesheet"),
+				textureMap.get("blue_ui"),
 				new int[] { 0, 69 },
 				new int[] { 190, -20 },
 				new int[] { 250, 20 }
 			);
 		
 		optionBox = new Sprite(
-				textureMap.get("greensheet"),
+				textureMap.get("green_ui"),
 				new int[] { 0, 0 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		
 		selector[0] = new Sprite( // left-side arrow
-				textureMap.get("greysheet"),
+				textureMap.get("grey_ui"),
 				new int[] { 39, 478 },
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
 		selector[1] = new Sprite( // right-side arrow
-				textureMap.get("greysheet"),
+				textureMap.get("grey_ui"),
 				new int[] { 0, 478 },
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
@@ -311,6 +312,8 @@ public class Game {
 			}
 		}
 		
+		// TODO: add static class initializers
+		Block.initializeBlocks(textureMap);
 		
 	}
 	
