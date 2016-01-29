@@ -24,8 +24,7 @@ public class Block {
 	/* Define the draw space that a block will take up in the grid.
 	 * This value is independent from the texture size and will ensure
 	 * each block takes up the same space on the grid. */
-	protected final int drawHeight = 32;
-	protected final int drawWidth = 32;
+	protected static final int[] blockDrawSpace = new int[] { 32, 32 };
 	
 	protected BlockType blockType;
 	protected Sprite block;
@@ -70,39 +69,45 @@ public class Block {
 				blockTex,
 				new int[] { 212, 266 },
 				new int[] { 32, 32 },
-				new int[] { 32, 32 }
+				blockDrawSpace
 			);
 		blockColor[YELLOW] = new Sprite(
 				blockTex,
 				new int[] { 212, 332 },
 				new int[] { 32, 32 },
-				new int[] { 32, 32 }
+				blockDrawSpace
 			);
 		blockColor[GREEN] = new Sprite(
 				blockTex,
 				new int[] { 212, 299 },
 				new int[] { 32, 32 },
-				new int[] { 32, 32 }
+				blockDrawSpace
 			);
 		blockColor[RED] = new Sprite(
 				blockTex,
 				new int[] { 212, 431 },
 				new int[] { 32, 32 },
-				new int[] { 32, 32 }
+				blockDrawSpace
 			);
 		blockColor[PURPLE] = new Sprite(
 				blockTex,
 				new int[] { 240, 33 },
 				new int[] { 32, 32 },
-				new int[] { 32, 32 }
+				blockDrawSpace
 			);
 		blockTex = texMap.get("yellowtiles");
-		/*blockStar = new Sprite(
+		blockStar = new Sprite(
 				blockTex,
-				new int[] {  },
-				new int[] {  },
-				new int[] { 32, 32 }
-			);//*/
+				new int[] { 1036, 260 },
+				new int[] { 128, 128 },
+				blockDrawSpace
+			);
+		blockWedge = new Sprite(
+				blockTex,
+				new int[] { 1036, 874 },
+				new int[] { 128, 128 },
+				blockDrawSpace
+			);
 	}
 	
 	/** 

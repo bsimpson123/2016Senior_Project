@@ -9,7 +9,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-//import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.openal.SoundStore;
@@ -50,13 +49,13 @@ public class Game {
 	 * Additional values can be added as new game modes are developed.
 	 * @author John Ojala
 	 */
-	public enum GameMode {
+	public enum GameControl {
 		MainMenu,
 		BlockMatchStandard
 	}
 	
 	/** The current game mode within the main logic loop. */
-	GameMode activeGameMode = GameMode.MainMenu;
+	GameControl activeGameMode = GameControl.MainMenu;
 	
 	/* game control settings */
 	/** Indicates whether the keyboard can be for input in the game */
@@ -105,11 +104,15 @@ public class Game {
 	private Sprite optionFrameBottom;
 	private Sprite optionBox;
 	
+	private Thread gameModeLoader = null;
+	
 	/** The time remaining (milliseconds) until the next movement input can be read. */
 	private long movementInputDelay = 0;
 	/** The minimum time (milliseconds) to wait after receiving movement input before processing further input.
 	 * This is the sensitivity of the input. */
 	private long movementInputDelayTimer = 150;   
+	
+	private GameMode game;
 	
 	/**
 	 * Get the high resolution time in milliseconds
@@ -427,12 +430,8 @@ public class Game {
 			
 			// This code acts as a proof-of-concept for adjusting screen output from control input
 			if (movementInputDelay <= 0) {
-				if (Global.getControlActive(Global.GameControl.LEFT)) { 
-					;
-				}
-				if (Global.getControlActive(Global.GameControl.RIGHT)) { 
-					;
-				}
+				if (Global.getControlActive(Global.GameControl.LEFT)) { ; }
+				if (Global.getControlActive(Global.GameControl.RIGHT)) { ; }
 				if (Global.getControlActive(Global.GameControl.UP)) {
 					cursorPos--;
 					if (cursorPos < 0) {
@@ -453,7 +452,7 @@ public class Game {
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0:
-						
+						game = new BlockBreakStandard();
 						break;
 					case 1:
 						
@@ -494,6 +493,33 @@ public class Game {
 			// TODO: function call to class handling this game mode.
 			break;
 		default:
+			switch(game.getState()) { 
+				case NOT_LOADED:
+					gameModeLoader = new Thread(new GameModeLoader(textureMap, game));
+					break;
+				case LOADING_ASSETS:
+					// TODO: game mode loading indicator
+				case LOADING_DONE:
+					try {
+						gameModeLoader.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					// break statement is intentionally missing here
+				case READY:
+					game.run();
+					break;
+				case UNLOADING:
+					// TODO: handle unloading display
+					game.cleanup();
+					break;
+				case FINALIZED:
+					game = null;
+					activeGameMode = GameControl.MainMenu;
+					break;
+				default:
+					break;
+			}
 			break;
 		}
 		
@@ -580,4 +606,18 @@ public class Game {
 
 	}
 
+}
+
+class GameModeLoader implements Runnable {
+	private final HashMap<String, Texture> textureMap;
+	private final GameMode mode;
+	
+	public GameModeLoader(HashMap<String, Texture> texMap, GameMode gm) {
+		textureMap = texMap;
+		mode = gm;
+	}
+	
+	public void run() {
+		mode.initialize(textureMap);
+	}
 }

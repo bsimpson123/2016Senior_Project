@@ -6,11 +6,24 @@ public class BlockBreakStandard implements GameMode {
 	protected HashMap<String, Texture> rootTexMap = null;
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected Block[][] grid = new Block[20][30];
+	
+	
+	public BlockBreakStandard() {
+		// TODO: set or load any custom environment variables
+		// do not load assets at this point
+	}
+	
 	@Override
 	public void initialize(HashMap<String, Texture> textureMap) {
+		currentState = LoadState.LOADING_ASSETS;
 		rootTexMap = textureMap;
 		// TODO Auto-generated method stub
 
+		
+		
+		// Update mode state when asset loading is completed
+		currentState = LoadState.LOADING_DONE;
+		return;
 	}
 
 	@Override
@@ -21,7 +34,8 @@ public class BlockBreakStandard implements GameMode {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-
+		currentState = LoadState.READY;
+		
 	}
 
 	@Override
