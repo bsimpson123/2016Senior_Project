@@ -2,6 +2,12 @@ import java.util.Random;
 import java.util.HashMap;
 import org.lwjgl.input.Keyboard;
 
+/* 
+ * When adding variables and functions to this class, remember to always mark them
+ * as public and static, or they will not be accessible to the rest of the program.
+ */
+
+
 /**
  * Container class for variables and functions that are
  * global in scope.
@@ -10,8 +16,17 @@ import org.lwjgl.input.Keyboard;
  */
 public class Global {
 	public static Random rand = new Random();
+	/** The draw space (width) of the OpenGL environment. */
+	public static final int glEnvWidth = 800;
+	/** The draw space (height) of the OpenGL environment. */
+	public static final int glEnvHeight = 600;
 	/** The time in ms since the last frame update. */
 	public static long delta = 0;
+	/** The pixel height of the game window, defaults to the same size as the OpenGL environment. */
+	public static int winHeight = glEnvWidth;
+	/** The pixel width of the game window, defaults to the same size as the OpenGL environment. */
+	public static int winWidth = glEnvHeight;
+	
 	
 	public enum GameControl {
 		RIGHT, LEFT, UP, DOWN,
@@ -30,6 +45,7 @@ public class Global {
 	 * false if no keys assigned to the control as pressed. 
 	 */
 	public static boolean getControlActive(GameControl control) {
+		
 		for (int kbKey : keyMap.keySet()) {
 			if (keyMap.get(kbKey) == control) {
 				if (Keyboard.isKeyDown(kbKey)) { return true; }

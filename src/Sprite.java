@@ -25,6 +25,9 @@ public class Sprite {
 	 */
 	public Sprite(Texture tex, int[] texPos, int[] texSize, int[] drawSize) {
 		if (tex == null) { throw new NullPointerException("Undefined texture object passed to Sprite constructor."); }
+		if (texPos.length < 2 || texSize.length < 2 || drawSize.length < 2) {
+			throw new IllegalArgumentException("Invalid array dimensions provided to Sprite constructor.");
+		}
 		texture = tex;
 		this.width = (float) texSize[0] / texture.getImageWidth();
 		this.height = (float) texSize[1] / texture.getImageHeight();

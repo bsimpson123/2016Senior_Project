@@ -77,10 +77,6 @@ public class Game {
 	/* Game specific settings */
 	/** The text that is shown in the title of the window */
 	private final String WINDOW_TITLE = "Block Breaker";
-	/** The draw width of the OpenGL window area */
-	private int width = 800;
-	/** The draw height of the OpenGL window area */
-	private int height = 600;
 	
 	/* Define sound variables */ 
 	// TODO: Add all sound/music variable objects
@@ -136,10 +132,10 @@ public class Game {
 	private boolean setDisplayMode() {
 		try {
 			// get modes
-			DisplayMode [] dm = org.lwjgl.util.Display.getAvailableDisplayModes(width, height, -1, -1, -1, -1, 60, 60);
+			DisplayMode [] dm = org.lwjgl.util.Display.getAvailableDisplayModes(Global.winWidth, Global.winHeight, -1, -1, -1, -1, 60, 60);
 			org.lwjgl.util.Display.setDisplayMode(dm, new String[] {
-					"width=" + width, 
-					"height=" + height,
+					"width=" + Global.winWidth, 
+					"height=" + Global.winHeight,
 					"freq=" + 60,
 					"bpp=" + org.lwjgl.opengl.Display.getDisplayMode().getBitsPerPixel()
 			});
@@ -162,13 +158,13 @@ public class Game {
 			Display.setFullscreen(fullscreen);
 			Display.create();
 			
-			glViewport(0, 0, width, height);
+			glViewport(0, 0, Global.glEnvWidth, Global.glEnvHeight);
 
 			// Initialize GL matrices
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			// Sets 2D mode; no perspective
-			glOrtho(0, width, height, 0, -1, 1);
+			glOrtho(0, Global.glEnvWidth, Global.glEnvHeight, 0, -1, 1);
 
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
