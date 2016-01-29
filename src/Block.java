@@ -97,12 +97,12 @@ public class Block {
 				new int[] { 32, 32 }
 			);
 		blockTex = texMap.get("yellowtiles");
-		blockStar = new Sprite(
+		/*blockStar = new Sprite(
 				blockTex,
 				new int[] {  },
 				new int[] {  },
 				new int[] { 32, 32 }
-			);
+			);//*/
 	}
 	
 	/** 
