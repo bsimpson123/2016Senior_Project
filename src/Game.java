@@ -2,7 +2,6 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Stack;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -10,7 +9,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
+//import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.openal.SoundStore;
@@ -21,12 +20,11 @@ import org.newdawn.slick.util.ResourceLoader;
  * Base game class. This class is the first to run during program startup and acts
  * as the root of the game control logic.
  * @author John
- *
  */
 public class Game {
 	/* Base game variables. These are needed for the basics of the framework to function. */
 	/** Hash map for referencing textures that have been loaded. */
-	private HashMap<String, Texture> textureMap = new HashMap<String, Texture>();
+	private HashMap<String, Texture> textureMap = new HashMap<String, Texture>(15);
 	/** Hash map for referencing audio files that have been loaded. */
 	private HashMap<String, Audio> soundMap = new HashMap<String, Audio>();
 	/** Indicates whether the game is to continue running and processing logic. Set to false to end the program. */
@@ -98,13 +96,8 @@ public class Game {
 			new String[] { "greysheet", "media/greysheet.png" }
 	};
 	
-	private Sprite menuBar;
-	private Sprite menuBarWithText;
-	private Sprite cursor;
-	private int cursorPos = 0;
-	private Sprite testBlock;
-	
 	/* Menu display and control variables */
+	private int cursorPos = 0;
 	private Sprite[] selector = new Sprite[2];
 	private Sprite optionFrameTop;
 	private Sprite optionFrameMid;
@@ -218,6 +211,7 @@ public class Game {
 		Global.setKeyMap(Global.GameControl.RIGHT, Keyboard.KEY_RIGHT);
 		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_X);
 		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_RETURN);
+		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_SPACE);
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_W);
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_ESCAPE);
 		
@@ -247,20 +241,21 @@ public class Game {
 			 textureMap.put(source, tex);
 		}
 		
-		// loading sprites where the complete texture will be drawn to the screen
-		menuBar = new Sprite( textureMap.get("menubar"), new int[] { 190, 48 } );
-		cursor = new Sprite( textureMap.get("menucursor"), new int[] { 39, 28 } );
-		menuBarWithText = new Sprite (textureMap.get("menubartext"), new int[] { 190, 48 } );
-		
-		
-		// loading sprites where only a subsection of the textures will be drawn on the screen
-		testBlock = new Sprite(
-				textureMap.get("blocksheet"), 
-				new int[] { 212, 431 }, // {top, left}
-				new int[] { 32, 32}, // {width, height} counting left, down
-				new int[] { 32, 32 } // draw size on screen
+		// Example code for loading textures with Sprite objects
+		/* Loading sprites where the complete texture will be drawn to the screen
+		menuBar = new Sprite( 
+				textureMap.get("menubar"), // texture reference name
+				new int[] { 190, 48 } // draw size in the GL environment
 			);
 		
+		 * Loading sprites where only a subsection of the textures will be drawn on the screen
+		testBlock = new Sprite(
+				textureMap.get("blocksheet"), // texture reference name
+				new int[] { 212, 431 }, // {top, left} stating point
+				new int[] { 32, 32}, // {width, height} counting left, down
+				new int[] { 32, 32 } // draw size in the GL environment
+			); //*/
+		// TODO: Load all Sprite objects for menu navigation
 		optionFrameTop = new Sprite(
 				textureMap.get("bluesheet"),
 				new int[] { 0, 49 },
@@ -345,6 +340,7 @@ public class Game {
 		return null;
 	}
 	
+	/*
 	private void processInput() {
 		// Input needs will vary between game modes, and menus within each mode, so input handling will
 		// need to be checked in each specific section.
@@ -353,7 +349,7 @@ public class Game {
 		 * Can only call getDX and getDY once each per game loop.
 		 * Additional calls will return 0 or a very small value as there will have been 
 		 * zero or minimal movement of the mouse within the specific game loop. 
-		 */
+		 *
 		if (useMouse) {
 			mouseX = Mouse.getDX();
 			mouseY = Mouse.getDY();
@@ -386,7 +382,7 @@ public class Game {
 			;
 		}
 		
-	}
+	} //*/
 	
 	/**
 	 * Determine the delay time since the last frame render, get the player input,
@@ -452,10 +448,20 @@ public class Game {
 				movementInputDelay -= Global.delta;
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
-				;
+				switch (cursorPos) {
+					case 0:
+						
+						break;
+					case 1:
+						
+						break;
+					case 2:
+						gameRunning = false;
+						break;
+				}
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) {
-				gameRunning = false;
+				cursorPos = 2;
 			}
 			if (Global.getControlActive(Global.GameControl.SPECIAL)) {
 				;
@@ -558,7 +564,11 @@ public class Game {
 			renderGL();
 			Display.update();
 		}
-		
+		// release all textures loaded
+		for (String ref : textureMap.keySet()) {
+			textureMap.get(ref).release();
+		}
+		textureMap.clear();
 	}
 	
 	public static void main(String[] args) {

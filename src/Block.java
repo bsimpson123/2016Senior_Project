@@ -1,5 +1,5 @@
+import java.util.HashMap;
 import static org.lwjgl.opengl.GL11.*;
-import org.lwjgl.util.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public class Block {
@@ -7,14 +7,10 @@ public class Block {
 	public enum BlockType {
 		BLOCK, WEDGE, STAR, TRASH, ROCK
 	}
-	public static Color[] BlockColors = new Color[] {
-			new Color(Color.BLUE),
-			new Color(Color.YELLOW),
-			new Color(Color.GREEN),
-			new Color(Color.RED),
-			new Color(Color.PURPLE)
-	};
 
+	private static Sprite ColorBlocks[];
+	//private static Sprite 
+	
 	public static final int  
 		BLUE = 0,
 		YELLOW = 1,
@@ -22,14 +18,17 @@ public class Block {
 		RED = 3,
 		PURPLE = 4
 	;
+	public static final int blockColorCount = 5;
+	
 	/* Protected variables */
 	/* Define the draw space that a block will take up in the grid.
 	 * This value is independent from the texture size and will ensure
 	 * each block takes up the same space on the grid. */
 	protected final int drawHeight = 32;
 	protected final int drawWidth = 32;
-		
+	
 	protected BlockType blockType;
+	protected Sprite block;
 	protected int colorID = -1;
 	/** Collection of colors that will be used for standard blocks. */
 	protected Texture texture;
@@ -57,7 +56,7 @@ public class Block {
 	public Block(int colorID) {
 		blockType = BlockType.BLOCK;
 		// check that provided colorID is within range
-		if (colorID >= BlockColors.length) {
+		if (colorID >= blockColorCount) {
 			colorID = 0;
 		} else {
 			this.colorID = colorID;
@@ -67,6 +66,40 @@ public class Block {
 	}
 	
 	/* Class methods */
+	
+	public static void initializeBlocks(HashMap<String,Texture> texMap) {
+		ColorBlocks = new Sprite[5];
+		ColorBlocks[BLUE] = new Sprite(
+				texMap.get("blocksheet"),
+				new int[] {  },
+				new int[] { 32, 32 },
+				new int[] { 32, 32 }
+			);
+		ColorBlocks[YELLOW] = new Sprite(
+				texMap.get("blocksheet"),
+				new int[] {  },
+				new int[] { 32, 32 },
+				new int[] { 32, 32 }
+			);
+		ColorBlocks[GREEN] = new Sprite(
+				texMap.get("blocksheet"),
+				new int[] {  },
+				new int[] { 32, 32 },
+				new int[] { 32, 32 }
+			);
+		ColorBlocks[RED] = new Sprite(
+				texMap.get("blocksheet"),
+				new int[] { 212, 431 },
+				new int[] { 32, 32 },
+				new int[] { 32, 32 }
+			);
+		ColorBlocks[PURPLE] = new Sprite(
+				texMap.get("blocksheet"),
+				new int[] {  },
+				new int[] { 32, 32 },
+				new int[] { 32, 32 }
+			);
+	}
 	
 	/** 
 	 * Creates a copy of the object block with default block state values.
