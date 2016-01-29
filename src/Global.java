@@ -23,9 +23,9 @@ public class Global {
 	/** The time in ms since the last frame update. */
 	public static long delta = 0;
 	/** The pixel height of the game window, defaults to the same size as the OpenGL environment. */
-	public static int winHeight = glEnvWidth;
+	public static int winHeight = glEnvHeight;
 	/** The pixel width of the game window, defaults to the same size as the OpenGL environment. */
-	public static int winWidth = glEnvHeight;
+	public static int winWidth = glEnvWidth;
 	
 	
 	public enum GameControl {

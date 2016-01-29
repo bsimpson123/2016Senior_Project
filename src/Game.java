@@ -90,7 +90,12 @@ public class Game {
 			new String[] { "menubar", "media/mbar.png" },
 			new String[] { "menucursor", "media/menu_selector.png" },
 			new String[] { "blocksheet", "media/puzzleAssets_sheet.png" },
-			new String[] { "menubartext", "media/mbartext.png" }
+			new String[] { "menubartext", "media/mbartext.png" },
+			new String[] { "bluesheet", "media/blueSheet.png" }, 
+			new String[] { "greensheet", "media/greenSheet.png" },
+			new String[] { "redsheet", "media/redSheet.png" },
+			new String[] { "yellowsheet", "media/yellowSheet.png" },
+			new String[] { "greysheet", "media/greysheet.png" }
 	};
 	
 	private Sprite menuBar;
@@ -98,6 +103,13 @@ public class Game {
 	private Sprite cursor;
 	private int cursorPos = 0;
 	private Sprite testBlock;
+	
+	/* Menu display and control variables */
+	private Sprite[] selector = new Sprite[2];
+	private Sprite optionFrameTop;
+	private Sprite optionFrameMid;
+	private Sprite optionFrameBottom;
+	private Sprite optionBox;
 	
 	/** The time remaining (milliseconds) until the next movement input can be read. */
 	private long movementInputDelay = 0;
@@ -247,7 +259,46 @@ public class Game {
 				new int[] { 212, 431 }, // {top, left}
 				new int[] { 32, 32}, // {width, height} counting left, down
 				new int[] { 32, 32 } // draw size on screen
-				);
+			);
+		
+		optionFrameTop = new Sprite(
+				textureMap.get("bluesheet"),
+				new int[] { 0, 49 },
+				new int[] { 190, 20 },
+				new int[] { 250, 20 }
+			);
+		optionFrameMid = new Sprite(
+				textureMap.get("bluesheet"),
+				new int[] { 0, 59 },
+				new int[] { 190, 20 },
+				new int[] { 250, 300 }
+			);
+		optionFrameBottom = new Sprite(
+				textureMap.get("bluesheet"),
+				new int[] { 0, 69 },
+				new int[] { 190, -20 },
+				new int[] { 250, 20 }
+			);
+		
+		optionBox = new Sprite(
+				textureMap.get("greensheet"),
+				new int[] { 0, 0 },
+				new int[] { 190, 48 },
+				new int[] { 190, 48 }
+			);
+		
+		selector[0] = new Sprite( // left-side arrow
+				textureMap.get("greysheet"),
+				new int[] { 39, 478 },
+				new int[] { 38, 30 },
+				new int[] { 38, 30 }
+			);
+		selector[1] = new Sprite( // right-side arrow
+				textureMap.get("greysheet"),
+				new int[] { 0, 478 },
+				new int[] { 38, 30 },
+				new int[] { 38, 30 }
+			);
 		
 		
 		Audio sound;
@@ -386,13 +437,13 @@ public class Game {
 				if (Global.getControlActive(Global.GameControl.UP)) {
 					cursorPos--;
 					if (cursorPos < 0) {
-						cursorPos = 4;
+						cursorPos = 2;
 					}
 					movementInputDelay = movementInputDelayTimer;
 				}
 				if (Global.getControlActive(Global.GameControl.DOWN)) {
 					cursorPos++;
-					if (cursorPos > 4) {
+					if (cursorPos > 2) {
 						cursorPos = 0;
 					}
 					movementInputDelay = movementInputDelayTimer;
@@ -409,10 +460,25 @@ public class Game {
 			if (Global.getControlActive(Global.GameControl.SPECIAL)) {
 				;
 			}
+			/*
 			menuBar.draw(100, 100);
 			menuBarWithText.draw(100, 250);
 			cursor.draw(150, cursorPos * 50 + 100);
 			testBlock.draw(200, 100);
+			//*/
+			// Draw the frame that will contain the option boxes
+			optionFrameTop.draw(150, 150);
+			optionFrameMid.draw(150, 170);
+			optionFrameBottom.draw(150, 470);
+			
+			// Draw the option boxes
+			optionBox.draw(180, 180);
+			optionBox.draw(180, 250);
+			optionBox.draw(180, 320);
+			
+			selector[0].draw(160, 187 + cursorPos * 70);
+			selector[1].draw(351, 187 + cursorPos * 70);
+			
 			
 			break;
 		case BlockMatchStandard:
