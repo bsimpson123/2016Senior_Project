@@ -26,7 +26,7 @@ public class Block {
 	 * each block takes up the same space on the grid. */
 	protected static final int[] blockDrawSpace = new int[] { 32, 32 };
 	
-	protected BlockType blockType;
+	public final BlockType type;
 	protected Sprite block;
 	protected int colorID = 0;
 	/** Collection of colors that will be used for standard blocks. */
@@ -37,27 +37,33 @@ public class Block {
 	protected boolean clearMark = false;
 	
 	/* Constructors */
-	/**
-	 * Empty constructor used when cloning blocks.
-	 */
-	private Block() { }
-	
-	/**
-	 * 
-	 * @param type
-	 */
-	public Block(BlockType type) {
-		blockType = type;
-	}
-	
-	public Block(int colorID) {
-		blockType = BlockType.BLOCK;
-		// check that provided colorID is within range
+	public Block(BlockType type, int colorID) {
+		this.type = type;
 		if (colorID >= blockColorCount) {
 			colorID = 0;
 		} else {
 			this.colorID = colorID;
 		}
+		setSprite();
+	}
+	
+	public Block(BlockType type) {
+		this.type = type;
+		if (type == BlockType.BLOCK) {
+			colorID = Global.rand.nextInt(blockColorCount);
+		} else {
+			colorID = 0;
+		}
+		setSprite();
+	}
+	
+	/** 
+	 * Creates a new instance of the provided Block object, reseting only block states checked and clear to default values.
+	 */
+	public Block(Block clone) {
+		this.type = clone.type;
+		this.block = clone.block;
+		this.colorID = clone.colorID;
 	}
 	
 	/* Class methods */
@@ -110,34 +116,41 @@ public class Block {
 			);
 	}
 	
+	private void setSprite() {
+		switch (type) {
+			case BLOCK:
+				block = blockColor[colorID];
+				break;
+			case WEDGE:
+				block = blockWedge;
+				break;
+			case STAR:
+				block = blockStar;
+				break;
+			case TRASH:
+				// TODO: assign trash sprite to block variable
+				break;
+			case ROCK:
+				// TODO: assign rock sprite to block variable
+				break;
+		}
+	}
+	
+	
+	
 	/** 
 	 * Creates a copy of the object block with default block state values.
 	 */
 	public Block clone() {
-		Block b = new Block();
-		b.blockType = this.blockType;
-		b.colorID = this.colorID;
-		b.block = this.block;
-		
-		return b;
+		return new Block(this);
 	}
 	
 	public void draw(int xc, int yc) {
-		switch (blockType) {
-			case BLOCK:
-				blockColor[colorID].draw(xc, yc);
-			case ROCK:
-				
-				break;
-			case STAR:
-				break;
-			case TRASH:
-				break;
-			case WEDGE:
-				break;
-			default:
-				break;
+		if (block == null) { 
+			// TODO: add draw for 'error' block to indicate a problem with block texture assignment
+			return ;
 		}
+		block.draw(xc, yc);
 	}
 	
 	/**
@@ -148,7 +161,7 @@ public class Block {
 		int stopWidth = grid[0].length - 1;
 		int stopHeight = grid.length - 1;
 		
-		switch (this.blockType) {
+		switch (this.type) {
 		case BLOCK:
 			// Normal blocks clear all same color blocks sharing an edge
 			// Score returned equals (n-1)^2 blocks cleared.

@@ -49,13 +49,12 @@ public class Game {
 	 * Additional values can be added as new game modes are developed.
 	 * @author John Ojala
 	 */
-	public enum GameControl {
-		MainMenu,
-		BlockMatchStandard
-	}
+	private final int MainMenu = 0,
+		BlockMatchStandard = 1
+		;
 	
 	/** The current game mode within the main logic loop. */
-	GameControl activeGameMode = GameControl.MainMenu;
+	int activeGameMode = MainMenu;
 	
 	/* game control settings */
 	/** Indicates whether the keyboard can be for input in the game */
@@ -428,10 +427,12 @@ public class Game {
 		case MainMenu:
 			// TODO: Main menu draw and logic
 			
-			// This code acts as a proof-of-concept for adjusting screen output from control input
+			// This code acts as a proof-of-concept for reading and responding to control input
 			if (movementInputDelay <= 0) {
+				/*// Left and Right inputs do nothing at the main menu currently
 				if (Global.getControlActive(Global.GameControl.LEFT)) { ; }
 				if (Global.getControlActive(Global.GameControl.RIGHT)) { ; }
+				//*/
 				if (Global.getControlActive(Global.GameControl.UP)) {
 					cursorPos--;
 					if (cursorPos < 0) {
@@ -446,28 +447,25 @@ public class Game {
 					}
 					movementInputDelay = movementInputDelayTimer;
 				}
+				if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
+					cursorPos = 2;
+				}
 			} else if (movementInputDelay > 0) {
 				movementInputDelay -= Global.delta;
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0:
-						game = new BlockBreakStandard();
-						break;
 					case 1:
-						
+						game = new BlockBreakStandard();
+						activeGameMode = BlockMatchStandard;
 						break;
 					case 2:
 						gameRunning = false;
 						break;
 				}
 			}
-			if (Global.getControlActive(Global.GameControl.CANCEL)) {
-				cursorPos = 2;
-			}
-			if (Global.getControlActive(Global.GameControl.SPECIAL)) {
-				;
-			}
+			// if (Global.getControlActive(Global.GameControl.SPECIAL)) { ; }
 			/*
 			menuBar.draw(100, 100);
 			menuBarWithText.draw(100, 250);
@@ -489,16 +487,17 @@ public class Game {
 			
 			
 			break;
-		case BlockMatchStandard:
-			// TODO: function call to class handling this game mode.
-			break;
+//		case BlockMatchStandard:
+//			break;
 		default:
 			switch(game.getState()) { 
 				case NOT_LOADED:
 					gameModeLoader = new Thread(new GameModeLoader(textureMap, game));
+					gameModeLoader.run();
 					break;
 				case LOADING_ASSETS:
 					// TODO: game mode loading indicator
+					break;
 				case LOADING_DONE:
 					try {
 						gameModeLoader.join();
@@ -509,13 +508,11 @@ public class Game {
 				case READY:
 					game.run();
 					break;
-				case UNLOADING:
-					// TODO: handle unloading display
-					game.cleanup();
-					break;
 				case FINALIZED:
 					game = null;
-					activeGameMode = GameControl.MainMenu;
+					activeGameMode = MainMenu;
+					movementInputDelay = movementInputDelayTimer;
+					cursorPos = 0;
 					break;
 				default:
 					break;
@@ -615,9 +612,11 @@ class GameModeLoader implements Runnable {
 	public GameModeLoader(HashMap<String, Texture> texMap, GameMode gm) {
 		textureMap = texMap;
 		mode = gm;
+		System.out.println("Debug: Loader thread constructor called.");
 	}
 	
 	public void run() {
+		System.out.println("Debug: Loader thread active.");
 		mode.initialize(textureMap);
 	}
 }
