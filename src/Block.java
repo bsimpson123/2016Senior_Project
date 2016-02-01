@@ -9,7 +9,8 @@ public class Block {
 	}
 
 	protected static Sprite blockColor[];
-	protected static Sprite blockWedge, blockStar, blockTrash, blockRock; 
+	protected static Sprite blockWedge, blockStar, blockTrash, blockRock;
+	protected static Sprite errorBlock;
 	
 	public static final int  
 		BLUE = 0,
@@ -114,6 +115,12 @@ public class Block {
 				new int[] { 128, 128 },
 				blockDrawSpace
 			);
+		errorBlock = new Sprite(
+				texMap.get("red_ui"),
+				new int[] { 381, 36 },
+				new int[] { 36, 36 },
+				blockDrawSpace
+			);
 	}
 	
 	private void setSprite() {
@@ -147,6 +154,7 @@ public class Block {
 	
 	public void draw(int xc, int yc) {
 		if (block == null) { 
+			errorBlock.draw(xc, yc);
 			// TODO: add draw for 'error' block to indicate a problem with block texture assignment
 			return ;
 		}

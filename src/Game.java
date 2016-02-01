@@ -241,7 +241,7 @@ public class Game {
 				 e.printStackTrace();
 				 System.exit(-1);
 			 }
-			 textureMap.put(source, tex);
+			 //textureMap.put(source, tex);
 		}
 		
 		// Example code for loading textures with Sprite objects
