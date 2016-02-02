@@ -36,6 +36,7 @@ public class Block {
 	 * This value should be reset to false before logic processing each game loop. */
 	protected boolean checked = false;
 	protected boolean clearMark = false;
+	 
 	
 	/* Constructors */
 	public Block(BlockType type, int colorID) {

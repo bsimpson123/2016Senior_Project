@@ -12,12 +12,15 @@ public class BlockBreakStandard implements GameMode {
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected Block[][] grid = new Block[20][17]; // [x][y], [c][r]
 	protected Stack<Integer> cursorPos = new Stack<Integer>();
+	protected long inputDelay = Global.inputReadDelayTimer;
+
+	// Level variables. These may be moved/removed if level play is moved to separated class object.
 	protected Sprite cursor;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int level = 1;
+	protected int counter = 0;
 	protected final int maxLevel = 5;
-	protected long inputDelay = 0;
-	protected final long inputDelayTimer = 100l;
+	
 	
 	protected String[][] texLoadList = new String[][] {
 		new String[] { "ui_base", "media/UIpackSheet_transparent.png" }
@@ -96,47 +99,17 @@ public class BlockBreakStandard implements GameMode {
 		currentState = LoadState.READY;
 		int[] blockOffSet = new int[] { 32, 32 };
 		int[] gridBasePos = new int[] { 75, 540 }; // distance from the left top for the bottom-left of the grid display
-		if (inputDelay <= 0) {
-			if (Global.getControlActive(Global.GameControl.CANCEL)) {
-				// TODO: display exiting information in some manner
-				cleanup();
-				return;
-			}
-			if (Global.getControlActive(Global.GameControl.UP)) {
-				cursorGridPos[1]++;
-				if (cursorGridPos[1] >= grid[0].length) {
-					cursorGridPos[1] = grid[0].length - 1;
-				}
-				inputDelay = inputDelayTimer;
-			}
-			if (Global.getControlActive(Global.GameControl.DOWN)) {
-				if (cursorGridPos[1] > 0) {
-					cursorGridPos[1]--;
-				}
-				inputDelay = inputDelayTimer;
-			}
-			if (Global.getControlActive(Global.GameControl.LEFT)) {
-				if (cursorGridPos[0] > 0) {
-					cursorGridPos[0] --;
-				}
-				inputDelay = inputDelayTimer;
-			}
-			if (Global.getControlActive(Global.GameControl.RIGHT)) {
-				cursorGridPos[0]++;
-				if (cursorGridPos[0] >= grid.length) {
-					cursorGridPos[0] = grid.length - 1;
-				}
-				inputDelay = inputDelayTimer;
-			}
-		} else {
-			inputDelay -= Global.delta;
-		}
+
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].length; k++) {
-				grid[i][k].draw(
-						gridBasePos[0] + blockOffSet[0] * i,
-						gridBasePos[1] - blockOffSet[1] * k
-					);
+				if (grid[i][k] != null) {
+					grid[i][k].draw(
+							gridBasePos[0] + blockOffSet[0] * i,
+							gridBasePos[1] - blockOffSet[1] * k
+						);
+					grid[i][k].checked = false;
+					grid[i][k].clearMark = false;
+				}
 			}
 		}
 		
@@ -149,6 +122,58 @@ public class BlockBreakStandard implements GameMode {
 				gridBasePos[1] - blockOffSet[1] * cursorGridPos[1]
 			);
 		
+		
+		if (inputDelay <= 0) {
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				// TODO: display exiting information in some manner
+				cleanup();
+				return;
+			}
+			if (Global.getControlActive(Global.GameControl.UP)) {
+				cursorGridPos[1]++;
+				if (cursorGridPos[1] >= grid[0].length) {
+					cursorGridPos[1] = grid[0].length - 1;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+			}
+			if (Global.getControlActive(Global.GameControl.DOWN)) {
+				if (cursorGridPos[1] > 0) {
+					cursorGridPos[1]--;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+			}
+			if (Global.getControlActive(Global.GameControl.LEFT)) {
+				if (cursorGridPos[0] > 0) {
+					cursorGridPos[0] --;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+			}
+			if (Global.getControlActive(Global.GameControl.RIGHT)) {
+				cursorGridPos[0]++;
+				if (cursorGridPos[0] >= grid.length) {
+					cursorGridPos[0] = grid.length - 1;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+			}
+			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				counter = checkGrid(grid, cursorGridPos);
+				if (counter > 1) {
+					// TODO: score calculation
+					
+					for (int i = 0; i < grid.length; i++) {
+						for (int k = 0; k < grid[0].length; k++) {
+							if (grid[i][k] != null && grid[i][k].clearMark) {
+								grid[i][k] = null;
+							}
+						}
+					}
+				}
+				
+				inputDelay = Global.inputReadDelayTimer;
+			}
+		} else {
+			inputDelay -= Global.delta;
+		}
 		
 		
 	}
@@ -165,6 +190,41 @@ public class BlockBreakStandard implements GameMode {
 		 * return control to previous control loop.
 		 */
 		currentState = LoadState.FINALIZED;
+	}
+	
+	
+	public int checkGrid(Block[][] grid, int[] xy) {
+		if (grid[xy[0]][xy[1]] == null) { return 0; }
+		return checkGrid(grid, xy[0], xy[1], grid[xy[0]][xy[1]].colorID);
+	}
+	
+	
+	private int checkGrid(Block[][] grid, int xc, int yc, int colorID) {
+		int sum = 0;
+		if (grid[xc][yc] == null || grid[xc][yc].checked) {
+			return 0;
+		}
+		grid[xc][yc].checked = true;
+		if (grid[xc][yc].colorID != colorID) {
+			return 0;
+		}
+		grid[xc][yc].clearMark = true;
+		sum = 1;
+		if (xc > 0) {
+			sum += checkGrid(grid, xc - 1, yc, colorID);
+		}
+		if (yc > 0) {
+			sum += checkGrid(grid, xc, yc - 1, colorID);
+		}
+		if ( (xc + 1) < grid.length) {
+			sum += checkGrid(grid, xc + 1, yc, colorID);
+		}
+		if ( (yc + 1) < grid[0].length) {
+			sum += checkGrid(grid, xc, yc + 1, colorID);
+		}
+		
+		return sum;
+		
 	}
 
 }

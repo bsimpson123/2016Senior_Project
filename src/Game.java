@@ -107,9 +107,6 @@ public class Game {
 	
 	/** The time remaining (milliseconds) until the next movement input can be read. */
 	private long movementInputDelay = 0;
-	/** The minimum time (milliseconds) to wait after receiving movement input before processing further input.
-	 * This is the sensitivity of the input. */
-	private long movementInputDelayTimer = 150;   
 	
 	private GameMode game;
 	
@@ -438,14 +435,14 @@ public class Game {
 					if (cursorPos < 0) {
 						cursorPos = 2;
 					}
-					movementInputDelay = movementInputDelayTimer;
+					movementInputDelay = Global.inputReadDelayTimer;
 				}
 				if (Global.getControlActive(Global.GameControl.DOWN)) {
 					cursorPos++;
 					if (cursorPos > 2) {
 						cursorPos = 0;
 					}
-					movementInputDelay = movementInputDelayTimer;
+					movementInputDelay = Global.inputReadDelayTimer;
 				}
 				if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
 					cursorPos = 2;
@@ -511,7 +508,7 @@ public class Game {
 				case FINALIZED:
 					game = null;
 					activeGameMode = MainMenu;
-					movementInputDelay = movementInputDelayTimer;
+					movementInputDelay = Global.inputReadDelayTimer;
 					cursorPos = 0;
 					break;
 				default:
