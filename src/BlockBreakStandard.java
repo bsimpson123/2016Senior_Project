@@ -10,11 +10,11 @@ public class BlockBreakStandard implements GameMode {
 	protected LoadState currentState = LoadState.NOT_LOADED;
 	protected HashMap<String, Texture> rootTexMap = null;
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
-	protected Block[][] grid = new Block[20][17]; // [x][y], [c][r]
 	protected Stack<Integer> cursorPos = new Stack<Integer>();
 	protected long inputDelay = Global.inputReadDelayTimer;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
+	protected Block[][] grid = new Block[20][17]; // [x][y], [c][r]
 	protected Sprite cursor;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int level = 1;
@@ -99,16 +99,30 @@ public class BlockBreakStandard implements GameMode {
 		currentState = LoadState.READY;
 		int[] blockOffSet = new int[] { 32, 32 };
 		int[] gridBasePos = new int[] { 75, 540 }; // distance from the left top for the bottom-left of the grid display
+		int dropRate = 20; // millisecond time for a falling block to cover 1 space
+		boolean blocksFalling = false;
 
+		
+		// Move falling blocks and render the grid
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].length; k++) {
 				if (grid[i][k] != null) {
+					if (grid[i][k].dropDistance > 0) {
+						grid[i][k].dropDistance -= (Global.delta * dropRate) / blockOffSet[1];
+						if (grid[i][k].dropDistance < 0) { 
+							grid[i][k].dropDistance = 0; 
+						} else {
+							blocksFalling = true;
+						}
+					}
 					grid[i][k].draw(
 							gridBasePos[0] + blockOffSet[0] * i,
-							gridBasePos[1] - blockOffSet[1] * k
+							gridBasePos[1] - blockOffSet[1] * k - grid[i][k].dropDistance
 						);
 					grid[i][k].checked = false;
 					grid[i][k].clearMark = false;
+//					grid[i][k].dropDistance -= Global.delta / blockOffSet[1];
+//					if (grid[i][k].dropDistance < 0f) { grid[i][k].dropDistance = 0; }
 				}
 			}
 		}
@@ -155,18 +169,46 @@ public class BlockBreakStandard implements GameMode {
 				}
 				inputDelay = Global.inputReadDelayTimer;
 			}
-			if (Global.getControlActive(Global.GameControl.SELECT)) {
+			if (!blocksFalling && Global.getControlActive(Global.GameControl.SELECT)) {
 				counter = checkGrid(grid, cursorGridPos);
 				if (counter > 1) {
 					// TODO: score calculation
 					
+					// remove blocks marked to be cleared
 					for (int i = 0; i < grid.length; i++) {
+						int slotDist = 0;
+						int dropDist = 0;
 						for (int k = 0; k < grid[0].length; k++) {
 							if (grid[i][k] != null && grid[i][k].clearMark) {
+								grid[i][k] = null;
+							} 
+						}
+						for (int k = 0; k < grid[0].length; k++) {
+							if (grid[i][k] == null) {
+								dropDist += blockOffSet[1];
+								slotDist++;
+							} else if (dropDist > 0) {
+								grid[i][k].dropDistance = dropDist;
+								grid[i][k-slotDist] = grid[i][k];
 								grid[i][k] = null;
 							}
 						}
 					}
+					Block[] emptyset = new Block[grid[0].length];
+					for (int i = grid.length - 1; i > 0; i--) {
+						if (grid[i][0] == null) {
+							for (int k = i - 1; k >= 0; k--) {
+								if (grid[k][0] != null) {
+									grid[i] = grid[k];
+									grid[k] = emptyset;
+									break;
+								}
+							}
+						}
+					}
+					
+					
+					
 				}
 				
 				inputDelay = Global.inputReadDelayTimer;
@@ -193,8 +235,17 @@ public class BlockBreakStandard implements GameMode {
 	}
 	
 	
+	
+	/**
+	 * Checks the grid for blocks of the same color sharing edges, and marks those blocks
+	 * for removal.
+	 * @param grid The 2-dimensional grid of blocks
+	 * @param xy 2-element array containing the starting index locations for the search
+	 * @return The total number of blocks found
+	 */
 	public int checkGrid(Block[][] grid, int[] xy) {
 		if (grid[xy[0]][xy[1]] == null) { return 0; }
+		if (grid[xy[0]][xy[1]].type != Block.BlockType.BLOCK) { return 0; }
 		return checkGrid(grid, xy[0], xy[1], grid[xy[0]][xy[1]].colorID);
 	}
 	

@@ -34,8 +34,9 @@ public class Block {
 	
 	/** Indicates whether the block has been checked for processing during a game loop.
 	 * This value should be reset to false before logic processing each game loop. */
-	protected boolean checked = false;
-	protected boolean clearMark = false;
+	public boolean checked = false;
+	public boolean clearMark = false;
+	public int dropDistance = 0;
 	 
 	
 	/* Constructors */
