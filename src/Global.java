@@ -17,16 +17,18 @@ import org.lwjgl.input.Keyboard;
 public class Global {
 	public static Random rand = new Random();
 	/** The draw space (width) of the OpenGL environment. */
-	public static final int glEnvWidth = 800;
+	public static final int glEnvWidth = 1200;
 	/** The draw space (height) of the OpenGL environment. */
-	public static final int glEnvHeight = 600;
+	public static final int glEnvHeight = 800;
 	/** The time in ms since the last frame update. */
 	public static long delta = 0;
 	/** The pixel height of the game window, defaults to the same size as the OpenGL environment. */
 	public static int winHeight = glEnvHeight;
 	/** The pixel width of the game window, defaults to the same size as the OpenGL environment. */
 	public static int winWidth = glEnvWidth;
-	
+	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
+	 * This is the sensitivity of the input. */
+	public static long inputReadDelayTimer = 80l;
 	
 	public enum GameControl {
 		RIGHT, LEFT, UP, DOWN,
