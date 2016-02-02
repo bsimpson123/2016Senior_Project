@@ -60,10 +60,13 @@ public class BlockBreakStandard implements GameMode {
 
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].length; k++) {
-				grid[i][k] = new Block( Block.BlockType.BLOCK, Global.rand.nextInt(3) );
+				grid[i][k] = new Block( Block.BlockType.BLOCK, Global.rand.nextInt(5) );
 			}
 		}
 		
+		
+		cursorGridPos[0] = grid.length / 2;
+		cursorGridPos[1] = grid[0].length / 2;
 /*		cursor = new Sprite(
 				localTexMap.get("ui_base"),
 				new int[] { 485, 341 },

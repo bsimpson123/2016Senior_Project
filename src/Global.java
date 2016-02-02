@@ -12,14 +12,13 @@ import org.lwjgl.input.Keyboard;
  * Container class for variables and functions that are
  * global in scope.
  * @author John Ojala
- *
  */
 public class Global {
 	public static Random rand = new Random();
 	/** The draw space (width) of the OpenGL environment. */
-	public static final int glEnvWidth = 800;
+	public static final int glEnvWidth = 1200;
 	/** The draw space (height) of the OpenGL environment. */
-	public static final int glEnvHeight = 600;
+	public static final int glEnvHeight = 800;
 	/** The time in ms since the last frame update. */
 	public static long delta = 0;
 	/** The pixel height of the game window, defaults to the same size as the OpenGL environment. */
