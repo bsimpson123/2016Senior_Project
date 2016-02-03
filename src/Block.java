@@ -163,42 +163,4 @@ public class Block {
 		block.draw(xc, yc);
 	}
 	
-	/**
-	 * 
-	 */
-	public int activate(Block[][] grid, int xPos, int yPos) {
-		int score = 0;
-		int stopWidth = grid[0].length - 1;
-		int stopHeight = grid.length - 1;
-		
-		switch (this.type) {
-		case BLOCK:
-			// Normal blocks clear all same color blocks sharing an edge
-			// Score returned equals (n-1)^2 blocks cleared.
-			// Blocks that do not share an edge with a similar color block do nothing.
-			
-			// TODO: algorithm to search for similar connected blocks, mark those blocks for removal,
-			// and count blocks that are removed.
-			
-			break;
-		case WEDGE: 
-		case ROCK:
-		case TRASH:
-			// Wedge, trash, and rock blocks cannot be activated, do nothing.
-			break;
-		case STAR:
-			// Star blocks clear all blocks in a one block radius, including diagonals,
-			// but can only be activated if at the bottom row.
-			if (yPos != 0) { // check for bottom row
-				break;
-			}
-			
-			break;
-		default:
-			break;
-		}
-		
-		
-		return score;
-	}
 }
