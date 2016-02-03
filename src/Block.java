@@ -94,7 +94,7 @@ public class Block {
 			);
 		blockColor[RED] = new Sprite(
 				blockTex,
-				new int[] { 212, 431 },
+				new int[] { 212, 233 },
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
