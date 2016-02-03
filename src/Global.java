@@ -16,9 +16,9 @@ import org.lwjgl.input.Keyboard;
 public class Global {
 	public static Random rand = new Random();
 	/** The draw space (width) of the OpenGL environment. */
-	public static final int glEnvWidth = 1200;
+	public static final int glEnvWidth = 1024;
 	/** The draw space (height) of the OpenGL environment. */
-	public static final int glEnvHeight = 800;
+	public static final int glEnvHeight = 768;
 	/** The time in ms since the last frame update. */
 	public static long delta = 0;
 	/** The pixel height of the game window, defaults to the same size as the OpenGL environment. */

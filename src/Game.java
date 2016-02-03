@@ -66,7 +66,7 @@ public class Game {
 	@SuppressWarnings("unused")
 	private final boolean useController = false;
 	/** Set whether the mouse cursor should be captured during game play */
-	private final boolean captureMouse = true;
+	private final boolean captureMouse = false;
 	/** Indicates the currently selected option at the main menu */
 	private int mainMenuSelection = 0;
 

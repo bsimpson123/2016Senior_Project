@@ -20,6 +20,7 @@ public class BlockBreakStandard implements GameMode {
 	protected int level = 1;
 	protected int counter = 0;
 	protected final int maxLevel = 5;
+	protected int[] blockOffSet = new int[] { 32, 32 };
 	
 	
 	protected String[][] texLoadList = new String[][] {
@@ -63,7 +64,7 @@ public class BlockBreakStandard implements GameMode {
 
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].length; k++) {
-				grid[i][k] = new Block( Block.BlockType.BLOCK, Global.rand.nextInt(5) );
+				grid[i][k] = new Block( Block.BlockType.BLOCK, Global.rand.nextInt(3) );
 			}
 		}
 		
@@ -80,7 +81,7 @@ public class BlockBreakStandard implements GameMode {
 				rootTexMap.get("blocksheet"),
 				new int[] { 240, 0 },
 				new int[] { 32, 32 },
-				new int[] { 32, 32 }
+				blockOffSet
 			);
 		
 		// Update mode state when asset loading is completed
@@ -97,8 +98,7 @@ public class BlockBreakStandard implements GameMode {
 	public void run() {
 		// TODO Auto-generated method stub
 		currentState = LoadState.READY;
-		int[] blockOffSet = new int[] { 32, 32 };
-		int[] gridBasePos = new int[] { 75, 540 }; // distance from the left top for the bottom-left of the grid display
+		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockOffSet[1] - 20 }; // distance from the left top for the bottom-left of the grid display
 		int dropRate = 20; // millisecond time for a falling block to cover 1 space
 		boolean blocksFalling = false;
 
@@ -250,7 +250,7 @@ public class BlockBreakStandard implements GameMode {
 	}
 	
 	
-	private int checkGrid(Block[][] grid, int xc, int yc, int colorID) {
+	private int checkGrid(Block[][] grid, int xc, int yc, final int colorID) {
 		int sum = 0;
 		if (grid[xc][yc] == null || grid[xc][yc].checked) {
 			return 0;
