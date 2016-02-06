@@ -1,6 +1,7 @@
 import java.util.Random;
 import java.util.HashMap;
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.opengl.Texture;
 
 /* 
  * When adding variables and functions to this class, remember to always mark them
@@ -14,6 +15,8 @@ import org.lwjgl.input.Keyboard;
  * @author John Ojala
  */
 public class Global {
+	/** Contains publicly loaded texture objects, mapped to string phrase keys  */
+	public static HashMap<String, Texture> textureMap = new HashMap<String, Texture>(15);
 	public static Random rand = new Random();
 	/** The draw space (width) of the OpenGL environment. */
 	public static final int glEnvWidth = 1024;

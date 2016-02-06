@@ -22,8 +22,6 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class Game {
 	/* Base game variables. These are needed for the basics of the framework to function. */
-	/** Hash map for referencing textures that have been loaded. */
-	private HashMap<String, Texture> textureMap = new HashMap<String, Texture>(15);
 	/** Hash map for referencing audio files that have been loaded. */
 	private HashMap<String, Audio> soundMap = new HashMap<String, Audio>();
 	/** Indicates whether the game is to continue running and processing logic. Set to false to end the program. */
@@ -228,7 +226,7 @@ public class Game {
 			 try {
 				 source = FileResource.requestResource(ref[1]);
 				 tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref[1]));
-				 if ( textureMap.putIfAbsent(ref[0], tex) != null) {
+				 if ( Global.textureMap.putIfAbsent(ref[0], tex) != null) {
 					 // report error, attempting to add duplicate key entry
 					 System.out.printf("Attempting to load multiple textures to key [%s]", ref[0]);
 					 System.out.printf("Texture resource [%s] not loaded.", ref[1]);
@@ -238,58 +236,58 @@ public class Game {
 				 e.printStackTrace();
 				 System.exit(-1);
 			 }
-			 //textureMap.put(source, tex);
+			 //Global.textureMap.put(source, tex);
 		}
 		
 		// Example code for loading textures with Sprite objects
 		/* Loading sprites where the complete texture will be drawn to the screen
 		menuBar = new Sprite( 
-				textureMap.get("menubar"), // texture reference name
+				Global.textureMap.get("menubar"), // texture reference name
 				new int[] { 190, 48 } // draw size in the GL environment
 			);
 		
 		 * Loading sprites where only a subsection of the textures will be drawn on the screen
 		testBlock = new Sprite(
-				textureMap.get("blocksheet"), // texture reference name
+				Global.textureMap.get("blocksheet"), // texture reference name
 				new int[] { 212, 431 }, // {top, left} stating point
 				new int[] { 32, 32}, // {width, height} counting left, down
 				new int[] { 32, 32 } // draw size in the GL environment
 			); //*/
 		// TODO: Load all Sprite objects for menu navigation
 		optionFrameTop = new Sprite(
-				textureMap.get("blue_ui"),
+				Global.textureMap.get("blue_ui"),
 				new int[] { 0, 49 },
 				new int[] { 190, 20 },
 				new int[] { 250, 20 }
 			);
 		optionFrameMid = new Sprite(
-				textureMap.get("blue_ui"),
+				Global.textureMap.get("blue_ui"),
 				new int[] { 0, 59 },
 				new int[] { 190, 20 },
 				new int[] { 250, 300 }
 			);
 		optionFrameBottom = new Sprite(
-				textureMap.get("blue_ui"),
+				Global.textureMap.get("blue_ui"),
 				new int[] { 0, 69 },
 				new int[] { 190, -20 },
 				new int[] { 250, 20 }
 			);
 		
 		optionBox = new Sprite(
-				textureMap.get("green_ui"),
+				Global.textureMap.get("green_ui"),
 				new int[] { 0, 0 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		
 		selector[0] = new Sprite( // left-side arrow
-				textureMap.get("grey_ui"),
+				Global.textureMap.get("grey_ui"),
 				new int[] { 39, 478 },
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
 		selector[1] = new Sprite( // right-side arrow
-				textureMap.get("grey_ui"),
+				Global.textureMap.get("grey_ui"),
 				new int[] { 0, 478 },
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
@@ -312,7 +310,7 @@ public class Game {
 		}
 		
 		// TODO: add static class initializers
-		Block.initializeBlocks(textureMap);
+		Block.initializeBlocks(Global.textureMap);
 		
 	}
 	
@@ -336,8 +334,8 @@ public class Game {
 	 * @return The loaded OpenGL texture, null if the referenced texture was not available.
 	 */
 	public Texture getTexture(String reference) {
-		if (textureMap.containsKey(reference)) {
-			return textureMap.get(reference);
+		if (Global.textureMap.containsKey(reference)) {
+			return Global.textureMap.get(reference);
 		}
 		return null;
 	}
@@ -489,7 +487,7 @@ public class Game {
 		default:
 			switch(game.getState()) { 
 				case NOT_LOADED:
-					gameModeLoader = new Thread(new GameModeLoader(textureMap, game));
+					gameModeLoader = new Thread( new GameModeLoader(game) );
 					gameModeLoader.run();
 					break;
 				case LOADING_ASSETS:
@@ -588,10 +586,10 @@ public class Game {
 			Display.update();
 		}
 		// release all textures loaded
-		for (String ref : textureMap.keySet()) {
-			textureMap.get(ref).release();
+		for (String ref : Global.textureMap.keySet()) {
+			Global.textureMap.get(ref).release();
 		}
-		textureMap.clear();
+		Global.textureMap.clear();
 	}
 	
 	public static void main(String[] args) {
@@ -603,17 +601,15 @@ public class Game {
 }
 
 class GameModeLoader implements Runnable {
-	private final HashMap<String, Texture> textureMap;
 	private final GameMode mode;
 	
-	public GameModeLoader(HashMap<String, Texture> texMap, GameMode gm) {
-		textureMap = texMap;
+	public GameModeLoader(GameMode gm) {
 		mode = gm;
 		System.out.println("Debug: Loader thread constructor called.");
 	}
 	
 	public void run() {
 		System.out.println("Debug: Loader thread active.");
-		mode.initialize(textureMap);
+		mode.initialize();
 	}
 }

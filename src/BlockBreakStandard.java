@@ -8,13 +8,12 @@ import org.newdawn.slick.util.ResourceLoader;
 
 public class BlockBreakStandard implements GameMode {
 	protected LoadState currentState = LoadState.NOT_LOADED;
-	protected HashMap<String, Texture> rootTexMap = null;
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected Stack<Integer> cursorPos = new Stack<Integer>();
 	protected long inputDelay = Global.inputReadDelayTimer;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
-	protected Block[][] grid = new Block[20][17]; // [x][y], [c][r]
+	protected Block[][] grid = new Block[20][20]; // [x][y], [c][r]
 	protected Sprite cursor;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int level = 1;
@@ -34,9 +33,9 @@ public class BlockBreakStandard implements GameMode {
 	}
 	
 	@Override
-	public void initialize(HashMap<String, Texture> textureMap) {
+	public void initialize() {
+		// This should always be the first line
 		currentState = LoadState.LOADING_ASSETS;
-		rootTexMap = textureMap;
 		// TODO Auto-generated method stub
 		Texture tex;
 		String type; // holds file type extension
@@ -78,7 +77,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 28, 36 }
 			); //*/
 		cursor = new Sprite(
-				rootTexMap.get("blocksheet"),
+				Global.textureMap.get("blocksheet"),
 				new int[] { 240, 0 },
 				new int[] { 32, 32 },
 				blockOffSet
@@ -98,7 +97,7 @@ public class BlockBreakStandard implements GameMode {
 	public void run() {
 		// TODO Auto-generated method stub
 		currentState = LoadState.READY;
-		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockOffSet[1] - 20 }; // distance from the left top for the bottom-left of the grid display
+		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockOffSet[1] - 50 }; // distance from the left top for the bottom-left of the grid display
 		int dropRate = 20; // millisecond time for a falling block to cover 1 space
 		boolean blocksFalling = false;
 
