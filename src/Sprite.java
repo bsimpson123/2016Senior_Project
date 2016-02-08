@@ -80,4 +80,30 @@ public class Sprite {
 		// restore the model view matrix to prevent contamination
 		glPopMatrix();
 	}
+	
+	public void draw(int[] xy, int[] size) {
+		glPushMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		texture.bind();
+		glTranslatef(xy[0], xy[1], 0);
+		
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(left, top);
+			glVertex2i(0, 0);
+			
+			glTexCoord2f(left, top + height);
+			glVertex2i(0, size[1]);
+			
+			glTexCoord2f(left + width, top + height);
+			glVertex2i(size[0], size[1]);
+			
+			glTexCoord2f(left + width, top);
+			glVertex2i(size[0], 0);
+
+		} 
+		glEnd();
+		
+		glPopMatrix();
+	}
 }

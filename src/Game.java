@@ -101,6 +101,8 @@ public class Game {
 	private Sprite optionFrameBottom;
 	private Sprite optionBox;
 	
+	private long mouseDelay = Global.inputReadDelayTimer;
+	
 	private Thread gameModeLoader = null;
 	
 	/** The time remaining (milliseconds) until the next movement input can be read. */
@@ -293,7 +295,6 @@ public class Game {
 				new int[] { 38, 30 }
 			);
 		
-		
 		Audio sound;
 		for (String ref : soundEffectResource) {
 			sound = null;
@@ -407,6 +408,18 @@ public class Game {
 			fps = 0;
 		}
 
+		// Screen location checking. this will output mouse click locations in /every/ gamemode to the console
+		if (mouseDelay <= 0) {
+			if (Mouse.isButtonDown(0)) {
+				int x, y;
+				x = Mouse.getX();
+				y = Global.glEnvHeight - Mouse.getY();
+				System.out.printf("Mouse click at %d, %d\n", x, y);
+				mouseDelay = Global.inputReadDelayTimer;
+			} 
+		} else {
+			mouseDelay -= Global.delta;
+		}
 		/* check and handle input controls */
 		// processInput(); 
 		/* input checking is handled within individual game loops, where only the necessary
@@ -480,7 +493,7 @@ public class Game {
 			selector[0].draw(160, 187 + cursorPos * 70);
 			selector[1].draw(351, 187 + cursorPos * 70);
 			
-			
+			selector[0].draw(new int[] { 500, 50 }, new int[] { 64, 64 });
 			break;
 //		case BlockMatchStandard:
 //			break;

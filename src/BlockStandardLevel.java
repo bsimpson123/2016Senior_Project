@@ -15,7 +15,7 @@ public abstract class BlockStandardLevel {
 	 * @param xy 2-element array containing the starting index locations for the search
 	 * @return The total number of blocks found
 	 */
-	public final int checkGrid(Block[][] grid, int[] xy) {
+	protected final int checkGrid(Block[][] grid, int[] xy) {
 		if (grid[xy[0]][xy[1]] == null) { return 0; }
 		if (grid[xy[0]][xy[1]].type != Block.BlockType.BLOCK) { return 0; }
 		return checkGrid(grid, xy[0], xy[1], grid[xy[0]][xy[1]].colorID);
