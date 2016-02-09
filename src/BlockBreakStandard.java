@@ -11,6 +11,7 @@ public class BlockBreakStandard implements GameMode {
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected Stack<Integer> cursorPos = new Stack<Integer>();
 	protected long inputDelay = Global.inputReadDelayTimer;
+	private BlockStandardLevel playLevel;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
 	protected Block[][] grid = new Block[20][20]; // [x][y], [c][r]
@@ -23,7 +24,9 @@ public class BlockBreakStandard implements GameMode {
 	
 	
 	protected String[][] texLoadList = new String[][] {
-		new String[] { "ui_base", "media/UIpackSheet_transparent.png" }
+		new String[] { "ui_base", "media/UIpackSheet_transparent.png" },
+		new String[] { "ui_stdmode", "media/StandardMode_UI.png" },
+		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" }
 	};
 	
 	
@@ -76,13 +79,17 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 14, 18 },
 				new int[] { 28, 36 }
 			); //*/
+		// update to BlockBreakStandard.cursor after code moves to separate level class
 		cursor = new Sprite(
 				Global.textureMap.get("blocksheet"),
 				new int[] { 240, 0 },
 				new int[] { 32, 32 },
 				blockOffSet
 			);
+		// TODO: create sprite for pauseCursor
+		BlockStandardLevel.cursor = cursor;
 		
+		playLevel = new BlockStandardLevelEx(localTexMap);
 		// Update mode state when asset loading is completed
 		currentState = LoadState.LOADING_DONE;
 		return;
@@ -95,6 +102,21 @@ public class BlockBreakStandard implements GameMode {
 
 	@Override
 	public void run() {
+		currentState = LoadState.READY;
+		// TODO: draw user interface for practice, play, high score display, and return to main menu
+		
+		if (playLevel != null) {
+			playLevel.run();
+			if (playLevel.levelFinished) {
+				cleanup();
+			}
+		}
+		
+	}
+	
+	
+	//@Override
+	public void run2() {
 		// TODO Auto-generated method stub
 		currentState = LoadState.READY;
 		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockOffSet[1] - 50 }; // distance from the left top for the bottom-left of the grid display

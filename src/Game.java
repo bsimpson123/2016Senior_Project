@@ -301,7 +301,7 @@ public class Game {
 			source = ref;
 			try {
 				source = FileResource.requestResource(ref);
-				type = source.substring(source.lastIndexOf('.')).toUpperCase(); 
+				type = source.substring(source.lastIndexOf('.') + 1).toUpperCase(); 
 				sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
 				soundMap.put(ref, sound);
 			} catch (IOException e) {
@@ -421,7 +421,7 @@ public class Game {
 		}
 		/* check and handle input controls */
 		// processInput(); 
-		/* input checking is handled within individual game loops, where only the necessary
+		/* input checking is handled within individual control loops, where only the necessary
 		 * inputs will be checked.
 		 */
 		

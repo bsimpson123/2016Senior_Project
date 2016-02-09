@@ -9,7 +9,8 @@ public class Block {
 	}
 
 	protected static Sprite blockColor[];
-	protected static Sprite blockWedge, blockStar, blockTrash, blockRock;
+	protected static Sprite blockStar, blockStarOverlay;
+	protected static Sprite blockWedge, blockTrash, blockRock;
 	protected static Sprite errorBlock;
 	
 	public static final int  
@@ -104,11 +105,16 @@ public class Block {
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
-		blockTex = texMap.get("yellowtiles");
 		blockStar = new Sprite(
 				blockTex,
-				new int[] { 1036, 260 },
-				new int[] { 128, 128 },
+				new int[] { 65, 361 },
+				new int[] { 48, 48 },
+				blockDrawSpace
+			);
+		blockStarOverlay = new Sprite(
+				texMap.get("yellow_ui"),
+				new int[] { 417, 0 },
+				new int[] { 32, 32 },
 				blockDrawSpace
 			);
 		blockWedge = new Sprite(
@@ -161,6 +167,19 @@ public class Block {
 			return ;
 		}
 		block.draw(xc, yc);
+		if (type == BlockType.STAR) {
+			blockStarOverlay.draw(xc, yc);
+		}
 	}
-	
+
+	public void draw(int xc, int yc, int[] size) {
+		if (block == null) {
+			errorBlock.draw(xc, yc, size);
+			return ;
+		}
+		block.draw(xc, yc, size);
+		if (type == BlockType.STAR) {
+			blockStarOverlay.draw(xc, yc, size);
+		}
+	}
 }

@@ -81,11 +81,11 @@ public class Sprite {
 		glPopMatrix();
 	}
 	
-	public void draw(int[] xy, int[] size) {
+	public void draw(int xc, int yc, int[] size) {
 		glPushMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		texture.bind();
-		glTranslatef(xy[0], xy[1], 0);
+		glTranslatef(xc, yc, 0);
 		
 		glBegin(GL_QUADS);
 		{
@@ -103,7 +103,10 @@ public class Sprite {
 
 		} 
 		glEnd();
-		
 		glPopMatrix();
+	}
+	
+	public void draw(int[] xy, int[] size) {
+		this.draw(xy[0], xy[1], size);
 	}
 }
