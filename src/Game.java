@@ -89,7 +89,7 @@ public class Game {
 			new String[] { "green_ui", "media/greenSheet.png" },
 			new String[] { "red_ui", "media/redSheet.png" },
 			new String[] { "yellow_ui", "media/yellowSheet.png" },
-			new String[] { "grey_ui", "media/greysheet.png" },
+			new String[] { "grey_ui", "media/greySheet.png" },
 			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" }
 	};
 	

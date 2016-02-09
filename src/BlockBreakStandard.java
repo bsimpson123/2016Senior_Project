@@ -86,8 +86,14 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 32, 32 },
 				blockOffSet
 			);
-		// TODO: create sprite for pauseCursor
+		// TODO: load static sprite objects for level play.
+		/* By pre-loading level assets, there will be no additional load time
+		 * when starting or switching levels.
+		 */
 		BlockStandardLevel.cursor = cursor;
+		// BlockStandardLevel.pauseCursor
+		// BlockStandardLevel.numbers // numbers used for score display
+		
 		
 		playLevel = new BlockStandardLevelEx(localTexMap);
 		// Update mode state when asset loading is completed

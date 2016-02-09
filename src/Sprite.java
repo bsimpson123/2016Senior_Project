@@ -80,6 +80,10 @@ public class Sprite {
 		// restore the model view matrix to prevent contamination
 		glPopMatrix();
 	}
+
+	public int[] getDefinedSpace() {
+		return drawSpace.clone();
+	}
 	
 	public void draw(int xc, int yc, int[] size) {
 		glPushMatrix();

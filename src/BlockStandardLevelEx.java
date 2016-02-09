@@ -9,7 +9,7 @@ import org.newdawn.slick.opengl.Texture;
  */
 public class BlockStandardLevelEx extends BlockStandardLevel {
 	/** Defines the width and height of the blocks in the grid. */
-	private final int[] blockDimL1;
+	private final int[] blockDimL1; // block dimensions Level 1
 	private int gridShift = 1;
 	private boolean specialActive = false;
 	private final int[] gridBasePos;
@@ -48,7 +48,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].length; k++) {
 				r = Global.rand.nextInt(1024);
-				if (r > 20) {
+				if (r > 20) { 
 					b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
 				} else {
 					b = new Block(Block.BlockType.STAR);
@@ -60,7 +60,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	
 	@Override
 	public void run() {
-		// background is always the first item drawn
+		/* Draw all background elements. These should always be the first items drawn to screen. */
 		background.draw(0, 0);
 		int counter = 0;
 		
@@ -82,7 +82,8 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 
 			// process left,right,up,down movement in the grid or special item area
 			if (specialActive) {
-				; // not implemented yet
+				// if a special item or event has moved the selector cursor, handle that here
+				; 
 			} else {
 				if (inputDelay <= 0l) {
 					checkGridMovement();
@@ -167,8 +168,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		}
 		
 		// draw the top-level UI frame, score and other elements
-		userInterface.draw(0,0);
-		
+		drawTopLevelUI();
 		
 		
 		if (gamePaused) {

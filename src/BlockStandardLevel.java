@@ -3,16 +3,19 @@
  * @author John
  */
 public abstract class BlockStandardLevel {
-	protected Block[][] grid; // = new Block[20][20]; // [x][y], [c][r]
+	protected static Sprite[] numbers = new Sprite[10]; 
+	protected static int score;
+	protected static Sprite pauseCursor;
 	protected static Sprite cursor;
+
+	protected Sprite levelDisplay;
 	protected Sprite background;
 	protected Sprite userInterface;
-	protected static Sprite[] numbers = new Sprite[10]; 
+
+	protected Block[][] grid; // = new Block[20][20]; // [x][y], [c][r]
 	protected int[] cursorGridPos = new int[] { 0, 0 };
-	protected static int score;
 	protected int blocksRemaining = 0;
 	protected boolean gamePaused = false;
-	protected static Sprite pauseCursor;
 	protected long inputDelay = 0;
 
 	public boolean levelFinished = false;
@@ -64,6 +67,11 @@ public abstract class BlockStandardLevel {
 	}
 
 	protected void drawScore() {
+		
+	}
+	
+	protected void drawTopLevelUI() {
+		userInterface.draw(0,0);
 		
 	}
 	
