@@ -90,7 +90,8 @@ public class Game {
 			new String[] { "red_ui", "media/redSheet.png" },
 			new String[] { "yellow_ui", "media/yellowSheet.png" },
 			new String[] { "grey_ui", "media/greySheet.png" },
-			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" }
+			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
+			new String[] { "main_menu_background","media/main_menu_background.png"}
 	};
 	
 	/* Menu display and control variables */
@@ -100,6 +101,7 @@ public class Game {
 	private Sprite optionFrameMid;
 	private Sprite optionFrameBottom;
 	private Sprite optionBox;
+	private Sprite menu_background;
 	
 	private long mouseDelay = Global.inputReadDelayTimer;
 	
@@ -294,7 +296,12 @@ public class Game {
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
-
+		menu_background =new Sprite(
+				Global.textureMap.get("main_menu_background"),
+				new int[] {0,0},
+				new int[] {1024,768},
+				new int[] {1024,768}
+				);
 		Audio sound;
 		for (String ref : soundEffectResource) {
 			sound = null;
@@ -480,6 +487,7 @@ public class Game {
 			testBlock.draw(200, 100);
 			//*/
 			// Draw the frame that will contain the option boxes
+			menu_background.draw(0,0);
 			optionFrameTop.draw(150, 150);
 			optionFrameMid.draw(150, 170);
 			optionFrameBottom.draw(150, 470);
@@ -493,6 +501,7 @@ public class Game {
 			selector[1].draw(351, 187 + cursorPos * 70);
 			
 			selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
+			
 			break;
 //		case BlockMatchStandard:
 //			break;
