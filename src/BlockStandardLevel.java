@@ -110,6 +110,8 @@ public abstract class BlockStandardLevel {
 		return blocksFalling;
 	}
 	
+	protected abstract void shiftGrid();
+	
 	protected void checkGridMovement() {
 		if (Global.getControlActive(Global.GameControl.UP)) {
 			cursorGridPos[1]++;
