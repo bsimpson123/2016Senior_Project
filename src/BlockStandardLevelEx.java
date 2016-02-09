@@ -17,6 +17,8 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
 		rand = Global.rand;
+		// set the score multiplier for the level when 
+		levelMultiplier = 1.5f;
 		// Set environment textures and variables
 		background = new Sprite(
 				rootTex.get("bg_stdmode_wood1"),
@@ -33,6 +35,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		// this value can be { 16, 16 } or { 8, 8 } to reduce the size of the blocks
 		// but the grid size should be increased proportionately
 		blockDimL1 = new int[] { 32, 32 };
+		grid = new Block[20][20];
 		buildGrid();
 		gridBasePos = new int[] { 20, Global.glEnvHeight - blockDimL1[1] - 50 };
 		// set the cursor starting position in the center of the grid
@@ -42,12 +45,11 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	
 	@Override
 	protected void buildGrid() {
-		grid = new Block[20][20];
 		Block b = null;
 		int r = 0;
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].length; k++) {
-				r = Global.rand.nextInt(1024);
+				r = Global.rand.nextInt(10000);
 				if (r > 20) { 
 					b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
 				} else {
@@ -103,7 +105,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					switch (grid[cursorGridPos[0]][cursorGridPos[1]].type) {
 						case BLOCK:
 							counter = checkGrid(grid, cursorGridPos);
-							score += (int)Math.floor(Math.pow(counter - 1, 2) * 1.);
+							score += (int)Math.floor(Math.pow(counter - 1, 2) * levelMultiplier);
 							break;
 						case STAR:
 							if (cursorGridPos[1] > 0) { break; }
@@ -135,8 +137,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		}
 		
 		// draw the top-level UI frame, score and other elements
-		drawTopLevelUI();
-		
+		drawTopLevelUI();		
 		
 		if (gamePaused) {
 			// draw the pause menu and handle input appropriately

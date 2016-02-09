@@ -17,6 +17,8 @@ public abstract class BlockStandardLevel {
 	protected int blocksRemaining = 0;
 	protected boolean gamePaused = false;
 	protected long inputDelay = 0;
+	protected int level = 1;
+	protected float levelMultiplier = 1.0f;
 
 	public boolean levelFinished = false;
 	
@@ -67,11 +69,57 @@ public abstract class BlockStandardLevel {
 	}
 
 	protected void drawScore() {
-		
+		char[] strScore = Integer.toString(score).toCharArray();
+		int offsetX = 948;
+		int yPos = 125;
+		Sprite n;
+		for (int i = strScore.length - 1; i >= 0; i--) {
+			getNumber(strScore[i]).draw(offsetX, yPos);
+			offsetX -= 24;
+		}
+		for (int i = strScore.length; i < 11; i++) {
+			numbers[0].draw(offsetX, yPos);
+			offsetX -= 24;
+		}
+	}
+	
+	private Sprite getNumber(char c) {
+		switch (c) {
+			case '0':
+				return numbers[0];
+			case '1':
+				return numbers[1];
+			case '2':
+				return numbers[2];
+			case '3':
+				return numbers[3];
+			case '4':
+				return numbers[4];
+			case '5':
+				return numbers[5];
+			case '6':
+				return numbers[6];
+			case '7':
+				return numbers[7];
+			case '8':
+				return numbers[8];
+			case '9':
+			default:
+				return numbers[9];
+		}
 	}
 	
 	protected void drawTopLevelUI() {
 		userInterface.draw(0,0);
+		char[] lvl = Integer.toString(level).toCharArray();
+		int offsetX = 860;
+		int yPos = 16;
+		int[] numResize = new int[] { 30, 40 };
+		for (int i = 0; i < lvl.length; i++) {
+			getNumber(lvl[i]).draw(offsetX, yPos, numResize);
+			offsetX += 24;
+		}
+		drawScore();
 		
 	}
 	
@@ -96,8 +144,8 @@ public abstract class BlockStandardLevel {
 					}
 					grid[i][k].draw(
 							gridBasePos[0] + blockSize[0] * i,
-							gridBasePos[1] - blockSize[1] * k - grid[i][k].dropDistance
-							//blockSize
+							gridBasePos[1] - blockSize[1] * k - grid[i][k].dropDistance,
+							blockSize
 						);
 					grid[i][k].checked = false;
 					grid[i][k].clearMark = false;

@@ -26,7 +26,8 @@ public class BlockBreakStandard implements GameMode {
 	protected String[][] texLoadList = new String[][] {
 		new String[] { "ui_base", "media/UIpackSheet_transparent.png" },
 		new String[] { "ui_stdmode", "media/StandardMode_UI.png" },
-		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" }
+		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" },
+		new String[] { "number_white", "media/numbers_sheet_white.png" }
 	};
 	
 	
@@ -93,7 +94,16 @@ public class BlockBreakStandard implements GameMode {
 		BlockStandardLevel.cursor = cursor;
 		// BlockStandardLevel.pauseCursor
 		// BlockStandardLevel.numbers // numbers used for score display
-		
+		int offset = 0;
+		for (int i = 0; i < BlockStandardLevel.numbers.length; i++) {
+			offset = i * 24 - 1;
+			BlockStandardLevel.numbers[i] = new Sprite(
+					localTexMap.get("number_white"),
+					new int[] { offset, 0 },
+					new int[] { 24, 30 },
+					new int[] { 24, 30 }
+				);
+		}
 		
 		playLevel = new BlockStandardLevelEx(localTexMap);
 		// Update mode state when asset loading is completed
