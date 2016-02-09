@@ -1,8 +1,10 @@
 
 public abstract class BlockStandardLevel {
 	protected Block[][] grid = new Block[20][20]; // [x][y], [c][r]
-	protected Sprite cursor;
+	protected static Sprite cursor;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
+	protected static int score;
+	protected int blocksRemaining = 0;
 
 	public boolean levelFinished = false;
 	
@@ -49,5 +51,41 @@ public abstract class BlockStandardLevel {
 		
 	}
 
+	protected void drawScore() {
+		
+	}
 	
+	/**
+	 * Generates a new grid layout based on specified blocks and the weights of each block occurring.
+	 * @param elements A list of Block.BlockTypes to generate for the grid
+	 * @param weights A list of the weighted chance that each block type will occur within 1000.
+	 * This list should be the same size as elements, and the sum of the values should add to 1000.
+	 * @param colorRange For BlockType.BLOCK, this is the lower and upper bounds of the colorID to be used.
+	 */
+	protected void buildGrid(Block.BlockType[] elements, int[] weights, int[] colorRange) {
+		int[] localWeights = new int[weights.length];
+		localWeights[0]--;
+		for (int i = 1; i < weights.length; i++) {
+			localWeights[i] += weights[i-1];
+		}
+		Block b;
+		int r;
+		for (int i = 0; i < grid.length; i++) {
+			for (int k = 0; k < grid[0].length; k++) {
+				b = null;
+				r = Global.rand.nextInt(1000);
+				for (int x = 0; x < localWeights.length; x++) {
+					if (r < localWeights[x]) {
+						if (elements[x] == Block.BlockType.BLOCK) {
+							b = new Block(elements[x], Global.rand.nextInt(colorRange[1]) + colorRange[0]);
+						} else {
+							b = new Block(elements[x]);
+						}
+					}
+				}
+				grid[i][k] = b;
+				blocksRemaining++;
+			}
+		}
+	}
 }
