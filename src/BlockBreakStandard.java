@@ -106,6 +106,7 @@ public class BlockBreakStandard implements GameMode {
 		}
 		
 		playLevel = new BlockStandardLevelEx(localTexMap);
+		BlockStandardLevel.score = 0;
 		// Update mode state when asset loading is completed
 		currentState = LoadState.LOADING_DONE;
 		return;

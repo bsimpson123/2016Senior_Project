@@ -13,7 +13,13 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	private int gridShift = 1;
 	private boolean specialActive = false;
 	private final int[] gridBasePos;
-	private Random rand;
+	private Random rand; // used to shorten the code for calling the randomizer
+	private final int queueStepsUntilAdd = 4; // time in ms between each block being added to the queue
+	private int queueStepsRemaining = queueStepsUntilAdd;
+	private final long queueStepTimer = 750l; // time delay in ms between each step shift in the queue
+	private long queueStepDelay = queueStepTimer * 2; // initial delay is 2x longer than regular delay
+	private int blocksInQueue = 0;
+	private int queueBlockLimit = 5; // number of blocks that can be in queue until forced into grid
 
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
 		rand = Global.rand;
@@ -36,6 +42,8 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		// but the grid size should be increased proportionately
 		blockDimL1 = new int[] { 32, 32 };
 		grid = new Block[20][20];
+		// gridQueue should be the same size as the first grid dimension
+		gridQueue = new Block[20];
 		buildGrid();
 		gridBasePos = new int[] { 20, Global.glEnvHeight - blockDimL1[1] - 50 };
 		// set the cursor starting position in the center of the grid
@@ -70,7 +78,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		if (!gamePaused) {
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			boolean blocksFalling = drawGrid(blockDimL1, 20);
-		
+			drawQueue(blockDimL1);
 			cursor.draw(
 				// for pointer at center of block
 /*				gridBasePos[0] + blockOffSet[0] * cursorGridPos[0] - blockOffSet[0]/2,
@@ -87,6 +95,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				// if a special item or event has moved the selector cursor, handle that here
 				; 
 			} else {
+				processQueue();
 				if (inputDelay <= 0l) {
 					checkGridMovement();
 				} else {
@@ -125,10 +134,16 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 							break;
 					}
 					if (counter > 1) {
-						// remove blocks marked to be cleared
-						shiftGrid();
+						blocksRemaining -= counter;
+						if (blocksRemaining == 0) {
+							// end game code or setup
+						} else {
+							// remove blocks marked to be cleared
+							shiftGrid();
+						}
 						// input delay is only increased if an action was performed and the grid was changed
 						inputDelay = Global.inputReadDelayTimer;
+						
 					}
 				}
 			} else {
@@ -137,12 +152,43 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		}
 		
 		// draw the top-level UI frame, score and other elements
-		drawTopLevelUI();		
+		drawTopLevelUI();
 		
 		if (gamePaused) {
 			// draw the pause menu and handle input appropriately
 		}
 
+	}
+	
+	private void processQueue() {
+		queueStepDelay -= Global.delta;
+		if (queueStepDelay > 0) { return ; }
+		queueStepDelay += queueStepTimer;
+		if (gridQueue[0] == null && blocksInQueue > 0) {
+			for (int i = 0; i < gridQueue.length - 1; i++) {
+				gridQueue[i] = gridQueue[i + 1]; // shift blocks left by one space
+				gridQueue[i + 1] = null;
+			}
+		}
+		if (blocksInQueue == queueBlockLimit) {
+			blocksInQueue = addToGrid(gridQueue);
+			if (blocksInQueue > 0) {
+				// shuffle the  queue
+			}
+		}
+		queueStepsRemaining--;
+		if (queueStepsRemaining > 0) { return ; }
+		Block b;
+		int r = rand.nextInt(10000);
+		if (r > 20) {
+			b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
+		} else {
+			b = new Block(Block.BlockType.STAR);
+		}
+		blocksInQueue++;
+		gridQueue[gridQueue.length - 1] = b;
+		queueStepsRemaining = queueStepsUntilAdd;
+		return;
 	}
 	
 	@Override

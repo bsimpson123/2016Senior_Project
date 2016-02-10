@@ -3,10 +3,13 @@ import static org.lwjgl.opengl.GL11.*;
 import java.io.IOException;
 import java.util.HashMap;
 
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.input.Controller;
+import org.lwjgl.input.Controllers;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.openal.Audio;
@@ -217,7 +220,14 @@ public class Game {
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_W);
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_ESCAPE);
 		
-		
+		// gamepad controls
+		Global.buildControllers();
+		Controller gamepad = Global.getController();
+		if (gamepad != null) {
+			// add gamepad controls here;
+			Global.setGamePadMap(Global.GameControl.SELECT, 1);
+			
+		}
 		// Load all used textures into memory so the game will not be slowed down by loading textures later
 		Texture tex;
 		String type; // holds file type extension
@@ -500,7 +510,7 @@ public class Game {
 			selector[0].draw(160, 187 + cursorPos * 70);
 			selector[1].draw(351, 187 + cursorPos * 70);
 			
-			selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
+			//selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
 			
 			break;
 //		case BlockMatchStandard:

@@ -1,5 +1,9 @@
 import java.util.Random;
 import java.util.HashMap;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Controller;
+import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.opengl.Texture;
 
@@ -41,8 +45,46 @@ public class Global {
 	
 	// a different variable type may be needed to handle key mapping with a many-to-one keys-to-control implementation 
 	private static HashMap<Integer, GameControl> keyMap = new HashMap<Integer, GameControl>();
-	
+	private static HashMap<Integer, GameControl> gamepadMap = new HashMap<Integer, GameControl>();
+	private static int ctrlID = -1;
+	private static Controller[] ctrlList;
+	private static String[] controllerKeywords = new String[] {
+			"Logitech Dual Action"
+		};
 
+	public static Controller getController() {
+		if (ctrlID == -1) { return null; }
+		return ctrlList[ctrlID];
+	}
+	
+	public static void buildControllers() {
+		int count = 0;
+		try {
+			Controllers.create();
+			count = Controllers.getControllerCount();
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		
+		ctrlList = new Controller[count];
+		for (int i = 0; i < count; i++) {
+			ctrlList[i] = Controllers.getController(i);
+			System.out.printf("Controller detected: %s\n\tButton count: %d; Axis count: %d\n", 
+					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount());
+			if (ctrlList[i].getAxisCount() > 0) {
+				ctrlID = i;
+				break;
+			}
+		}
+		if (ctrlID < 0) {
+			System.out.println("No gamepad detected.");
+		} else {
+			System.out.printf("Controller set: %s; controller ID: %d\n", ctrlList[ctrlID].getName(), ctrlID);
+		}
+	}
+	
+	
 	/**
 	 * Checks if keys mapped to the specified game control are pressed.
 	 * @param control The game controls to check input for
@@ -50,10 +92,16 @@ public class Global {
 	 * false if no keys assigned to the control as pressed. 
 	 */
 	public static boolean getControlActive(GameControl control) {
-		
+		int controllers = Controllers.getControllerCount();
 		for (int kbKey : keyMap.keySet()) {
 			if (keyMap.get(kbKey) == control) {
 				if (Keyboard.isKeyDown(kbKey)) { return true; }
+			}
+		}
+		if (controllers == 0 || ctrlID == -1) { return false; }
+		for (int gpKey : gamepadMap.keySet()) {
+			if (gamepadMap.get(gpKey) == control) {
+				if (ctrlList[ctrlID].isButtonPressed(gpKey)) { return true; }
 			}
 		}
 		return false;
@@ -80,5 +128,18 @@ public class Global {
 			keyMap.remove(key);
 		}
 	}
-
+	
+	public static boolean setGamePadMap(GameControl control, int key) {
+		if (gamepadMap.containsKey(key)) {
+			return false;
+		}
+		gamepadMap.put(key, control);
+		return true;
+	}
+	
+	public static void breakGamePadMap(int key) {
+		if (gamepadMap.containsKey(key)) {
+			gamepadMap.remove(key);
+		}
+	}
 }
