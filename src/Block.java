@@ -182,4 +182,30 @@ public class Block {
 			blockStarOverlay.draw(xc, yc, size);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		String blockID;
+		switch (type) {
+			case BLOCK:
+				blockID = "BLOCK";
+				break;
+			case WEDGE:
+				blockID = "WEDGE";
+				break;
+			case STAR:
+				blockID = "STAR";
+				break;
+			case ROCK:
+				blockID = "ROCK";
+				break;
+			case TRASH:
+				blockID = "TRASH";
+				break;
+			default:
+				blockID = "UNKOWN";
+				break;
+		}
+		return String.format("%s %d c:%s m:%s", blockID, colorID, checked ? "T" : "F", clearMark ? "T" : "F");
+	}
 }
