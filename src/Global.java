@@ -1,4 +1,12 @@
 import java.util.Random;
+
+import javax.print.attribute.standard.DateTimeAtCompleted;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.Formatter;
 import java.util.HashMap;
 
 import org.lwjgl.LWJGLException;
@@ -35,6 +43,7 @@ public class Global {
 	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
 	 * This is the sensitivity of the input. */
 	public static long inputReadDelayTimer = 120l;
+	private static FileWriter logFile;
 	
 	
 	public enum GameControl {
@@ -92,16 +101,25 @@ public class Global {
 	 * false if no keys assigned to the control as pressed. 
 	 */
 	public static boolean getControlActive(GameControl control) {
-		int controllers = Controllers.getControllerCount();
 		for (int kbKey : keyMap.keySet()) {
 			if (keyMap.get(kbKey) == control) {
 				if (Keyboard.isKeyDown(kbKey)) { return true; }
 			}
 		}
-		if (controllers == 0 || ctrlID == -1) { return false; }
-		for (int gpKey : gamepadMap.keySet()) {
-			if (gamepadMap.get(gpKey) == control) {
-				if (ctrlList[ctrlID].isButtonPressed(gpKey)) { return true; }
+		if (ctrlID == -1) { return false; }
+		if (control == GameControl.LEFT) {
+			return (ctrlList[ctrlID].getPovX() == -1f);
+		} else if (control == GameControl.RIGHT) {
+			return (ctrlList[ctrlID].getPovX() == 1f);
+		} else if (control == GameControl.UP) {
+			return (ctrlList[ctrlID].getPovY() == -1f);
+		} else if (control == GameControl.DOWN) {
+			return (ctrlList[ctrlID].getPovY() == 1f);
+		} else {
+			for (int gpKey : gamepadMap.keySet()) {
+				if (gamepadMap.get(gpKey) == control) {
+					if (ctrlList[ctrlID].isButtonPressed(gpKey)) { return true; }
+				}
 			}
 		}
 		return false;
@@ -140,6 +158,32 @@ public class Global {
 	public static void breakGamePadMap(int key) {
 		if (gamepadMap.containsKey(key)) {
 			gamepadMap.remove(key);
+		}
+	}
+	
+	public static void initLog() {
+		LocalDateTime time = LocalDateTime.now();
+		Formatter format = new Formatter();
+		String filename = String.format("logs/%tF ", 
+				time.getYear(), time.getMonthValue(), time.getDayOfMonth());
+/*
+		try {
+			logFile = new FileWriter(filename);
+		} catch (IOException e) {
+			System.out.println("Unable to create log file.");
+			e.printStackTrace();
+		} */
+		
+	}
+	
+	public static void closeLog() {
+		if (logFile != null) {
+			try {
+				logFile.close();
+			} catch (IOException e) {
+				System.out.println("Error closing log file.");
+				e.printStackTrace();
+			}
 		}
 	}
 }

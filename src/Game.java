@@ -217,6 +217,7 @@ public class Game {
 		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_X);
 		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_RETURN);
 		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_SPACE);
+		Global.setKeyMap(Global.GameControl.SPECIAL, Keyboard.KEY_F);
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_W);
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_ESCAPE);
 		
@@ -226,6 +227,8 @@ public class Game {
 		if (gamepad != null) {
 			// add gamepad controls here;
 			Global.setGamePadMap(Global.GameControl.SELECT, 1);
+			Global.setGamePadMap(Global.GameControl.CANCEL, 0);
+			Global.setGamePadMap(Global.GameControl.SPECIAL, 2);
 			
 		}
 		// Load all used textures into memory so the game will not be slowed down by loading textures later
