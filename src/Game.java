@@ -94,7 +94,8 @@ public class Game {
 			new String[] { "yellow_ui", "media/yellowSheet.png" },
 			new String[] { "grey_ui", "media/greySheet.png" },
 			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
-			new String[] { "main_menu_background","media/main_menu_background.png"}
+			new String[] { "main_menu_background","media/main_menu_background.png"},
+			new String[] { "uibox", "media/UI_Boxes.png" }
 	};
 	
 	/* Menu display and control variables */
@@ -208,6 +209,7 @@ public class Game {
 	private void initComponents() {
 		// grab the mouse (hides the cursor while playing)
 		Mouse.setGrabbed(captureMouse);
+		Global.globalInit();
 		// TODO: add all game variables to be loaded/initialized at the start of the program
 		// Setup default game controls.
 		Global.setKeyMap(Global.GameControl.UP, Keyboard.KEY_UP);
@@ -222,13 +224,13 @@ public class Game {
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_ESCAPE);
 		
 		// gamepad controls
-		Global.buildControllers();
 		Controller gamepad = Global.getController();
 		if (gamepad != null) {
 			// add gamepad controls here;
 			Global.setGamePadMap(Global.GameControl.SELECT, 1);
 			Global.setGamePadMap(Global.GameControl.CANCEL, 0);
 			Global.setGamePadMap(Global.GameControl.SPECIAL, 2);
+			Global.setGamePadMap(Global.GameControl.PAUSE, 9);
 			
 		}
 		// Load all used textures into memory so the game will not be slowed down by loading textures later
@@ -256,6 +258,7 @@ public class Game {
 			 //Global.textureMap.put(source, tex);
 		}
 		
+		Global.buildStandardUIBoxes();
 		// Example code for loading textures with Sprite objects
 		/* Loading sprites where the complete texture will be drawn to the screen
 		menuBar = new Sprite( 
@@ -309,12 +312,15 @@ public class Game {
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
-		menu_background =new Sprite(
+		menu_background = new Sprite(
 				Global.textureMap.get("main_menu_background"),
 				new int[] {0,0},
 				new int[] {1024,768},
 				new int[] {1024,768}
 				);
+		
+	
+		
 		Audio sound;
 		for (String ref : soundEffectResource) {
 			sound = null;
@@ -514,7 +520,8 @@ public class Game {
 			selector[1].draw(351, 187 + cursorPos * 70);
 			
 			//selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
-			
+			Global.uiBlue.draw(mouseX, mouseY, 240, 48);
+
 			break;
 //		case BlockMatchStandard:
 //			break;
@@ -619,11 +626,8 @@ public class Game {
 			renderGL();
 			Display.update();
 		}
+		Global.globalFinalize();
 		// release all textures loaded
-		for (String ref : Global.textureMap.keySet()) {
-			Global.textureMap.get(ref).release();
-		}
-		Global.textureMap.clear();
 	}
 	
 	public static void main(String[] args) {

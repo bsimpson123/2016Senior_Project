@@ -1,7 +1,6 @@
-
-
 import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
+
 /**
  * Manages texture binding and drawing on the screen.
  * @author John Ojala

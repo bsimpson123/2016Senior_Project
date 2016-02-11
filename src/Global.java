@@ -1,10 +1,7 @@
 import java.util.Random;
 
-import javax.print.attribute.standard.DateTimeAtCompleted;
-
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -43,6 +40,9 @@ public class Global {
 	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
 	 * This is the sensitivity of the input. */
 	public static long inputReadDelayTimer = 120l;
+	public static UIBox 
+		uiBlue, uiRed, uiGreen, uiYellow, uiGrey;
+	
 	private static FileWriter logFile;
 	
 	
@@ -57,16 +57,13 @@ public class Global {
 	private static HashMap<Integer, GameControl> gamepadMap = new HashMap<Integer, GameControl>();
 	private static int ctrlID = -1;
 	private static Controller[] ctrlList;
-	private static String[] controllerKeywords = new String[] {
-			"Logitech Dual Action"
-		};
 
 	public static Controller getController() {
 		if (ctrlID == -1) { return null; }
 		return ctrlList[ctrlID];
 	}
 	
-	public static void buildControllers() {
+	private static void buildControllers() {
 		int count = 0;
 		try {
 			Controllers.create();
@@ -176,7 +173,18 @@ public class Global {
 		
 	}
 	
-	public static void closeLog() {
+	public static void writeLog(String text) {
+		if (logFile == null) { return ; }
+		try {
+			logFile.write(text);
+			logFile.write("\n");
+			logFile.flush();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+	}
+	
+	private static void closeLog() {
 		if (logFile != null) {
 			try {
 				logFile.close();
@@ -185,5 +193,71 @@ public class Global {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static void globalInit() {
+		//initLog();
+		buildControllers();
+		
+	}
+	
+	public static void buildStandardUIBoxes() {
+		Sprite[][] box = new Sprite[3][3];
+		int[] corner = new int[] { 16, 16 };
+		Texture tex = textureMap.get("uibox");
+		int[] point = new int[2];
+		for (int i = 0; i < 3; i++) {
+			point[0] = i * 16;
+			for (int k = 0; k < 3; k++) {
+				point[1] = k * 16 ;
+				box[i][k] = new Sprite( tex, point, corner, corner);
+			}
+		}
+		uiBlue = new UIBox(box, corner);
+		box = new Sprite[3][3];
+		for (int i = 0; i < 3; i++) {
+			point[0] = i * 16 + 48;
+			for (int k = 0; k < 3; k++) {
+				point[1] = k * 18;
+				box[i][k] = new Sprite( tex, point, corner, corner);
+			}
+		}
+		uiRed = new UIBox(box, corner);
+		box = new Sprite[3][3];
+		for (int i = 0; i < 3; i++) {
+			point[0] = i * 16 + 96;
+			for (int k = 0; k < 3; k++) {
+				point[1] = k * 18;
+				box[i][k] = new Sprite( tex, point, corner, corner);
+			}
+		}
+		uiGreen = new UIBox(box, corner);
+		box = new Sprite[3][3];
+		for (int i = 0; i < 3; i++) {
+			point[0] = i * 16 + 144;
+			for (int k = 0; k < 3; k++) {
+				point[1] = k * 18;
+				box[i][k] = new Sprite( tex, point, corner, corner);
+			}
+		}
+		uiYellow = new UIBox(box, corner);
+		box = new Sprite[3][3];
+		for (int i = 0; i < 3; i++) {
+			point[0] = i * 16 + 192;
+			for (int k = 0; k < 3; k++) {
+				point[1] = k * 18;
+				box[i][k] = new Sprite( tex, point, corner, corner);
+			}
+		}
+		uiGrey = new UIBox(box, corner);
+	}
+	
+	public static void globalFinalize() {
+		//closeLog();
+		for (String ref : Global.textureMap.keySet()) {
+			Global.textureMap.get(ref).release();
+		}
+		Global.textureMap.clear();
+
 	}
 }
