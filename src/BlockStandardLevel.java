@@ -1,7 +1,6 @@
 /**
- * This class serves as the base class for all Block Breaker Standard mode levels,
- * and defines and abstracts many of the functions that many level design simpler.
- * @author John Ojala
+ * 
+ * @author John
  */
 public abstract class BlockStandardLevel {
 	protected static Sprite[] numbers = new Sprite[10]; 
@@ -14,7 +13,6 @@ public abstract class BlockStandardLevel {
 	protected Sprite userInterface;
 
 	protected Block[][] grid; // = new Block[20][20]; // [x][y], [c][r]
-	protected Block[] gridQueue;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int blocksRemaining = 0;
 	protected boolean gamePaused = false;
@@ -112,6 +110,8 @@ public abstract class BlockStandardLevel {
 	}
 	
 	protected void drawTopLevelUI() {
+		Global.uiRed.draw(700, 16, 300, 56);
+		Global.uiBlue.draw(700, 72, 300, 96);
 		userInterface.draw(0,0);
 		char[] lvl = Integer.toString(level).toCharArray();
 		int offsetX = 860;
@@ -127,19 +127,6 @@ public abstract class BlockStandardLevel {
 	
 	protected abstract void buildGrid(); 
 
-	protected final boolean drawQueue(int[] blockSize) {
-		int[] anchorPos = new int[] { 20, 40 };
-		int offset = 0, count = 0;
-		for (int i = 0; i < gridQueue.length; i++) {
-			if (gridQueue[i] != null) {
-				gridQueue[i].draw(anchorPos[0] + offset, anchorPos[1], blockSize);
-				count++;
-			}
-			offset += blockSize[0];
-		}
-		return (count >= 5);
-	}
-	
 	protected final boolean drawGrid(int[] blockSize, int dropRate) {
 		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 }; // distance from the left top for the bottom-left of the grid display
 		//int dropRate = 20; // millisecond time for a falling block to cover 1 space
@@ -206,25 +193,6 @@ public abstract class BlockStandardLevel {
 			}
 			inputDelay = Global.inputReadDelayTimer;
 		}
-	}
-	
-	/**
-	 * Add a row of blocks to the grid. Returns the number of blocks that could not be added, if any.
-	 * @param queue Array of Block objects the same size as the first dimension of the grid
-	 */
-	protected int addToGrid(Block[] queue) {
-		int blocksRemaining = 0;
-		int topLevel = grid[0].length - 1;
-		for (int i = 0; i < grid.length; i++) {
-			if (grid[i][topLevel] == null) {
-				grid[i][topLevel] = queue[i]; // add the block in queue to the grid at the same column
-				queue[i] = null; // remove the block from the queue
-			} else if (queue[i] != null) { // grid column is full, and a block was in the queue for the column
-				blocksRemaining++;
-			}
-		}
-		shiftGrid();
-		return blocksRemaining;
 	}
 }
 

@@ -243,15 +243,16 @@ public class Game {
 			tex = null;
 			source = ref[1];
 			 try {
-				 source = FileResource.requestResource(ref[1]);
-				 tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref[1]));
-				 if ( Global.textureMap.putIfAbsent(ref[0], tex) != null) {
-					 // report error, attempting to add duplicate key entry
-					 System.out.printf("Attempting to load multiple textures to key [%s]", ref[0]);
-					 System.out.printf("Texture resource [%s] not loaded.", ref[1]);
+				source = FileResource.requestResource(ref[1]);
+				tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref[1]));
+				if ( Global.textureMap.putIfAbsent(ref[0], tex) != null) {
+					// report error, attempting to add duplicate key entry
+					Global.writeToLog(
+						String.format("Attempting to load multiple textures to key [%s]\n" + 
+							"Texture resource [%s] not loaded.", ref[0], ref[1]), true);
 				 }
 			 } catch (IOException e) {
-				 System.out.printf("Unable to load texture resource %s\n", source);
+				 Global.writeToLog(String.format("Unable to load texture resource %s\n", source), true);
 				 e.printStackTrace();
 				 System.exit(-1);
 			 }
@@ -331,7 +332,7 @@ public class Game {
 				sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
 				soundMap.put(ref, sound);
 			} catch (IOException e) {
-				System.out.printf("Unable to load sound resource: %s\n%s", source, e.getMessage());
+				Global.writeToLog(String.format("Unable to load sound resource: %s\n%s", source, e.getMessage()), true);
 				System.out.println(e.getMessage());
 			}
 		}
@@ -340,19 +341,6 @@ public class Game {
 		Block.initializeBlocks(Global.textureMap);
 		
 	}
-	
-	
-	/*
-	public static String requestResource(String file) throws IOException { 
-		Path resourcePath;
-		Path reqPath = Paths.get(file).toAbsolutePath();
-		System.out.printf("Requesting resource: %s...", file);
-		resourcePath = reqPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
-		System.out.println("Success.");
-		System.out.printf("\t%s\n", resourcePath.toString());
-		return resourcePath.toString();
-	} //*/
-
 	
 	/**
 	 * Attempts to get a preloaded texture. Attempting to request a texture that
@@ -366,50 +354,6 @@ public class Game {
 		}
 		return null;
 	}
-	
-	/*
-	private void processInput() {
-		// Input needs will vary between game modes, and menus within each mode, so input handling will
-		// need to be checked in each specific section.
-		
-		/* Get mouse movement on the X and Y axis
-		 * Can only call getDX and getDY once each per game loop.
-		 * Additional calls will return 0 or a very small value as there will have been 
-		 * zero or minimal movement of the mouse within the specific game loop. 
-		 *
-		if (useMouse) {
-			mouseX = Mouse.getDX();
-			mouseY = Mouse.getDY();
-			int moveX = 0;
-			int moveY = 0;
-		}
-		
-		// This code, in whole or part, should be used in individual control loops 
-		// to check against registered input for processing
-		if (Global.getControlActive(Global.GameControl.LEFT)) { 
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.RIGHT)) { 
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.UP)) {
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.DOWN)) {
-			cursorPos++;
-			
-		}
-		if (Global.getControlActive(Global.GameControl.SELECT)) {
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.CANCEL)) {
-			gameRunning = false;
-		}
-		if (Global.getControlActive(Global.GameControl.SPECIAL)) {
-			;
-		}
-		
-	} //*/
 	
 	/**
 	 * Determine the delay time since the last frame render, get the player input,
@@ -579,7 +523,7 @@ public class Game {
 			sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
 			soundMap.put(file, sound);
 		} catch (IOException e) {
-			System.out.printf("Unable to load sound resource: %s\n%s", source, e.getMessage());
+			Global.writeToLog(String.format("Unable to load sound resource: %s\n%s", source, e.getMessage()));
 			return false;
 		}
 		return true;
@@ -643,11 +587,11 @@ class GameModeLoader implements Runnable {
 	
 	public GameModeLoader(GameMode gm) {
 		mode = gm;
-		System.out.println("Debug: Loader thread constructor called.");
+		Global.writeToLog("Debug: Loader thread constructor called.");
 	}
 	
 	public void run() {
-		System.out.println("Debug: Loader thread active.");
+		Global.writeToLog("Debug: Loader thread active.");
 		mode.initialize();
 	}
 }

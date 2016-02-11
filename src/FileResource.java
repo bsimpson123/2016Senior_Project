@@ -10,7 +10,7 @@ public final class FileResource {
 	public static String requestResource(String file) throws IOException { 
 		Path resourcePath;
 		Path reqPath = Paths.get(file).toAbsolutePath();
-		System.out.printf("Loading resource file: %s...", file);
+		Global.writeToLog(String.format("Loading resource file: %s...", file));
 		//try {
 			resourcePath = reqPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
 		/*} catch (IOException e) {
@@ -19,8 +19,8 @@ public final class FileResource {
 			e.printStackTrace();
 			return null;
 		}*/
-		System.out.println("Success.");
-		System.out.printf("\t%s\n", resourcePath.toString());
+		Global.writeToLog(String.format("Success."));
+		Global.writeToLog(String.format("\t%s\n", resourcePath.toString()));
 		return resourcePath.toString();
 	}
 }

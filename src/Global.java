@@ -76,17 +76,17 @@ public class Global {
 		ctrlList = new Controller[count];
 		for (int i = 0; i < count; i++) {
 			ctrlList[i] = Controllers.getController(i);
-			System.out.printf("Controller detected: %s\n\tButton count: %d; Axis count: %d\n", 
-					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount());
+			writeToLog(String.format("Controller detected: %s\n\tButton count: %d; Axis count: %d\n", 
+					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount()));
 			if (ctrlList[i].getAxisCount() > 0) {
 				ctrlID = i;
 				break;
 			}
 		}
 		if (ctrlID < 0) {
-			System.out.println("No gamepad detected.");
+			writeToLog("No gamepad detected.");
 		} else {
-			System.out.printf("Controller set: %s; controller ID: %d\n", ctrlList[ctrlID].getName(), ctrlID);
+			writeToLog(String.format("Controller set: %s; controller ID: %d\n", ctrlList[ctrlID].getName(), ctrlID));
 		}
 	}
 	
@@ -160,20 +160,17 @@ public class Global {
 	
 	public static void initLog() {
 		LocalDateTime time = LocalDateTime.now();
-		Formatter format = new Formatter();
-		String filename = String.format("logs/%tF ", 
-				time.getYear(), time.getMonthValue(), time.getDayOfMonth());
-/*
+		String filename = String.format("%1$tF %1$tH%1$tI.log", time);
 		try {
 			logFile = new FileWriter(filename);
 		} catch (IOException e) {
 			System.out.println("Unable to create log file.");
 			e.printStackTrace();
-		} */
+		} 
 		
 	}
-	
-	public static void writeLog(String text) {
+	public static void writeToLog(String text) { writeToLog(text, false); }
+	public static void writeToLog(String text, boolean writeToConsole) {
 		if (logFile == null) { return ; }
 		try {
 			logFile.write(text);
@@ -196,7 +193,7 @@ public class Global {
 	}
 	
 	public static void globalInit() {
-		//initLog();
+		initLog();
 		buildControllers();
 		
 	}
@@ -253,7 +250,7 @@ public class Global {
 	}
 	
 	public static void globalFinalize() {
-		//closeLog();
+		closeLog();
 		for (String ref : Global.textureMap.keySet()) {
 			Global.textureMap.get(ref).release();
 		}

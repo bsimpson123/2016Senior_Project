@@ -54,12 +54,12 @@ public class BlockBreakStandard implements GameMode {
 				 tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref[1]));
 				 if ( localTexMap.putIfAbsent(ref[0], tex) != null) {
 					 // report error, attempting to add duplicate key entry
-					 System.out.printf("Attempting to load multiple textures to key [%s]", ref[0]);
-					 System.out.printf("Texture resource [%s] not loaded.", ref[1]);
+					 Global.writeToLog(String.format("Attempting to load multiple textures to key [%s]", ref[0]));
+					 Global.writeToLog(String.format("Texture resource [%s] not loaded.", ref[1]) );
 				 }
 				 localTexMap.put(source, tex);
 			 } catch (IOException e) {
-				 System.out.printf("Unable to load texture resource %s\n", source);
+				 Global.writeToLog(String.format("Unable to load texture resource %s\n", source) );
 				 e.printStackTrace();
 				 System.exit(-1);
 			 }
