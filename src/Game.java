@@ -97,7 +97,8 @@ public class Game {
 			new String[] { "grey_ui", "media/greySheet.png" },
 			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
 			new String[] { "main_menu_background","media/main_menu_background.png"},
-			new String[] { "uibox", "media/UI_Boxes.png" }
+			new String[] { "uibox", "media/UI_Boxes.png" },
+			new String[] { "title", "media/TitleDisplay.png" }
 	};
 	
 	/* Menu display and control variables */
@@ -108,6 +109,7 @@ public class Game {
 	private Sprite optionFrameBottom;
 	private Sprite optionBox;
 	private Sprite menu_background;
+	private Sprite title;
 	
 	private long mouseDelay = Global.inputReadDelayTimer;
 	
@@ -320,9 +322,14 @@ public class Game {
 				new int[] {0,0},
 				new int[] {1024,768},
 				new int[] {1024,768}
-				);
+			);
 		
-	
+		title = new Sprite(
+				Global.textureMap.get("title"),
+				new int[] { 0, 0 },
+				new int[] { 1024, 256 },
+				new int[] { 1024, 256 }
+			);
 		
 		Audio sound;
 		for (String ref : soundEffectResource) {
@@ -455,6 +462,7 @@ public class Game {
 			//*/
 			// Draw the frame that will contain the option boxes
 			menu_background.draw(0,0);
+			title.draw(0, 50);
 			optionFrameTop.draw(400, 350);
 			optionFrameMid.draw(400, 370);
 			optionFrameBottom.draw(400, 670);
