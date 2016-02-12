@@ -127,6 +127,13 @@ public abstract class BlockStandardLevel {
 	
 	protected abstract void buildGrid(); 
 
+	/**
+	 * 
+	 * @param blockSize The size of the blocks being drawn
+	 * @param dropRate The drop rate in pixels/second for falling blocks
+	 * @return true if blocks are currently falling within the grid, false
+	 * if no blocks are currently falling 
+	 */
 	protected final boolean drawGrid(int[] blockSize, int dropRate) {
 		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 }; // distance from the left top for the bottom-left of the grid display
 		//int dropRate = 20; // millisecond time for a falling block to cover 1 space
@@ -137,7 +144,7 @@ public abstract class BlockStandardLevel {
 			for (int k = 0; k < grid[0].length; k++) {
 				if (grid[i][k] != null) {
 					if (grid[i][k].dropDistance > 0) {
-						grid[i][k].dropDistance -= (Global.delta * dropRate) / blockSize[1];
+						grid[i][k].dropDistance -= (Global.delta * dropRate) / 100;
 						if (grid[i][k].dropDistance < 0) { 
 							grid[i][k].dropDistance = 0; 
 						} else {

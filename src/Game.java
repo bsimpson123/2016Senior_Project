@@ -1,5 +1,6 @@
 import static org.lwjgl.opengl.GL11.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -575,6 +576,8 @@ public class Game {
 	}
 	
 	public static void main(String[] args) {
+		System.setProperty("java.library.path", new File("native/windows").getAbsolutePath());
+		System.setProperty("org.lwjgl.librarypath", new File("native/windows/").getAbsolutePath());
 		System.out.println("Use -fullscreen for fullscreen mode.");
 		new Game( (args.length > 0) && args[0].equalsIgnoreCase("-fullscreen") ).run();
 

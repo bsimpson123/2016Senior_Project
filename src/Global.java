@@ -3,7 +3,6 @@ import java.util.Random;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Formatter;
 import java.util.HashMap;
 
 import org.lwjgl.LWJGLException;
@@ -26,7 +25,7 @@ import org.newdawn.slick.opengl.Texture;
 public class Global {
 	/** Contains publicly loaded texture objects, mapped to string phrase keys  */
 	public static HashMap<String, Texture> textureMap = new HashMap<String, Texture>(15);
-	public static Random rand = new Random();
+	public static final Random rand = new Random();
 	/** The draw space (width) of the OpenGL environment. */
 	public static final int glEnvWidth = 1024;
 	/** The draw space (height) of the OpenGL environment. */
@@ -65,6 +64,7 @@ public class Global {
 	
 	private static void buildControllers() {
 		int count = 0;
+		int axis = 0;
 		try {
 			Controllers.create();
 			count = Controllers.getControllerCount();
@@ -77,8 +77,9 @@ public class Global {
 		for (int i = 0; i < count; i++) {
 			ctrlList[i] = Controllers.getController(i);
 			writeToLog(String.format("Controller detected: %s\n\tButton count: %d; Axis count: %d\n", 
-					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount()));
-			if (ctrlList[i].getAxisCount() > 0) {
+					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount()), false);
+			axis = ctrlList[i].getAxisCount();
+			if (axis == 2 || axis == 4) {
 				ctrlID = i;
 				break;
 			}
@@ -171,6 +172,9 @@ public class Global {
 	}
 	public static void writeToLog(String text) { writeToLog(text, false); }
 	public static void writeToLog(String text, boolean writeToConsole) {
+		if (writeToConsole) {
+			System.out.println(text);
+		}
 		if (logFile == null) { return ; }
 		try {
 			logFile.write(text);
@@ -195,6 +199,7 @@ public class Global {
 	public static void globalInit() {
 		initLog();
 		buildControllers();
+		
 		
 	}
 	

@@ -72,7 +72,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused) {
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			boolean blocksFalling = drawGrid(blockDimL1, 20);
+			boolean blocksFalling = drawGrid(blockDimL1, 40);
 		
 			cursor.draw(
 				// for pointer at center of block
