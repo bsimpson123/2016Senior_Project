@@ -434,8 +434,8 @@ public class Game {
 				switch (cursorPos) {
 					case 0:
 					case 1:
-						game = new GameModeSelection();
-						//game = new BlockBreakStandard();
+						//game = new GameModeSelection();
+						game = new BlockBreakStandard();
 						activeGameMode = GameModeSelection;
 						break;
 					case 2:

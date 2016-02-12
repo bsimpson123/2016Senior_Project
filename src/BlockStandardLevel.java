@@ -21,6 +21,7 @@ public abstract class BlockStandardLevel {
 	protected float levelMultiplier = 1.0f;
 
 	public boolean levelFinished = false;
+	public boolean gameOver = false;
 	
 	public abstract void run();
 

@@ -9,7 +9,7 @@ import org.newdawn.slick.util.ResourceLoader;
 public class BlockBreakStandard implements GameMode {
 	protected LoadState currentState = LoadState.NOT_LOADED;
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
-	protected Stack<Integer> cursorPos = new Stack<Integer>();
+	protected int cursorPos = 0;
 	protected long inputDelay = Global.inputReadDelayTimer;
 	private BlockStandardLevel playLevel;
 
@@ -21,8 +21,11 @@ public class BlockBreakStandard implements GameMode {
 	protected int counter = 0;
 	protected final int maxLevel = 5;
 	protected int[] blockOffSet = new int[] { 32, 32 };
+	private long movementInputDelay = Global.inputReadDelayTimer;
 	
-	
+	private boolean pageBack = false;
+	/** The current game mode within the main logic loop. */
+
 	protected String[][] texLoadList = new String[][] {
 		new String[] { "ui_base", "media/UIpackSheet_transparent.png" },
 		new String[] { "ui_stdmode", "media/StandardMode_UI.png" },
@@ -30,6 +33,17 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "number_white", "media/numbers_sheet_white.png" }
 	};
 	
+	private final int GameModeSelection = 0,
+		BlockMatchStandard = 1,
+		PracticeMode = 2,
+		HighScore = 3
+		;
+	int activeGameMode = GameModeSelection;
+
+	private int optionBoxOffset = 0;
+	private Sprite[] selector = new Sprite[2];
+	private Sprite optionBox;
+
 	
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
@@ -64,22 +78,27 @@ public class BlockBreakStandard implements GameMode {
 				 System.exit(-1);
 			 }
 		}
-
-		for (int i = 0; i < grid.length; i++) {
-			for (int k = 0; k < grid[0].length; k++) {
-				grid[i][k] = new Block( Block.BlockType.BLOCK, Global.rand.nextInt(3) );
-			}
-		}
+// author Brock
+		optionBox = new Sprite(
+				Global.textureMap.get("green_ui"),
+				new int[] { 0, 0 },
+				new int[] { 190, 48 },
+				new int[] { 190, 48 }
+			);
 		
+		selector[0] = new Sprite( // left-side arrow
+				Global.textureMap.get("grey_ui"),
+				new int[] { 39, 478 },
+				new int[] { 38, 30 },
+				new int[] { 38, 30 }
+			);
+		selector[1] = new Sprite( // right-side arrow
+				Global.textureMap.get("grey_ui"),
+				new int[] { 0, 478 },
+				new int[] { 38, 30 },
+				new int[] { 38, 30 }
+			);
 		
-		cursorGridPos[0] = grid.length / 2;
-		cursorGridPos[1] = grid[0].length / 2;
-/*		cursor = new Sprite(
-				localTexMap.get("ui_base"),
-				new int[] { 485, 341 },
-				new int[] { 14, 18 },
-				new int[] { 28, 36 }
-			); //*/
 		// update to BlockBreakStandard.cursor after code moves to separate level class
 		cursor = new Sprite(
 				Global.textureMap.get("blocksheet"),
@@ -87,10 +106,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 32, 32 },
 				blockOffSet
 			);
-		// TODO: load static sprite objects for level play.
-		/* By pre-loading level assets, there will be no additional load time
-		 * when starting or switching levels.
-		 */
+
 		BlockStandardLevel.cursor = cursor;
 		// BlockStandardLevel.pauseCursor
 		// BlockStandardLevel.numbers // numbers used for score display
@@ -105,8 +121,6 @@ public class BlockBreakStandard implements GameMode {
 				);
 		}
 		
-		playLevel = new BlockStandardLevelEx(localTexMap);
-		BlockStandardLevel.score = 0;
 		// Update mode state when asset loading is completed
 		currentState = LoadState.LOADING_DONE;
 		return;
@@ -120,15 +134,69 @@ public class BlockBreakStandard implements GameMode {
 	@Override
 	public void run() {
 		currentState = LoadState.READY;
-		// TODO: draw user interface for practice, play, high score display, and return to main menu
+		//movementInputDelay = Global.inputReadDelayTimer;
+
 		
 		if (playLevel != null) {
 			playLevel.run();
 			if (playLevel.levelFinished) {
+				if (playLevel.gameOver) {
+					// kick back to menu
+				} else {
+					// load next level
+					switch(playLevel.level) {
+						case 1:
+							
+							break;
+						default:
+							break;
+					}
+				}
 				cleanup();
 			}
+		} else {
+// @author Brock
+			moveCursor();
+			optionBoxOffset = 100;
+			if (cursorPos == 0) {
+				optionBox.draw(180 + optionBoxOffset, 180);
+				optionBox.draw(180, 250);
+				optionBox.draw(180, 320);
+				optionBox.draw(180, 390);
+				
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+			} 
+			if (cursorPos == 1) {
+				optionBox.draw(180, 180);
+				optionBox.draw(180 + optionBoxOffset, 250);
+				optionBox.draw(180, 320);
+				optionBox.draw(180, 390);
+				
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+			}
+			if (cursorPos == 2) {
+				optionBox.draw(180, 180);
+				optionBox.draw(180, 250);
+				optionBox.draw(180 + optionBoxOffset, 320);
+				optionBox.draw(180, 390);
+				
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+			}
+			if (cursorPos == 3) {
+				optionBox.draw(180, 180);
+				optionBox.draw(180, 250);
+				optionBox.draw(180, 320);
+				optionBox.draw(180 + optionBoxOffset, 390);
+				
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+			}
+			
 		}
-		
+		if (pageBack) { cleanup(); }
 	}
 	
 	@Override
@@ -144,4 +212,63 @@ public class BlockBreakStandard implements GameMode {
 		 */
 		currentState = LoadState.FINALIZED;
 	}
+	
+	/**
+	 * @author Brock
+	 */
+	public void moveCursor() {
+		if (movementInputDelay <= 0) {
+		if (Global.getControlActive(Global.GameControl.UP)) {
+			cursorPos--;
+			if (cursorPos < 0) {
+				
+				cursorPos = 3;
+			}
+			movementInputDelay = Global.inputReadDelayTimer;
+		}
+		if (Global.getControlActive(Global.GameControl.DOWN)) {
+			cursorPos++;
+			if (cursorPos > 3) {
+				cursorPos = 0;
+			}
+			movementInputDelay = Global.inputReadDelayTimer;
+		}
+		if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
+			cursorPos = 3;
+		}
+		
+		if (Global.getControlActive(Global.GameControl.SELECT)) {
+			switch (cursorPos) {
+				case 0:
+					playLevel = new BlockStandardLevelEx(localTexMap);
+					BlockStandardLevel.score = 0;
+					//activeGameMode = BlockMatchStandard;
+					break;
+				case 1:
+					playLevel = new BlockStandardLevelEx(localTexMap);
+					BlockStandardLevel.score = 0;
+					//activeGameMode = BlockMatchStandard;
+					break;
+					
+				case 2:
+					//game = 
+					//pageBack = true;
+					//activeGameMode = MainMenu;
+					//gameRunning = false;
+					break;
+				case 3:
+					pageBack = true;
+					break;
+			}
+			
+		}
+	} else if (movementInputDelay > 0) {
+		movementInputDelay -= Global.delta;
+	}
+
+		}
+		
+	
+
 }
+
