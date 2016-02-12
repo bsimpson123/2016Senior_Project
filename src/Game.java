@@ -429,21 +429,22 @@ public class Game {
 				if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
 					cursorPos = 2;
 				}
-			} else if (movementInputDelay > 0) {
-				movementInputDelay -= Global.delta;
-			}
+	
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0:
 					case 1:
 						game = new GameModeSelection();
 						//game = new BlockBreakStandard();
-						activeGameMode = BlockMatchStandard;
+						activeGameMode = GameModeSelection;
 						break;
 					case 2:
 						gameRunning = false;
 						break;
 				}
+			}
+			} else if (movementInputDelay > 0) {
+				movementInputDelay -= Global.delta;
 			}
 			// if (Global.getControlActive(Global.GameControl.SPECIAL)) { ; }
 			/*

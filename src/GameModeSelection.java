@@ -20,7 +20,7 @@ import org.newdawn.slick.util.ResourceLoader;
 /**
  * Base game class. This class is the first to run during program startup and acts
  * as the root of the game control logic.
- * @author John
+ * @author Brock
  */
 public class GameModeSelection implements GameMode{
 	protected LoadState currentState = LoadState.NOT_LOADED;
@@ -56,9 +56,11 @@ public class GameModeSelection implements GameMode{
 	 * @author John Ojala
 	 */
 	private final int GameModeSelection = 0,
-		BlockMatchStandard = 1
+		BlockMatchStandard = 1,
+		PracticeMode = 2,
+		HighScore = 3
 		;
-	
+	private boolean pageBack = false;
 	/** The current game mode within the main logic loop. */
 	int activeGameMode = GameModeSelection;
 	
@@ -147,80 +149,7 @@ public class GameModeSelection implements GameMode{
 		}
 	}
 	
-/*	private boolean setDisplayMode() {
-		try {
-			// get modes
-			DisplayMode [] dm = org.lwjgl.util.Display.getAvailableDisplayModes(Global.winWidth, Global.winHeight, -1, -1, -1, -1, 60, 60);
-			org.lwjgl.util.Display.setDisplayMode(dm, new String[] {
-					"width=" + Global.winWidth, 
-					"height=" + Global.winHeight,
-					"freq=" + 60,
-					"bpp=" + org.lwjgl.opengl.Display.getDisplayMode().getBitsPerPixel()
-			});
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Unable to enter fullscreen, continuing in windowed mode.");
-		}
-		return false;
-	}*/
 
-	
-	/**
-	 * Initialize OpenGL components and set OpenGL environment variables.
-	 */
-/*	private void initGL() {
-		try {
-			setDisplayMode();
-			Display.setTitle(WINDOW_TITLE);
-			Display.setFullscreen(fullscreen);
-			Display.create();
-			
-			glViewport(0, 0, Global.glEnvWidth, Global.glEnvHeight);
-
-			// Initialize GL matrices
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			// Sets 2D mode; no perspective
-			glOrtho(0, Global.glEnvWidth, Global.glEnvHeight, 0, -1, 1);
-
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-
-
-			// disable the OpenGL depth test since only 2D graphics are used
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_LIGHTING);
-			glDisable(GL_FOG);
-			glDisable(GL_CULL_FACE);
-			
-			// clear the screen
-			glClearColor(0f, 0f, 0f, 0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			// enable textures
-			glEnable(GL_TEXTURE_2D);
-			// Enable alpha processing for textures
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_BLEND);
-		} catch (LWJGLException glErr) {
-			System.out.println("Game exiting - exception in initialization:");
-			glErr.printStackTrace();
-			System.exit(-1);
-		}
-	}*/
-	
-	
-	/*
-	public static String requestResource(String file) throws IOException { 
-		Path resourcePath;
-		Path reqPath = Paths.get(file).toAbsolutePath();
-		System.out.printf("Requesting resource: %s...", file);
-		resourcePath = reqPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
-		System.out.println("Success.");
-		System.out.printf("\t%s\n", resourcePath.toString());
-		return resourcePath.toString();
-	} //*/
 
 	
 	/**
@@ -236,251 +165,9 @@ public class GameModeSelection implements GameMode{
 		return null;
 	}
 	
-	/*
-	private void processInput() {
-		// Input needs will vary between game modes, and menus within each mode, so input handling will
-		// need to be checked in each specific section.
-		
-		/* Get mouse movement on the X and Y axis
-		 * Can only call getDX and getDY once each per game loop.
-		 * Additional calls will return 0 or a very small value as there will have been 
-		 * zero or minimal movement of the mouse within the specific game loop. 
-		 *
-		if (useMouse) {
-			mouseX = Mouse.getDX();
-			mouseY = Mouse.getDY();
-			int moveX = 0;
-			int moveY = 0;
-		}
-		
-		// This code, in whole or part, should be used in individual control loops 
-		// to check against registered input for processing
-		if (Global.getControlActive(Global.GameControl.LEFT)) { 
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.RIGHT)) { 
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.UP)) {
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.DOWN)) {
-			cursorPos++;
-			
-		}
-		if (Global.getControlActive(Global.GameControl.SELECT)) {
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.CANCEL)) {
-			gameRunning = false;
-		}
-		if (Global.getControlActive(Global.GameControl.SPECIAL)) {
-			;
-		}
-		
-	} //*/
 	
-	/**
-	 * Determine the delay time since the last frame render, get the player input,
-	 * move and draw entities, add, and remove necessary entities from the lists 
-	 * of maintained entities. 
-	 */
-	private void renderGL() {
-		// cap framerate to 60 fps
-		Display.sync(60);
-		/* determine how long it has been since the last update
-		 * this will be used to calculate how far the entities
-		 * should move this loop  */
-		/* The time in milliseconds since the last update */
-		Global.delta = getTime() - lastLoopTime;
-		lastLoopTime = getTime();
-		lastFpsTime += Global.delta;
-		fps++;
-		// update the FPS counter if a second has passed
-		if (lastFpsTime >= 1000) {
-			Display.setTitle( String.format("%s (FPS: %d)", WINDOW_TITLE, fps) );
-			lastFpsTime = 0;
-			fps = 0;
-		}
-
-		// Screen location checking. this will output mouse click locations in /every/ gamemode to the console
-		if (mouseDelay <= 0) {
-			if (Mouse.isButtonDown(0)) {
-				mouseX = Mouse.getX();
-				mouseY = Global.glEnvHeight - Mouse.getY();
-				System.out.printf("Mouse click at %d, %d\n", mouseX, mouseY);
-				mouseDelay = Global.inputReadDelayTimer;
-			} 
-		} else {
-			mouseDelay -= Global.delta;
-		}
-		/* check and handle input controls */
-		// processInput(); 
-		/* input checking is handled within individual control loops, where only the necessary
-		 * inputs will be checked.run
-		 */
-		
-		/* Checks for an active menu that will be drawn in place of normal game code. 
-		 * Menu comments are only suggestions, and any number can be added. Each menu
-		 * function is responsible for changing the activeMenu variable to represent
-		 * the current function call
-		 */
-		switch (activeGameMode) {
-		case GameModeSelection:
-			// TODO: Main menu draw and logic
-			
-			// This code acts as a proof-of-concept for reading and responding to control input
-			if (movementInputDelay <= 0) {
-				/*// Left and Right inputs do nothing at the main menu currently
-				if (Global.getControlActive(Global.GameControl.LEFT)) { ; }
-				if (Global.getControlActive(Global.GameControl.RIGHT)) { ; }
-				//*/
-				if (Global.getControlActive(Global.GameControl.UP)) {
-					cursorPos--;
-					if (cursorPos < 0) {
-						cursorPos = 2;
-					}
-					movementInputDelay = Global.inputReadDelayTimer;
-				}
-				if (Global.getControlActive(Global.GameControl.DOWN)) {
-					cursorPos++;
-					if (cursorPos > 2) {
-						cursorPos = 0;
-					}
-					movementInputDelay = Global.inputReadDelayTimer;
-				}
-				if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
-					cursorPos = 2;
-				}
-			} else if (movementInputDelay > 0) {
-				movementInputDelay -= Global.delta;
-			}
-			if (Global.getControlActive(Global.GameControl.SELECT)) {
-				switch (cursorPos) {
-					case 0:
-					case 1:
-						game = new BlockBreakStandard();
-						activeGameMode = BlockMatchStandard;
-						break;
-					case 2:
-						gameRunning = false;
-						break;
-				}
-			}
-			// if (Global.getControlActive(Global.GameControl.SPECIAL)) { ; }
-			/*
-			menuBar.draw(100, 100);
-			menuBarWithText.draw(100, 250);
-			cursor.draw(150, cursorPos * 50 + 100);
-			testBlock.draw(200, 100);
-			//*/
-			// Draw the frame that will contain the option boxes
-			optionBoxOffset = 100;
-			if (offset) {
-				optionBox.draw(180 + optionBoxOffset, 180);
-			}
-			
-			optionFrameTop.draw(150, 150);
-			optionFrameMid.draw(150, 170);
-			optionFrameBottom.draw(150, 470);
-			
-			// Draw the option boxes
-			optionBox.draw(180, 180);
-			optionBox.draw(180, 250);
-			optionBox.draw(180, 320);
-			
-			selector[0].draw(160, 187 + cursorPos * 70);
-			selector[1].draw(351, 187 + cursorPos * 70);
-			
-			selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
-			break;
-//		case BlockMatchStandard:
-//			break;
-		default:
-			switch(game.getState()) { 
-				case NOT_LOADED:
-					gameModeLoader = new Thread( new GameModeLoader(game) );
-					gameModeLoader.run();
-					break;
-				case LOADING_ASSETS:
-					// TODO: game mode loading indicator
-					break;
-				case LOADING_DONE:
-					try {
-						gameModeLoader.join();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					// break statement is intentionally missing here
-				case READY:
-					game.run();
-					break;
-				case FINALIZED:
-					game = null;
-					activeGameMode = GameModeSelection;
-					movementInputDelay = Global.inputReadDelayTimer;
-					cursorPos = 0;
-					break;
-				default:
-					break;
-			}
-			break;
-		}
-		
-		// an exit key is strongly recommended if mouse capture is enabled
-		if ( Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-			gameRunning = false; // indicate that the game is no longer running
-		}
-		
-	}
 	
-	/**
-	 * Loads a sound file into memory for faster access at runtime.
-	 * @param file 
-	 * @return true if the file was loaded successfully
-	 */
-	/*private boolean loadSound(String file) {
-		String source = file, type;
-		Audio sound = soundMap.get(file);
-		if (sound != null) { return true; } // sound has already been loaded
-		
-		try {
-			source = FileResource.requestResource(file);
-			type = source.substring(source.lastIndexOf('.')).toUpperCase(); 
-			sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
-			soundMap.put(file, sound);
-		} catch (IOException e) {
-			System.out.printf("Unable to load sound resource: %s\n%s", source, e.getMessage());
-			return false;
-		}
-		return true;
-	}
-
-	public Audio getSound(String ref) {
-		return soundMap.get(ref);
-	}
 	
-	/**
-	 * Plays the audio as a sound effect. No effect if the value passed is null.
-	 * @param sfx The audio to be played
-	 */
-	/*private void playSoundEffect(String ref) {
-		Audio sfx = getSound(ref);
-		if (sfx == null) { return; } // check that sfx is a defined sound object
-		sfx.playAsSoundEffect(1.0f, 1.0f, false);
-		return ;
-	}*/
-	
-	/**
-	 * Plays the audio as repeating background music. No effect if the value passed is null.
-	 * @param music The audio to be played in the background
-	 */
-	/*private void playSoundMusic(Audio music) {
-		if (music == null) { return; }
-		// TODO: check for and stop previously playing music if any
-		music.playAsMusic(1.0f, 1.0f, true);
-		return ;
-	}*/
 
 	public GameModeSelection(boolean runFullscreen) {
 		fullscreen = runFullscreen;
@@ -497,6 +184,7 @@ public class GameModeSelection implements GameMode{
 			optionBox.draw(180 + optionBoxOffset, 180);
 			optionBox.draw(180, 250);
 			optionBox.draw(180, 320);
+			optionBox.draw(180, 390);
 			
 			selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 			selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
@@ -505,6 +193,7 @@ public class GameModeSelection implements GameMode{
 			optionBox.draw(180, 180);
 			optionBox.draw(180 + optionBoxOffset, 250);
 			optionBox.draw(180, 320);
+			optionBox.draw(180, 390);
 			
 			selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 			selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
@@ -513,11 +202,20 @@ public class GameModeSelection implements GameMode{
 		optionBox.draw(180, 180);
 		optionBox.draw(180, 250);
 		optionBox.draw(180 + optionBoxOffset, 320);
+		optionBox.draw(180, 390);
 		
 		selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 		selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 		}
-		
+		if (cursorPos == 3) {
+			optionBox.draw(180, 180);
+			optionBox.draw(180, 250);
+			optionBox.draw(180, 320);
+			optionBox.draw(180 + optionBoxOffset, 390);
+			
+			selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+			selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+		}
 		switch(activeGameMode) {
 			case GameModeSelection:
 				moveCursor();
@@ -554,6 +252,9 @@ public class GameModeSelection implements GameMode{
 				
 		}
 
+		if (pageBack) {
+			cleanup();
+		}
 		selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
 		
 		
@@ -654,13 +355,13 @@ public class GameModeSelection implements GameMode{
 			cursorPos--;
 			if (cursorPos < 0) {
 				
-				cursorPos = 2;
+				cursorPos = 3;
 			}
 			movementInputDelay = Global.inputReadDelayTimer;
 		}
 		if (Global.getControlActive(Global.GameControl.DOWN)) {
 			cursorPos++;
-			if (cursorPos > 2) {
+			if (cursorPos > 3) {
 				cursorPos = 0;
 			}
 			movementInputDelay = Global.inputReadDelayTimer;
@@ -679,14 +380,22 @@ public class GameModeSelection implements GameMode{
 					game = new BlockBreakStandard();
 					activeGameMode = BlockMatchStandard;
 					break;
+					
 				case 2:
-					gameRunning = false;
+					//game = 
+					//pageBack = true;
+					//activeGameMode = MainMenu;
+					//gameRunning = false;
+					break;
+				case 3:
+					pageBack = true;
 					break;
 			}
-		}
-		} else if (movementInputDelay > 0) {
+			
+		}} else if (movementInputDelay > 0) {
 			movementInputDelay -= Global.delta;
 	}
+
 		}
 		
 	
