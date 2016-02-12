@@ -455,18 +455,17 @@ public class Game {
 			//*/
 			// Draw the frame that will contain the option boxes
 			menu_background.draw(0,0);
-			optionFrameTop.draw(150, 150);
-			optionFrameMid.draw(150, 170);
-			optionFrameBottom.draw(150, 470);
+			optionFrameTop.draw(400, 350);
+			optionFrameMid.draw(400, 370);
+			optionFrameBottom.draw(400, 670);
 			
 			// Draw the option boxes
-			optionBox.draw(180, 180);
-			optionBox.draw(180, 250);
-			optionBox.draw(180, 320);
+			optionBox.draw(430, 380);
+			optionBox.draw(430, 450);
+			optionBox.draw(430, 520);
 			
-			selector[0].draw(160, 187 + cursorPos * 70);
-			selector[1].draw(351, 187 + cursorPos * 70);
-			
+			selector[0].draw(410, 387 + cursorPos * 70);
+			selector[1].draw(600, 387 + cursorPos * 70);
 			//selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
 			Global.uiBlue.draw(mouseX, mouseY, 240, 48);
 
