@@ -1,6 +1,7 @@
 /**
- * 
- * @author John
+ * This class serves as the base class for all Block Breaker Standard mode levels,
+ * and defines and abstracts many of the functions that many level design simpler.
+ * @author John Ojala
  */
 public abstract class BlockStandardLevel {
 	protected static Sprite[] numbers = new Sprite[10]; 
@@ -73,7 +74,6 @@ public abstract class BlockStandardLevel {
 		char[] strScore = Integer.toString(score).toCharArray();
 		int offsetX = 948;
 		int yPos = 125;
-		Sprite n;
 		for (int i = strScore.length - 1; i >= 0; i--) {
 			getNumber(strScore[i]).draw(offsetX, yPos);
 			offsetX -= 24;
