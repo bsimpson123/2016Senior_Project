@@ -220,7 +220,7 @@ public class Global {
 		for (int i = 0; i < 3; i++) {
 			point[0] = i * 16 + 48;
 			for (int k = 0; k < 3; k++) {
-				point[1] = k * 18;
+				point[1] = k * 16;
 				box[i][k] = new Sprite( tex, point, corner, corner);
 			}
 		}
@@ -229,7 +229,7 @@ public class Global {
 		for (int i = 0; i < 3; i++) {
 			point[0] = i * 16 + 96;
 			for (int k = 0; k < 3; k++) {
-				point[1] = k * 18;
+				point[1] = k * 16;
 				box[i][k] = new Sprite( tex, point, corner, corner);
 			}
 		}
@@ -238,7 +238,7 @@ public class Global {
 		for (int i = 0; i < 3; i++) {
 			point[0] = i * 16 + 144;
 			for (int k = 0; k < 3; k++) {
-				point[1] = k * 18;
+				point[1] = k * 16;
 				box[i][k] = new Sprite( tex, point, corner, corner);
 			}
 		}
@@ -247,7 +247,7 @@ public class Global {
 		for (int i = 0; i < 3; i++) {
 			point[0] = i * 16 + 192;
 			for (int k = 0; k < 3; k++) {
-				point[1] = k * 18;
+				point[1] = k * 16;
 				box[i][k] = new Sprite( tex, point, corner, corner);
 			}
 		}

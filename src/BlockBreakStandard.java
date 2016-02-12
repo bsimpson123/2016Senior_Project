@@ -10,7 +10,7 @@ public class BlockBreakStandard implements GameMode {
 	protected LoadState currentState = LoadState.NOT_LOADED;
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected int cursorPos = 0;
-	protected long inputDelay = Global.inputReadDelayTimer;
+	//protected long inputDelay = Global.inputReadDelayTimer;
 	private BlockStandardLevel playLevel;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
@@ -141,7 +141,8 @@ public class BlockBreakStandard implements GameMode {
 			playLevel.run();
 			if (playLevel.levelFinished) {
 				if (playLevel.gameOver) {
-					// kick back to menu
+					playLevel = null;
+					movementInputDelay = Global.inputReadDelayTimer;
 				} else {
 					// load next level
 					switch(playLevel.level) {
@@ -152,7 +153,7 @@ public class BlockBreakStandard implements GameMode {
 							break;
 					}
 				}
-				cleanup();
+				
 			}
 		} else {
 // @author Brock

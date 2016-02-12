@@ -96,6 +96,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) {
 				levelFinished = true;
+				gameOver = true;
 			}
 			if (actionDelay <= 0) {
 				if (!blocksFalling && Global.getControlActive(Global.GameControl.SELECT) &&
