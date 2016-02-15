@@ -9,6 +9,11 @@ public abstract class BlockStandardLevel {
 	protected static Sprite pauseCursor;
 	protected static Sprite cursor;
 
+	private static int scoreDisplay = 0;
+	private static int change = 0;
+	private static long scoreUpdateDelayTimer = 50l;
+	private static long scoreUpdateDelay = scoreUpdateDelayTimer;
+
 	protected Sprite levelDisplay;
 	protected Sprite background;
 	protected Sprite userInterface;
@@ -71,7 +76,21 @@ public abstract class BlockStandardLevel {
 	}
 
 	protected void drawScore() {
-		char[] strScore = Integer.toString(score).toCharArray();
+		if (score > 0) {
+			scoreUpdateDelay -= Global.delta;
+			if (scoreUpdateDelay <= 0 && score != scoreDisplay) {
+				if (scoreDisplay < score) { // most common case, score is increasing
+					change = (score - scoreDisplay) >> 2;
+					if (change == 0) { change = 4; }
+					scoreDisplay += change;
+					if (scoreDisplay > score) { scoreDisplay = score; }
+				}
+				scoreUpdateDelay = scoreUpdateDelayTimer;
+			}
+		} else { 
+			scoreDisplay = score; 
+		}
+		char[] strScore = Integer.toString(scoreDisplay).toCharArray();
 		int offsetX = 948;
 		int yPos = 125;
 		for (int i = strScore.length - 1; i >= 0; i--) {

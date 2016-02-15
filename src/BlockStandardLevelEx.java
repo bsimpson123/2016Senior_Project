@@ -1,3 +1,5 @@
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -48,6 +50,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	protected void buildGrid() {
 		Block b = null;
 		int r = 0;
+		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].length; k++) {
 				r = Global.rand.nextInt(10000);
@@ -59,6 +62,8 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				grid[i][k] = b;
 			}
 		}
+		// TODO: set the block count for the level
+		this.blocksRemaining = grid.length * grid[0].length;
 	}
 	
 	@Override
@@ -70,7 +75,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		actionDelay -= Global.delta;
 		
 		// draw the grid and handle grid mechanics and input if the game is not paused
-		if (!gamePaused) {
+		if (!gamePaused && !gameOver) {
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			boolean blocksFalling = drawGrid(blockDimL1, 40);
 		
@@ -99,6 +104,11 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				gameOver = true;
 			}
 			if (actionDelay <= 0) {
+				if (Global.getControlActive(Global.GameControl.SPECIAL)) {
+					System.out.println(this.blocksRemaining);
+					actionDelay = Global.inputReadDelayTimer;
+				}
+				
 				if (!blocksFalling && Global.getControlActive(Global.GameControl.SELECT) &&
 						grid[cursorGridPos[0]][cursorGridPos[1]] != null) {
 					counter = 0;
@@ -121,12 +131,15 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 									}
 								}
 							}
+							grid[cursorGridPos[0]][cursorGridPos[1]].clearMark = true;
 							score += counter * 5;
 							break;
 						default:
 							break;
 					}
 					if (counter > 1) {
+						// TODO: remember to decrease the blocksRemaining counter after blocks are cleared
+						blocksRemaining -= counter;
 						// remove blocks marked to be cleared
 						shiftGrid();
 						// input delay is only increased if an action was performed and the grid was changed
@@ -140,7 +153,9 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		drawTopLevelUI();
 		
 		if (gamePaused) {
-			// draw the pause menu and handle input appropriately
+			// TODO: display the pause menu
+		} else if (gameOver) {
+			// TODO: show game over screen, high score entry calculation
 		}
 
 	}
