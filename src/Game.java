@@ -475,7 +475,7 @@ public class Game {
 			selector[0].draw(410, 387 + cursorPos * 70);
 			selector[1].draw(600, 387 + cursorPos * 70);
 			//selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
-			Global.uiBlue.draw(mouseX, mouseY, 240, 48);
+			//Global.uiBlue.draw(mouseX, mouseY, 240, 48);
 
 			break;
 //		case BlockMatchStandard:
