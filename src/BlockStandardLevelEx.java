@@ -112,7 +112,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					System.out.println(this.blocksRemaining);
 					actionDelay = Global.inputReadDelayTimer;
 					gridShiftActive = true;
-					gridShiftDir ^= 1;
+					gridShiftDir *= -1;
 					shiftGridColumns(blockDimL1[0]);
 				}
 				

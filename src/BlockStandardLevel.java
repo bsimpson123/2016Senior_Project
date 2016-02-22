@@ -168,13 +168,14 @@ public abstract class BlockStandardLevel {
 		//int dropRate = 20; // millisecond time for a falling block to cover 1 space
 		blockDropActive = false;
 		gridShiftActive = false;
-		int moveRate = (int)(Global.delta * shiftRate) / 1000;
-		// Move falling blocks and render the grid
+		int blockMoveRate = (int)(Global.delta * shiftRate) / 1000;
+		int columnMoveRate = (int) (Global.delta * shiftRate) / 500; // columns move 2x as fast as blocks
+		// adjust falling block offsets
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				if (grid[i].blocks[k] != null) {
 					if (grid[i].blocks[k].dropDistance > 0) {
-						grid[i].blocks[k].dropDistance -= moveRate;
+						grid[i].blocks[k].dropDistance -= blockMoveRate;
 						if (grid[i].blocks[k].dropDistance < 0) { 
 							grid[i].blocks[k].dropDistance = 0; 
 						} else {
@@ -184,27 +185,29 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		}
+		// adjust grid column offsets if no blocks are falling
 		if (!blockDropActive) {
 			for (int i = 0; i < grid.length; i++) {
-				//if (grid[i].columnOffset != 0) {
+				if (grid[i].columnOffset != 0) {
 					if (gridShiftDir == 1) { // right-shift
-						grid[i].columnOffset += moveRate;
+						grid[i].columnOffset += columnMoveRate;
 						if (grid[i].columnOffset >= 0) { 
 							grid[i].columnOffset = 0; 
 						} else {
 							gridShiftActive = true;
 						}
 					} else { // left-shift
-						grid[i].columnOffset -= moveRate;
+						grid[i].columnOffset -= columnMoveRate;
 						if (grid[i].columnOffset <= 0) {
 							grid[i].columnOffset = 0;
 						} else {
 							gridShiftActive = true;
 						}
 					}
-				//}
+				}
 			}
 		}
+		// draw the grid
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				if (grid[i].blocks[k] != null) {
@@ -285,7 +288,6 @@ public abstract class BlockStandardLevel {
 	protected void dropBlocks(int blockDimensions) {
 		int dropDist = 0;
 		int slotDist = 0;
-		int yMax = grid[0].blocks.length - 1;
 		for (int i = 0; i < grid.length; i++) {
 			slotDist = 0;
 			dropDist = 0;
@@ -319,7 +321,16 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		} else if (gridShiftDir == -1) {
-			
+			for (int xc = 0; xc < grid.length; xc++) {
+				if (grid[xc].blocks[0] == null) {
+					colDist++;
+					shiftDist += blockDimensions;
+				} else if (shiftDist > 0) {
+					grid[xc].columnOffset += shiftDist;
+					grid[xc - colDist] = grid[xc];
+					grid[xc] = emptyset.clone();
+				}
+			}
 		}
 		return ;
 	}
