@@ -24,7 +24,9 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "ui_base", "media/UIpackSheet_transparent.png" },
 		new String[] { "ui_stdmode", "media/StandardMode_UI.png" },
 		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" },
-		new String[] { "number_white", "media/numbers_sheet_white.png" }
+		new String[] { "number_white", "media/numbers_sheet_white.png" }, 
+		new String[] { "energy_empty", "media/energy_bar_empty.png" },
+		new String[] { "energybar", "media/energy_bar.png" }
 	};
 	
 	private final int GameModeSelection = 0,
@@ -93,6 +95,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 38, 30 }
 			);
 		
+		// author: John
 		// update to BlockBreakStandard.cursor after code moves to separate level class
 		cursor = new Sprite(
 				Global.textureMap.get("blocksheet"),
@@ -100,8 +103,13 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 32, 32 },
 				blockOffSet
 			);
-
 		BlockStandardLevel.cursor = cursor;
+		BlockStandardLevel.emptyEnergy = new Sprite(
+				localTexMap.get("energy_empty"),
+				new int[] { 0, 0 },
+				new int[] { 512, 20 },
+				new int[] { 640, 20 }
+			);
 		// BlockStandardLevel.pauseCursor
 		// BlockStandardLevel.numbers // numbers used for score display
 		int offset = 0;
