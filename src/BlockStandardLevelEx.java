@@ -12,11 +12,11 @@ import org.newdawn.slick.opengl.Texture;
 public class BlockStandardLevelEx extends BlockStandardLevel {
 	/** Defines the width and height of the blocks in the grid. */
 	private final int[] blockDimL1; // block dimensions Level 1
-	private int gridShift = 1;
 	private boolean specialActive = false;
 	private final int[] gridBasePos;
 	private Random rand;
 	private long actionDelay = Global.inputReadDelayTimer * 2;
+	private int counter = 0;
 
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
 		rand = Global.rand;
@@ -38,12 +38,14 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		// this value can be { 16, 16 } or { 8, 8 } to reduce the size of the blocks
 		// but the grid size should be increased proportionately
 		blockDimL1 = new int[] { 32, 32 };
-		grid = new Block[20][20];
+		gridSize = new int[] { 20, 20 };
+		//grid = new Block[20][20];
+		grid = new GridColumn[gridSize[0]];
 		buildGrid();
 		gridBasePos = new int[] { 20, Global.glEnvHeight - blockDimL1[1] - 50 };
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
-		cursorGridPos[1] = grid[0].length / 2;
+		cursorGridPos[1] = grid[0].blocks.length / 2;
 	}
 	
 	@Override
@@ -52,32 +54,34 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		int r = 0;
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
-			for (int k = 0; k < grid[0].length; k++) {
+			grid[i] = new GridColumn(gridSize[1]);
+			for (int k = 0; k < grid[0].blocks.length; k++) {
 				r = Global.rand.nextInt(10000);
 				if (r > 20) { 
 					b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
 				} else {
 					b = new Block(Block.BlockType.STAR);
 				}
-				grid[i][k] = b;
+				grid[i].blocks[k] = b;
 			}
 		}
-		// TODO: set the block count for the level
-		this.blocksRemaining = grid.length * grid[0].length;
+		// TASK: set the block count for the level
+		this.blocksRemaining = grid.length * grid[0].blocks.length;
 	}
 	
 	@Override
 	public void run() {
 		/* Draw all background elements. These should always be the first items drawn to screen. */
 		background.draw(0, 0);
-		int counter = 0;
+		counter = 0;
 		inputDelay -= Global.delta;
 		actionDelay -= Global.delta;
 		
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver) {
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			boolean blocksFalling = drawGrid(blockDimL1, 40);
+			gridMoving = drawGrid(blockDimL1, 400);
+			//shiftGrid();
 		
 			cursor.draw(
 				// for pointer at center of block
@@ -96,7 +100,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				; 
 			} else {
 				if (inputDelay <= 0l) {
-					checkGridMovement();
+					checkCommonControls();
 				}
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) {
@@ -104,19 +108,22 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				gameOver = true;
 			}
 			if (actionDelay <= 0) {
-				if (Global.getControlActive(Global.GameControl.SPECIAL)) {
+				if (Global.getControlActive(Global.GameControl.SPECIAL1)) {
 					System.out.println(this.blocksRemaining);
 					actionDelay = Global.inputReadDelayTimer;
+					gridShiftActive = true;
+					gridShiftDir ^= 1;
+					shiftGridColumns(blockDimL1[0]);
 				}
 				
-				if (!blocksFalling && Global.getControlActive(Global.GameControl.SELECT) &&
-						grid[cursorGridPos[0]][cursorGridPos[1]] != null) {
+				if (!gridMoving && Global.getControlActive(Global.GameControl.SELECT) &&
+						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
 					counter = 0;
 					// TODO: score calculation is to be done within each case statement in line
 					// with the value of each 
-					switch (grid[cursorGridPos[0]][cursorGridPos[1]].type) {
+					switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
 						case BLOCK:
-							counter = checkGrid(grid, cursorGridPos);
+							counter = checkGrid(cursorGridPos);
 							score += (int)Math.floor(Math.pow(counter - 1, 2) * levelMultiplier);
 							break;
 						case STAR:
@@ -125,13 +132,13 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 							int uRange = cursorGridPos[0] == grid.length - 1 ? grid.length : cursorGridPos[0] + 2;
 							for (int i = lRange; i < uRange; i++) {
 								for (int k = 0; k < 2; k++) {
-									if (grid[i][k] != null) {
-										grid[i][k].clearMark = true;
+									if (grid[i].blocks[k] != null) {
+										grid[i].blocks[k].clearMark = true;
 										counter++;
 									}
 								}
 							}
-							grid[cursorGridPos[0]][cursorGridPos[1]].clearMark = true;
+							grid[cursorGridPos[0]].blocks[cursorGridPos[1]].clearMark = true;
 							score += counter * 5;
 							break;
 						default:
@@ -140,8 +147,11 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					if (counter > 1) {
 						// TODO: remember to decrease the blocksRemaining counter after blocks are cleared
 						blocksRemaining -= counter;
+						removeMarkedBlocks();
+						dropBlocks(blockDimL1[1]);
+						shiftGridColumns(blockDimL1[0]);
+						// shiftGrid();
 						// remove blocks marked to be cleared
-						shiftGrid();
 						// input delay is only increased if an action was performed and the grid was changed
 					}
 					actionDelay = Global.inputReadDelayTimer;
@@ -160,6 +170,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 
 	}
 	
+	/*//original grid shift code
 	@Override
 	protected void shiftGrid() {
 		for (int i = 0; i < grid.length; i++) {
@@ -196,7 +207,13 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				}
 			}
 		}
-
-	}
-
+	} //*/
+	
+	
+	
+	
+	
+	
 }
+
+

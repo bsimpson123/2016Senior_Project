@@ -13,12 +13,7 @@ public class BlockBreakStandard implements GameMode {
 	private BlockStandardLevel playLevel;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
-	protected Block[][] grid = new Block[20][20]; // [x][y], [c][r]
 	protected Sprite cursor;
-	protected int[] cursorGridPos = new int[] { 0, 0 };
-	protected int level = 1;
-	protected int counter = 0;
-	protected final int maxLevel = 5;
 	protected int[] blockOffSet = new int[] { 32, 32 };
 	private long movementInputDelay = Global.inputReadDelayTimer;
 	
