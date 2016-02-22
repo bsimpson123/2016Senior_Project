@@ -26,7 +26,7 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" },
 		new String[] { "number_white", "media/numbers_sheet_white.png" }, 
 		new String[] { "energy_empty", "media/energy_bar_empty.png" },
-		new String[] { "energybar", "media/energy_bar.png" }
+		new String[] { "energybar", "media/energy_bar.png"+- }
 	};
 	
 	private final int GameModeSelection = 0,
@@ -110,6 +110,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 512, 20 },
 				new int[] { 640, 20 }
 			);
+		BlockStandardLevel.energyBar = localTexMap.get("energybar");
 		// BlockStandardLevel.pauseCursor
 		// BlockStandardLevel.numbers // numbers used for score display
 		int offset = 0;
