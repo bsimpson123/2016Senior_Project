@@ -48,7 +48,7 @@ public class Global {
 	public enum GameControl {
 		RIGHT, LEFT, UP, DOWN,
 		SELECT, CANCEL, PAUSE,
-		SPECIAL
+		SPECIAL1, SPECIAL2
 	}
 	
 	// a different variable type may be needed to handle key mapping with a many-to-one keys-to-control implementation 
