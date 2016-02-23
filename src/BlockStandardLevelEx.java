@@ -56,7 +56,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				if (r > 20) { 
 					b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
 				} else {
-					b = new Block(Block.BlockType.STAR);
+					b = new Block(Block.BlockType.BOMB);
 				}
 				grid[i].blocks[k] = b;
 			}
@@ -149,7 +149,10 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				updateScore(counter * 5);
 				addEnergy(counter * 5);
 				break;
-			default:
+			case BOMB:
+				
+				break;
+			default: // selected block does not activate; do nothing
 				break;
 		}
 		

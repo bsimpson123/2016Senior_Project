@@ -1,16 +1,15 @@
 import java.util.HashMap;
-import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
 
 public class Block {
 	/* Public Variables */
 	public enum BlockType {
-		BLOCK, WEDGE, STAR, TRASH, ROCK
+		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB
 	}
 
 	protected static Sprite blockColor[];
 	protected static Sprite blockStar, blockStarOverlay;
-	protected static Sprite blockWedge, blockTrash, blockRock;
+	protected static Sprite blockWedge, blockTrash, blockRock, blockBomb;
 	protected static Sprite errorBlock;
 	
 	public static final int  
@@ -123,6 +122,12 @@ public class Block {
 				new int[] { 128, 128 },
 				blockDrawSpace
 			);
+		blockBomb = new Sprite(
+				blockTex,
+				new int[] { 272, 0 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
 		errorBlock = new Sprite(
 				texMap.get("red_ui"),
 				new int[] { 381, 36 },
@@ -147,6 +152,11 @@ public class Block {
 				break;
 			case ROCK:
 				// TODO: assign rock sprite to block variable
+				break;
+			case BOMB:
+				block = blockBomb;
+				break;
+			default:
 				break;
 		}
 	}
