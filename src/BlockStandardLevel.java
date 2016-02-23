@@ -304,29 +304,25 @@ public abstract class BlockStandardLevel {
 					cursorGridPos[1] = grid[0].blocks.length - 1;
 				}
 				inputDelay = Global.inputReadDelayTimer;
-				return;
-			}
+			} else
 			if (Global.getControlActive(Global.GameControl.DOWN)) {
 				if (cursorGridPos[1] > 0) {
 					cursorGridPos[1]--;
 				}
 				inputDelay = Global.inputReadDelayTimer;
-				return;
-			}
+			} 
 			if (Global.getControlActive(Global.GameControl.LEFT)) {
 				if (cursorGridPos[0] > 0) {
 					cursorGridPos[0]--;
 				}
 				inputDelay = Global.inputReadDelayTimer;
-				return;
-			}
+			} else
 			if (Global.getControlActive(Global.GameControl.RIGHT)) {
 				cursorGridPos[0]++;
 				if (cursorGridPos[0] >= grid.length) {
 					cursorGridPos[0] = grid.length - 1;
 				}
 				inputDelay = Global.inputReadDelayTimer;
-				return;
 			}
 			if (actionDelay <= 0) {
 				if (!gridMoving && Global.getControlActive(Global.GameControl.SELECT) &&
