@@ -10,7 +10,12 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 		// if these sprite must be defined or the game will crash at runtime
-		// background = new Sprite( params );
+		background = new Sprite(
+				rootTexMap.get("bg_stdmode_wood1"),
+				new int[] { 0, 0 },
+				new int[] { 1024, 768 },
+				new int[] { Global.glEnvWidth, Global.glEnvHeight }
+			);
 		
 		userInterface = new Sprite(
 				rootTexMap.get("ui_stdmode"), // default interface texture
@@ -117,7 +122,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 				if (r > 20) { 
 					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 				} else {
-					b = new Block(Block.BlockType.STAR);
+					b = new Block(Block.BlockType.BLOCK, 3);
 				}
 				grid[i].blocks[k] = b;
 			}
