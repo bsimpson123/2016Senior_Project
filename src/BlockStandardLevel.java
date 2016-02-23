@@ -35,15 +35,15 @@ public abstract class BlockStandardLevel {
 	protected boolean gridMoving = false;
 	protected int gridShiftDir = 1;
 	private long shiftActionDelayTimer = 1000l;
-	private long shiftActionDelay = shiftActionDelayTimer;
+	private long gridShiftActionDelay = shiftActionDelayTimer;
 	// grid queue variables
 	protected Block[] queue;
-	protected long queueStepDelayTimer = 500l;
-	protected long queueStepDelay = queueStepDelayTimer;
-	protected int queueStepReq = 4;
-	protected int queueStepCount = 0;
-	protected int queueCount = 0;
-	protected int queueLimit = 5;
+	private long queueStepDelayTimer = 500l;
+	private long queueStepDelay = queueStepDelayTimer;
+	private int queueStepReq = 4;
+	private int queueStepCount = 0;
+	private int queueCount = 0;
+	private int queueLimit = 5;
 	private long queueManualShiftDelayTimer = 250l;
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	
@@ -62,7 +62,17 @@ public abstract class BlockStandardLevel {
 	public boolean levelFinished = false;
 	public boolean gameOver = false;
 	
-	public abstract void run();
+	public void run() {
+		// decrement delay variables
+		queueManualShiftDelay -= Global.delta;
+		gridShiftActionDelay -= Global.delta;
+		actionDelay -= Global.delta;
+		inputDelay -= Global.delta;
+		/* Draw all background elements. These should always be the first items drawn to screen. */
+		background.draw(0, 0);
+		counter = 0;
+		
+	}
 
 	/**
 	 * Checks the grid for blocks of the same color sharing edges, and marks those blocks
@@ -194,7 +204,7 @@ public abstract class BlockStandardLevel {
 	 * if no blocks are currently falling 
 	 */
 	protected final boolean drawGrid(int[] blockSize, int shiftRate) {
-		shiftActionDelay -= Global.delta;
+		gridShiftActionDelay -= Global.delta;
 		queueManualShiftDelay -= Global.delta;
 		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 }; // distance from the left top for the bottom-left of the grid display
 		//int dropRate = 20; // millisecond time for a falling block to cover 1 space
@@ -262,28 +272,28 @@ public abstract class BlockStandardLevel {
 	 * position accordingly.
 	 */
 	protected void checkCommonControls() {
-		if (Global.getControlActive(Global.GameControl.SPECIAL2) && queueManualShiftDelay <= 0) {
+		if (Global.getControlActive(Global.GameControl.SPECIAL2)) {
 			// queue control
-			if (Global.getControlActive(Global.GameControl.LEFT)) {
-				// shift queue left
-				
-				queueManualShiftDelay = queueManualShiftDelayTimer;
-			} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
-				// shift queue right
-				
-				queueManualShiftDelay = queueManualShiftDelayTimer;
-			} else if (Global.getControlActive(Global.GameControl.DOWN)) {
-				// drop (add to grid) queue
-				int overflow = addToGrid();
-				queueCount = 0;
-				score -= overflow * 10;
-				queueManualShiftDelay = queueManualShiftDelayTimer;
+			if ( queueManualShiftDelay <= 0) {
+				if (Global.getControlActive(Global.GameControl.LEFT)) {
+					// shift queue left
+					
+					queueManualShiftDelay = queueManualShiftDelayTimer;
+				} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
+					// shift queue right
+					
+					queueManualShiftDelay = queueManualShiftDelayTimer;
+				} else if (Global.getControlActive(Global.GameControl.DOWN)) {
+					// drop (add to grid) queue
+					int overflow = addToGrid();
+					updateScore( overflow * -10 );
+					queueManualShiftDelay = queueManualShiftDelayTimer;
+				}
 			}
 		} else {
 			// cursor control
-			if (Global.getControlActive(Global.GameControl.SPECIAL1) && shiftActionDelay <= 0) {
-				actionDelay = Global.inputReadDelayTimer;
-				shiftActionDelay = shiftActionDelayTimer;
+			if (Global.getControlActive(Global.GameControl.SPECIAL1) && gridShiftActionDelay <= 0) {
+				gridShiftActionDelay = shiftActionDelayTimer;
 				gridShiftActive = true;
 				gridShiftDir *= -1;
 				shiftGridColumns();
@@ -329,9 +339,9 @@ public abstract class BlockStandardLevel {
 						removeMarkedBlocks();
 						dropBlocks();
 						shiftGridColumns();
+						// action delay is only increased if an action was performed and the grid was changed
+						actionDelay = Global.inputReadDelayTimer;
 					}
-					// input delay is only increased if an action was performed and the grid was changed
-					actionDelay = Global.inputReadDelayTimer;
 				}
 			}
 		}
@@ -415,15 +425,21 @@ public abstract class BlockStandardLevel {
 		int overflow = 0;
 		int yMax = grid[0].blocks.length - 1;
 		for (int x = 0; x < grid.length; x++) {
-			if (grid[x].blocks[yMax] == null && queue[x] != null) {
-				grid[x].blocks[yMax] = queue[x];
-			} else {
-				overflow++;
+			if (queue[x] != null) {
+				if (grid[x].blocks[yMax] == null) {
+					grid[x].blocks[yMax] = queue[x];
+				} else {
+					overflow++;
+				}
+				queue[x] = null;
 			}
-			queue[x] = null;
+		}
+		if (overflow < queueCount) {
+			gridMoving = true;
 		}
 		dropBlocks();
 		shiftGridColumns();
+		queueCount = 0;
 		return overflow;
 	}
 	
@@ -463,24 +479,10 @@ public abstract class BlockStandardLevel {
 		// shift the queue to the left by one block
 		if (queueCount >= queueLimit && queueStepCount == 2) {
 			int overflow = addToGrid();
-			if (overflow < queueCount) {
-				gridMoving = true;
-			}
-			score -= overflow * 10;
+			updateScore( overflow * -10 );
 			queueCount = 0;
 		} else {
 			shiftQueue(-1);
-/*			for (int x = 0; x < xMax; x++) {
-				if (queue[x] == null) { // find first null space
-					int current = x, next = (x + 1) % xMax;
-					for (int i = 0 ; i < xMax; i++) { // shift the queue
-						current = (x + i) % xMax;
-						next = (current + 1) % xMax;
-						queue[current] = queue[next]; 
-					}
-					break;
-				}
-			} //*/
 		}
 		if (queueStepCount < queueStepReq) { 
 			return; 

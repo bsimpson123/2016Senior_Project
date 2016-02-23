@@ -67,11 +67,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	
 	@Override
 	public void run() {
-		/* Draw all background elements. These should always be the first items drawn to screen. */
-		background.draw(0, 0);
-		counter = 0;
-		inputDelay -= Global.delta;
-		actionDelay -= Global.delta;
+		super.run();
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver) {
 			processQueue();
