@@ -162,7 +162,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
-		
+		draw_energy();
 		if (gamePaused) {
 			// TODO: display the pause menu
 		} else if (gameOver) {

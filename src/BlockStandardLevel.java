@@ -1,3 +1,5 @@
+import static org.lwjgl.opengl.GL11.*;
+import org.newdawn.slick.opengl.Texture;
 /**
  * This class serves as the base class for all Block Breaker Standard mode levels,
  * and defines and abstracts many of the functions that many level design simpler.
@@ -17,6 +19,10 @@ public abstract class BlockStandardLevel {
 	protected Sprite levelDisplay;
 	protected Sprite background;
 	protected Sprite userInterface;
+	protected static Sprite emptyEnergy; //empty energy bar
+	protected static Texture energyBar; //energy bar
+	protected int energyMax =100000;
+	protected int energy = energyMax;
 
 	//protected Block[][] grid; // = new Block[20][20]; // [x][y], [c][r]
 	protected GridColumn[] grid;
@@ -338,6 +344,29 @@ public abstract class BlockStandardLevel {
 	protected void switchGridShift() {
 		gridShiftDir ^= 1;
 		
+	}
+	protected void draw_energy() {
+		emptyEnergy.draw(20, 740);
+		energyBar.bind();
+		float percent = (float) energy/(float) energyMax;
+		glPushMatrix();
+		glTranslatef(20,740,0); // x y z
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(0,0);
+			glVertex2i(0,0);
+			
+			glTexCoord2f(percent,0);
+			glVertex2i((int) (percent*640),0);
+			
+			glTexCoord2f(percent,1);
+			glVertex2i((int)(percent*640),32);
+			
+			glTexCoord2f(0,1);
+			glVertex2i(0,32);
+		}
+		glEnd();
+		glPopMatrix();
 	}
 }
 

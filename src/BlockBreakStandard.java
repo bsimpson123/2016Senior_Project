@@ -26,7 +26,7 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" },
 		new String[] { "number_white", "media/numbers_sheet_white.png" }, 
 		new String[] { "energy_empty", "media/energy_bar_empty.png" },
-		new String[] { "energybar", "media/energy_bar.png"+- }
+		new String[] { "energybar", "media/energy_bar.png" }
 	};
 	
 	private final int GameModeSelection = 0,
