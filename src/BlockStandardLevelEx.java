@@ -150,11 +150,15 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				addEnergy(counter * 5);
 				break;
 			case BOMB:
-				
+				activateBomb();
 				break;
 			default: // selected block does not activate; do nothing
 				break;
 		}
+		
+	}
+	
+	private void activateBomb() {
 		
 	}
 }

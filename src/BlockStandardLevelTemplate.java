@@ -2,7 +2,12 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import org.newdawn.slick.opengl.Texture;
-
+/**
+ * Template level for simplify level-building.
+ * Copy the code here into a new BlockStandardLevel extended class and edit
+ * where necessary to set level difficulty. 
+ * @author John
+ */
 public class BlockStandardLevelTemplate extends BlockStandardLevel {
 	private boolean specialActive = false;
 	

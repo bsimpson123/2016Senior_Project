@@ -46,6 +46,7 @@ public abstract class BlockStandardLevel {
 	private int queueLimit = 5;
 	private long queueManualShiftDelayTimer = 250l;
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
+	private boolean queueHold = false;
 	
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int[] blockSize;
@@ -274,14 +275,15 @@ public abstract class BlockStandardLevel {
 	protected void checkCommonControls() {
 		if (Global.getControlActive(Global.GameControl.SPECIAL2)) {
 			// queue control
+			queueHold = true;
 			if ( queueManualShiftDelay <= 0) {
 				if (Global.getControlActive(Global.GameControl.LEFT)) {
 					// shift queue left
-					
+					shiftQueue(-1);
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
 					// shift queue right
-					
+					shiftQueue(1);
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				} else if (Global.getControlActive(Global.GameControl.DOWN)) {
 					// drop (add to grid) queue
@@ -291,6 +293,7 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		} else {
+			queueHold = false;
 			// cursor control
 			if (Global.getControlActive(Global.GameControl.SPECIAL1) && gridShiftActionDelay <= 0) {
 				gridShiftActionDelay = shiftActionDelayTimer;
@@ -446,12 +449,25 @@ public abstract class BlockStandardLevel {
 	
 	private void shiftQueue(int direction) {
 		int xMax = queue.length;
+		int current, next;
 		if (direction == 1) { // shift right
-			
+			for (int x = xMax - 1; x >=0; x--) {
+				if (queue[x] == null) {
+					current = x;
+					next = (xMax + (x - 1)) % xMax;
+					for (int i = 0; i < xMax; i++) {
+						current = (xMax + (x - i)) % xMax;
+						next = (xMax + (current - 1)) % xMax;
+						queue[current] = queue[next];
+					}
+					break;
+				}
+			}
 		} else {
 			for (int x = 0; x < xMax; x++) {
 				if (queue[x] == null) { // find first null space
-					int current = x, next = (x + 1) % xMax;
+					current = x;
+					next = (x + 1) % xMax;
 					for (int i = 0 ; i < xMax; i++) { // shift the queue
 						current = (x + i) % xMax;
 						next = (current + 1) % xMax;
@@ -477,7 +493,7 @@ public abstract class BlockStandardLevel {
 			int overflow = addToGrid();
 			updateScore( overflow * -10 );
 			queueCount = 0;
-		} else {
+		} else if (!queueHold) {
 			shiftQueue(-1);
 		}
 		if (queueStepCount < queueStepReq) { 
