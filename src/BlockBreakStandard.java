@@ -107,8 +107,8 @@ public class BlockBreakStandard implements GameMode {
 		BlockStandardLevel.emptyEnergy = new Sprite(
 				localTexMap.get("energy_empty"),
 				new int[] { 0, 0 },
-				new int[] { 512, 20 },
-				new int[] { 640, 20 }
+				new int[] { 512, 32 },
+				new int[] { 640, 32 }
 			);
 		BlockStandardLevel.energyBar = localTexMap.get("energybar");
 		// BlockStandardLevel.pauseCursor

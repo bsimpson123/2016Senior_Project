@@ -341,10 +341,9 @@ public abstract class BlockStandardLevel {
 		return ;
 	}
 	
-	protected void switchGridShift() {
-		gridShiftDir ^= 1;
-		
-	}
+	/**
+	 * @author Mario
+	 */
 	protected void draw_energy() {
 		emptyEnergy.draw(20, 740);
 		energyBar.bind();

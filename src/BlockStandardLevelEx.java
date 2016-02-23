@@ -1,5 +1,4 @@
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -78,6 +77,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		actionDelay -= Global.delta;
 		energy -= Global.delta;
 		if (energy < 0) { energy = 0; }
+		if (energy > energyMax) { energy = energyMax; }
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver) {
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
@@ -125,7 +125,9 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
 						case BLOCK:
 							counter = checkGrid(cursorGridPos);
-							score += (int)Math.floor(Math.pow(counter - 1, 2) * levelMultiplier);
+							int adj = (int)Math.floor(Math.pow(counter - 1, 2) * levelMultiplier);
+							score += adj;
+							energy += adj;
 							break;
 						case STAR:
 							if (cursorGridPos[1] > 0) { break; }
@@ -141,6 +143,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 							}
 							grid[cursorGridPos[0]].blocks[cursorGridPos[1]].clearMark = true;
 							score += counter * 5;
+							energy += counter * 5;
 							break;
 						default:
 							break;
@@ -151,10 +154,8 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 						removeMarkedBlocks();
 						dropBlocks(blockDimL1[1]);
 						shiftGridColumns(blockDimL1[0]);
-						// shiftGrid();
-						// remove blocks marked to be cleared
-						// input delay is only increased if an action was performed and the grid was changed
 					}
+					// input delay is only increased if an action was performed and the grid was changed
 					actionDelay = Global.inputReadDelayTimer;
 				}
 			}
@@ -170,51 +171,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		}
 
 	}
-	
-	/*//original grid shift code
-	@Override
-	protected void shiftGrid() {
-		for (int i = 0; i < grid.length; i++) {
-			int slotDist = 0;
-			int dropDist = 0;
-			for (int k = 0; k < grid[0].length; k++) {
-				if (grid[i][k] != null && grid[i][k].clearMark) {
-					grid[i][k] = null;
-				} 
-			}
-			for (int k = 0; k < grid[0].length; k++) {
-				if (grid[i][k] == null) {
-					dropDist += blockDimL1[1];
-					slotDist++;
-				} else if (dropDist > 0) {
-					grid[i][k].dropDistance = dropDist;
-					grid[i][k-slotDist] = grid[i][k];
-					grid[i][k] = null;
-				}
-			}
-		}
-		Block[] emptyset = new Block[grid[0].length];
-		// shift the grid to the right
-		if (gridShift == 1) {
-			for (int i = grid.length - 1; i > 0; i--) {
-				if (grid[i][0] == null) {
-					for (int k = i - 1; k >= 0; k--) {
-						if (grid[k][0] != null) {
-							grid[i] = grid[k];
-							grid[k] = emptyset;
-							break;
-						}
-					}
-				}
-			}
-		}
-	} //*/
-	
-	
-	
-	
-	
-	
 }
 
 
