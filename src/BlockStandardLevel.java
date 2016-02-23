@@ -23,10 +23,12 @@ public abstract class BlockStandardLevel {
 	protected static Texture energyBar; //energy bar
 	protected int energyMax = 100000;
 	protected int energy = energyMax;
+	protected float energyGainMultiplier = 1.0f;
 
-	//protected Block[][] grid; // = new Block[20][20]; // [x][y], [c][r]
+	// grid variables
 	protected GridColumn[] grid;
 	protected int[] gridSize;
+	protected int[] gridBasePos;
 	// grid shifting variables
 	protected boolean gridShiftActive = false;
 	protected boolean blockDropActive = false;
@@ -34,7 +36,6 @@ public abstract class BlockStandardLevel {
 	protected int gridShiftDir = 1;
 	private long shiftActionDelayTimer = 1000l;
 	private long shiftActionDelay = shiftActionDelayTimer;
-
 	// grid queue variables
 	protected Block[] queue;
 	protected long queueStepDelayTimer = 500l;
@@ -53,7 +54,10 @@ public abstract class BlockStandardLevel {
 	protected long inputDelay = 0;
 	protected long actionDelay = Global.inputReadDelayTimer * 2;
 	protected int level = 1;
+	/** Sets sets the multiplier to apply to all score additions/subtractions. */
 	protected float levelMultiplier = 1.0f;
+	/** Used to contain removed block counts for grid clears. */
+	protected int counter = 0;
 
 	public boolean levelFinished = false;
 	public boolean gameOver = false;
@@ -314,6 +318,22 @@ public abstract class BlockStandardLevel {
 				inputDelay = Global.inputReadDelayTimer;
 				return;
 			}
+			if (actionDelay <= 0) {
+				if (!gridMoving && Global.getControlActive(Global.GameControl.SELECT) &&
+						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
+					counter = 0;
+					processActivate();
+					if (counter > 1) {
+						// decrease the blocksRemaining counter after blocks are cleared
+						blocksRemaining -= counter;
+						removeMarkedBlocks();
+						dropBlocks();
+						shiftGridColumns();
+					}
+					// input delay is only increased if an action was performed and the grid was changed
+					actionDelay = Global.inputReadDelayTimer;
+				}
+			}
 		}
 	}
 
@@ -408,6 +428,8 @@ public abstract class BlockStandardLevel {
 	}
 	
 	protected abstract Block getQueueBlock();
+	
+	protected abstract void processActivate(); 
 	
 	
 	private void shiftQueue(int direction) {
@@ -522,6 +544,18 @@ public abstract class BlockStandardLevel {
 		}
 		glEnd();
 		glPopMatrix();
+	}
+	
+	/**
+	 * @param baseAdjustment The base value to adjust score by, before applying the <code>levelMultiplier</code>
+	 * @author John
+	 */
+	protected void updateScore(int baseAdjustment) {
+		score += (int)Math.floor(baseAdjustment * levelMultiplier);
+	}
+	
+	protected void addEnergy(int baseAdjustment) {
+		energy += (int)Math.floor(baseAdjustment * energyGainMultiplier);
 	}
 }
 
