@@ -76,7 +76,8 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		counter = 0;
 		inputDelay -= Global.delta;
 		actionDelay -= Global.delta;
-		
+		energy -= Global.delta;
+		if (energy < 0) { energy = 0; }
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver) {
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
