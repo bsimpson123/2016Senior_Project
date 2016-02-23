@@ -10,11 +10,9 @@ import org.newdawn.slick.opengl.Texture;
  */
 public class BlockStandardLevelEx extends BlockStandardLevel {
 	/** Defines the width and height of the blocks in the grid. */
-	private final int[] blockDimL1; // block dimensions Level 1
 	private boolean specialActive = false;
 	private final int[] gridBasePos;
 	private Random rand;
-	private long actionDelay = Global.inputReadDelayTimer * 2;
 	private int counter = 0;
 
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
@@ -36,12 +34,13 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 			);
 		// this value can be { 16, 16 } or { 8, 8 } to reduce the size of the blocks
 		// but the grid size should be increased proportionately
-		blockDimL1 = new int[] { 32, 32 };
+		blockSize = new int[] { 32, 32 };
 		gridSize = new int[] { 20, 20 };
 		//grid = new Block[20][20];
 		grid = new GridColumn[gridSize[0]];
+		queue = new Block[gridSize[0]];
 		buildGrid();
-		gridBasePos = new int[] { 20, Global.glEnvHeight - blockDimL1[1] - 50 };
+		gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
@@ -75,13 +74,14 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		counter = 0;
 		inputDelay -= Global.delta;
 		actionDelay -= Global.delta;
-		energy -= Global.delta;
-		if (energy < 0) { energy = 0; }
-		if (energy > energyMax) { energy = energyMax; }
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver) {
+			processQueue();
+			energy -= Global.delta;
+			if (energy < 0) { energy = 0; }
+			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			gridMoving = drawGrid(blockDimL1, 400);
+			gridMoving = drawGrid(blockSize, 500);
 			//shiftGrid();
 		
 			cursor.draw(
@@ -89,9 +89,9 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 /*				gridBasePos[0] + blockOffSet[0] * cursorGridPos[0] - blockOffSet[0]/2,
 				gridBasePos[1] - blockOffSet[1] * cursorGridPos[1] + blockOffSet[1]/2 //*/
 				// for selector surrounding block
-				gridBasePos[0] + blockDimL1[0] * cursorGridPos[0],
-				gridBasePos[1] - blockDimL1[1] * cursorGridPos[1],
-				blockDimL1
+				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
+				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
+				blockSize
 			);
 		
 
@@ -109,14 +109,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				gameOver = true;
 			}
 			if (actionDelay <= 0) {
-				if (Global.getControlActive(Global.GameControl.SPECIAL1)) {
-					System.out.println(this.blocksRemaining);
-					actionDelay = Global.inputReadDelayTimer;
-					gridShiftActive = true;
-					gridShiftDir *= -1;
-					shiftGridColumns(blockDimL1[0]);
-				}
-				
 				if (!gridMoving && Global.getControlActive(Global.GameControl.SELECT) &&
 						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
 					counter = 0;
@@ -152,8 +144,8 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 						// TODO: remember to decrease the blocksRemaining counter after blocks are cleared
 						blocksRemaining -= counter;
 						removeMarkedBlocks();
-						dropBlocks(blockDimL1[1]);
-						shiftGridColumns(blockDimL1[0]);
+						dropBlocks();
+						shiftGridColumns();
 					}
 					// input delay is only increased if an action was performed and the grid was changed
 					actionDelay = Global.inputReadDelayTimer;
@@ -170,6 +162,14 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 			// TODO: show game over screen, high score entry calculation
 		}
 
+	}
+
+	@Override
+	protected Block getQueueBlock() {
+		// TODO Auto-generated method stub
+		Block b = null;
+		b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
+		return b;		
 	}
 }
 

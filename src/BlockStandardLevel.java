@@ -21,7 +21,7 @@ public abstract class BlockStandardLevel {
 	protected Sprite userInterface;
 	protected static Sprite emptyEnergy; //empty energy bar
 	protected static Texture energyBar; //energy bar
-	protected int energyMax =100000;
+	protected int energyMax = 100000;
 	protected int energy = energyMax;
 
 	//protected Block[][] grid; // = new Block[20][20]; // [x][y], [c][r]
@@ -32,12 +32,26 @@ public abstract class BlockStandardLevel {
 	protected boolean blockDropActive = false;
 	protected boolean gridMoving = false;
 	protected int gridShiftDir = 1;
+	private long shiftActionDelayTimer = 1000l;
+	private long shiftActionDelay = shiftActionDelayTimer;
 
+	// grid queue variables
+	protected Block[] queue;
+	protected long queueStepDelayTimer = 500l;
+	protected long queueStepDelay = queueStepDelayTimer;
+	protected int queueStepReq = 4;
+	protected int queueStepCount = 0;
+	protected int queueCount = 0;
+	protected int queueLimit = 5;
+	private long queueManualShiftDelayTimer = 250l;
+	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	
 	protected int[] cursorGridPos = new int[] { 0, 0 };
+	protected int[] blockSize;
 	protected int blocksRemaining = 0;
 	protected boolean gamePaused = false;
 	protected long inputDelay = 0;
+	protected long actionDelay = Global.inputReadDelayTimer * 2;
 	protected int level = 1;
 	protected float levelMultiplier = 1.0f;
 
@@ -99,10 +113,16 @@ public abstract class BlockStandardLevel {
 					if (change == 0) { change = 4; }
 					scoreDisplay += change;
 					if (scoreDisplay > score) { scoreDisplay = score; }
+				} else { // score decreasing
+					change = (scoreDisplay - score) >> 2;
+					if (change == 0) { change = 4; }
+					scoreDisplay -= change;
+					if (scoreDisplay < score) { scoreDisplay = score; }
 				}
 				scoreUpdateDelay = scoreUpdateDelayTimer;
 			}
 		} else { 
+			score = 0;
 			scoreDisplay = score; 
 		}
 		char[] strScore = Integer.toString(scoreDisplay).toCharArray();
@@ -170,6 +190,8 @@ public abstract class BlockStandardLevel {
 	 * if no blocks are currently falling 
 	 */
 	protected final boolean drawGrid(int[] blockSize, int shiftRate) {
+		shiftActionDelay -= Global.delta;
+		queueManualShiftDelay -= Global.delta;
 		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 }; // distance from the left top for the bottom-left of the grid display
 		//int dropRate = 20; // millisecond time for a falling block to cover 1 space
 		blockDropActive = false;
@@ -227,7 +249,7 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		}
-		
+		drawQueue();
 		return (blockDropActive || gridShiftActive);
 	}
 	
@@ -236,42 +258,63 @@ public abstract class BlockStandardLevel {
 	 * position accordingly.
 	 */
 	protected void checkCommonControls() {
-		if (Global.getControlActive(Global.GameControl.UP)) {
-			cursorGridPos[1]++;
-			if (cursorGridPos[1] >= grid[0].blocks.length) {
-				cursorGridPos[1] = grid[0].blocks.length - 1;
+		if (Global.getControlActive(Global.GameControl.SPECIAL2) && queueManualShiftDelay <= 0) {
+			// queue control
+			if (Global.getControlActive(Global.GameControl.LEFT)) {
+				// shift queue left
+				
+				queueManualShiftDelay = queueManualShiftDelayTimer;
+			} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
+				// shift queue right
+				
+				queueManualShiftDelay = queueManualShiftDelayTimer;
+			} else if (Global.getControlActive(Global.GameControl.DOWN)) {
+				// drop (add to grid) queue
+				int overflow = addToGrid();
+				queueCount = 0;
+				score -= overflow * 10;
+				queueManualShiftDelay = queueManualShiftDelayTimer;
 			}
-			inputDelay = Global.inputReadDelayTimer;
-			return;
-		}
-		if (Global.getControlActive(Global.GameControl.DOWN)) {
-			if (cursorGridPos[1] > 0) {
-				cursorGridPos[1]--;
+		} else {
+			// cursor control
+			if (Global.getControlActive(Global.GameControl.SPECIAL1) && shiftActionDelay <= 0) {
+				actionDelay = Global.inputReadDelayTimer;
+				shiftActionDelay = shiftActionDelayTimer;
+				gridShiftActive = true;
+				gridShiftDir *= -1;
+				shiftGridColumns();
 			}
-			inputDelay = Global.inputReadDelayTimer;
-			return;
-		}
-		if (Global.getControlActive(Global.GameControl.LEFT)) {
-			if (cursorGridPos[0] > 0) {
-				cursorGridPos[0]--;
+			if (Global.getControlActive(Global.GameControl.UP)) {
+				cursorGridPos[1]++;
+				if (cursorGridPos[1] >= grid[0].blocks.length) {
+					cursorGridPos[1] = grid[0].blocks.length - 1;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+				return;
 			}
-			inputDelay = Global.inputReadDelayTimer;
-			return;
-		}
-		if (Global.getControlActive(Global.GameControl.RIGHT)) {
-			cursorGridPos[0]++;
-			if (cursorGridPos[0] >= grid.length) {
-				cursorGridPos[0] = grid.length - 1;
+			if (Global.getControlActive(Global.GameControl.DOWN)) {
+				if (cursorGridPos[1] > 0) {
+					cursorGridPos[1]--;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+				return;
 			}
-			inputDelay = Global.inputReadDelayTimer;
-			return;
+			if (Global.getControlActive(Global.GameControl.LEFT)) {
+				if (cursorGridPos[0] > 0) {
+					cursorGridPos[0]--;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+				return;
+			}
+			if (Global.getControlActive(Global.GameControl.RIGHT)) {
+				cursorGridPos[0]++;
+				if (cursorGridPos[0] >= grid.length) {
+					cursorGridPos[0] = grid.length - 1;
+				}
+				inputDelay = Global.inputReadDelayTimer;
+				return;
+			}
 		}
-		/*// future implementation
-		if (Global.getControlActive(Global.GameControl.SPECIAL)) {
-			shiftDirection ^= 1;
-			inputDelay = Global.inputReadDelayTimer;
-			return;
-		} //*/
 	}
 
 	protected final void removeMarkedBlocks() {
@@ -291,7 +334,7 @@ public abstract class BlockStandardLevel {
 	 * @param blockDimensions the height of blocks used in the level. 
 	 * Used to calculate the distance blocks will be offset. 
 	 */
-	protected void dropBlocks(int blockDimensions) {
+	protected void dropBlocks() {
 		int dropDist = 0;
 		int slotDist = 0;
 		for (int i = 0; i < grid.length; i++) {
@@ -299,7 +342,7 @@ public abstract class BlockStandardLevel {
 			dropDist = 0;
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				if (grid[i].blocks[k] == null) {
-					dropDist += blockDimensions;
+					dropDist += blockSize[1];
 					slotDist++;
 				} else if (dropDist > 0) {
 					grid[i].blocks[k].dropDistance = dropDist;
@@ -311,15 +354,14 @@ public abstract class BlockStandardLevel {
 		return ;
 	}
 	
-	
-	protected void shiftGridColumns(int blockDimensions) {
+	protected void shiftGridColumns() {
 		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
 		int colDist = 0, shiftDist = 0;
 		if (gridShiftDir == 1) {
 			for (int xc = grid.length - 1; xc >= 0; xc--) { // xCurrent, xPrevious
 				if (grid[xc].blocks[0] == null) {
 					colDist++;
-					shiftDist += blockDimensions;
+					shiftDist += blockSize[0];
 				} else if (shiftDist > 0) {
 					grid[xc].columnOffset -= shiftDist; 
 					grid[xc + colDist] = grid[xc];
@@ -330,13 +372,127 @@ public abstract class BlockStandardLevel {
 			for (int xc = 0; xc < grid.length; xc++) {
 				if (grid[xc].blocks[0] == null) {
 					colDist++;
-					shiftDist += blockDimensions;
+					shiftDist += blockSize[0];
 				} else if (shiftDist > 0) {
 					grid[xc].columnOffset += shiftDist;
 					grid[xc - colDist] = grid[xc];
 					grid[xc] = emptyset.clone();
 				}
 			}
+		}
+		return ;
+	}
+	
+	/**
+	 * Adds blocks in queue to the grid at the top level. Returns the number of blocks 
+	 * that could not be added (such as when the column is already full). 
+	 * @param blockQueue <code>Block</code> array containing blocks to be added for each
+	 * grid column.
+	 * @return The number of blocks that could not be added to the grid.
+	 * @author John
+	 */
+	protected int addToGrid() {
+		int overflow = 0;
+		int yMax = grid[0].blocks.length - 1;
+		for (int x = 0; x < grid.length; x++) {
+			if (grid[x].blocks[yMax] == null && queue[x] != null) {
+				grid[x].blocks[yMax] = queue[x];
+			} else {
+				overflow++;
+			}
+			queue[x] = null;
+		}
+		dropBlocks();
+		shiftGridColumns();
+		return overflow;
+	}
+	
+	protected abstract Block getQueueBlock();
+	
+	
+	private void shiftQueue(int direction) {
+		int xMax = queue.length;
+		if (direction == 1) { // shift right
+			
+		} else {
+			for (int x = 0; x < xMax; x++) {
+				if (queue[x] == null) { // find first null space
+					int current = x, next = (x + 1) % xMax;
+					for (int i = 0 ; i < xMax; i++) { // shift the queue
+						current = (x + i) % xMax;
+						next = (current + 1) % xMax;
+						queue[current] = queue[next]; 
+					}
+					break;
+				}
+			}
+			
+		}
+	}
+	/**
+	 * @author John
+	 */
+	protected void processQueue() {
+		queueStepDelay -= Global.delta;
+		int xMax = queue.length;
+		if (queueStepDelay > 0) { return; }
+		queueStepDelay = queueStepDelayTimer; // reset step timer
+		queueStepCount++;
+		// shift the queue to the left by one block
+		if (queueCount >= queueLimit && queueStepCount == 2) {
+			int overflow = addToGrid();
+			if (overflow < queueCount) {
+				gridMoving = true;
+			}
+			score -= overflow * 10;
+			queueCount = 0;
+		} else {
+			shiftQueue(-1);
+/*			for (int x = 0; x < xMax; x++) {
+				if (queue[x] == null) { // find first null space
+					int current = x, next = (x + 1) % xMax;
+					for (int i = 0 ; i < xMax; i++) { // shift the queue
+						current = (x + i) % xMax;
+						next = (current + 1) % xMax;
+						queue[current] = queue[next]; 
+					}
+					break;
+				}
+			} //*/
+		}
+		if (queueStepCount < queueStepReq) { 
+			return; 
+		}
+		queueStepCount = 0; // reset steps-remaining-until-block-add timer
+		Block b = getQueueBlock();
+		int firstNull = queue.length - 1;
+		if (queue[firstNull] != null) {
+			for (int x = xMax - 1; x > 0; x--) { // find closest null from right
+				if (queue[x] == null) {
+					firstNull = x;
+					break;
+				}
+			}
+			// shift right-most blocks to make room for new block
+			for (int x = firstNull; x < queue.length - 1; x++) { 
+				queue[x] = queue[x + 1];
+			}
+		}
+		queue[queue.length - 1] = b;
+		queueCount++;
+
+	}
+	/**
+	 * @author John
+	 */
+	protected void drawQueue() {
+		int[] anchorPos = new int[] { 20, 40 };
+		int offset = 0;
+		for (int i = 0; i < queue.length; i++) {
+			if (queue[i] != null) {
+				queue[i].draw(anchorPos[0] + offset, anchorPos[1], blockSize);
+			}
+			offset += blockSize[0];
 		}
 		return ;
 	}
