@@ -349,7 +349,7 @@ public abstract class BlockStandardLevel {
 					processActivate();
 					if (counter > 1) {
 						// decrease the blocksRemaining counter after blocks are cleared
-						blocksRemaining -= counter;
+//						blocksRemaining -= counter; // now adjusted in removeMarkedBlocks() function
 						removeMarkedBlocks();
 						dropBlocks();
 						shiftGridColumns();
@@ -369,6 +369,7 @@ public abstract class BlockStandardLevel {
 			for (int yc = 0; yc < grid[0].blocks.length; yc++) {
 				if (grid[xc].blocks[yc] != null && grid[xc].blocks[yc].clearMark) {
 					grid[xc].blocks[yc] = null;
+					blocksRemaining--;
 				}
 			}
 		}
@@ -449,6 +450,7 @@ public abstract class BlockStandardLevel {
 			if (queue[x] != null) {
 				if (grid[x].blocks[yMax] == null) {
 					grid[x].blocks[yMax] = queue[x];
+					blocksRemaining++;
 				} else {
 					overflow++;
 				}
@@ -598,6 +600,51 @@ public abstract class BlockStandardLevel {
 	
 	protected void addEnergy(int baseAdjustment) {
 		energy += (int)Math.floor(baseAdjustment * energyGainMultiplier);
+	}
+
+	/**
+	 * Marks for removal blocks within <code>radius</code> block distance (including diagonal).
+	 * Recursively activates any other bomb blocks within the radius.
+	 * @param radius the blocks radius from the bomb to clear
+	 * @param pos starting position for the bomb block
+	 * @return The number of blocks removed
+	 * @author John
+	 */
+	protected int activateBombBlock(int[] pos, int radius) {
+		int xMin = pos[0] - 2, 
+			xMax = pos[0] + 2,
+			yMin = pos[1] - 2, 
+			yMax = pos[1] + 2;
+		int[] xEdge = new int[] { xMin, xMax }; // edge values before range checks
+		int[] yEdge = new int[] { yMin, yMax };
+		int cornerRadius = radius / 3;
+		if (cornerRadius <= 0) { cornerRadius = 1; }
+		int count = 0;
+		if (xMin < 0) { xMin = 0; }
+		if (xMax >= gridSize[0]) { xMax = gridSize[0] - 1; }
+		if (yMin < 0) { yMin = 0; }
+		if (yMax >= gridSize[1]) { yMax = gridSize[1] - 1; }
+		// mark center bomb as cleared to prevent recursive calls to already activated bomb blocks
+		grid[pos[0]].blocks[pos[1]].clearMark = true;
+		count++;
+		for (int i = xMin; i <= xMax; i++) {
+			for (int k = yMin; k <= yMax; k++) {
+				if (i < (xEdge[0] + cornerRadius) || i > (xEdge[1] - cornerRadius)) {
+					if (k < (yEdge[0] + cornerRadius) || k > (yEdge[1] - cornerRadius)) {
+						continue; // skip corner checks
+					}
+				}
+				if (grid[i].blocks[k] != null && !grid[i].blocks[k].clearMark) {
+					if (grid[i].blocks[k].type == Block.BlockType.BOMB) {
+						count += activateBombBlock(new int[] { i, k }, radius);
+					} else {
+						grid[i].blocks[k].clearMark = true;
+						count++;
+					}
+				}
+			}
+		}
+		return count;
 	}
 }
 
