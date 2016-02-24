@@ -414,6 +414,11 @@ public abstract class BlockStandardLevel {
 				if (grid[xc].blocks[0] == null) {
 					colDist++;
 					shiftDist += blockSize[0];
+				} else if (grid[xc].blocks[0].type == Block.BlockType.ROCK) {
+					// columns with ROCK blocks do not shift and stop other columns from moving past
+					colDist = 0;
+					shiftDist = 0;
+					continue;
 				} else if (shiftDist > 0) {
 					grid[xc].columnOffset -= shiftDist; 
 					grid[xc + colDist] = grid[xc];
@@ -425,6 +430,11 @@ public abstract class BlockStandardLevel {
 				if (grid[xc].blocks[0] == null) {
 					colDist++;
 					shiftDist += blockSize[0];
+				} else if (grid[xc].blocks[0].type == Block.BlockType.ROCK) {
+					// columns with ROCK blocks do not shift and stop other columns from moving past
+					colDist = 0;
+					shiftDist = 0;
+					continue;
 				} else if (shiftDist > 0) {
 					grid[xc].columnOffset += shiftDist;
 					grid[xc - colDist] = grid[xc];

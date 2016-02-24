@@ -128,6 +128,12 @@ public class Block {
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
+		blockRock = new Sprite(
+				blockTex,
+				new int[] { 272, 32 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
 		errorBlock = new Sprite(
 				texMap.get("red_ui"),
 				new int[] { 381, 36 },
@@ -151,7 +157,7 @@ public class Block {
 				// TODO: assign trash sprite to block variable
 				break;
 			case ROCK:
-				// TODO: assign rock sprite to block variable
+				block = blockRock;
 				break;
 			case BOMB:
 				block = blockBomb;
