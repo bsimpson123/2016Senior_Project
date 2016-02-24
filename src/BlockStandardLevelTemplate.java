@@ -99,7 +99,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		}
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
-		draw_energy();
+		drawEnergy();
 		if (gamePaused) {
 			// TODO: display the pause menu
 		} else if (gameOver) {

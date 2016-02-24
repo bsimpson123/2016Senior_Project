@@ -81,6 +81,7 @@ public abstract class BlockStandardLevel {
 	 * @param grid The 2-dimensional grid of blocks
 	 * @param xy 2-element array containing the starting index locations for the search
 	 * @return The total number of blocks found
+	 * @author John
 	 */
 	protected final int checkGrid(int[] xy) {
 		if (grid[xy[0]].blocks[xy[1]] == null) { return 0; }
@@ -88,6 +89,9 @@ public abstract class BlockStandardLevel {
 		return checkGrid(xy[0], xy[1], grid[xy[0]].blocks[xy[1]].colorID);
 	}
 
+	/**
+	 * @author John 
+	 */
 	private final int checkGrid(int xc, int yc, final int colorID) {
 		int sum = 0;
 		if (grid[xc].blocks[yc] == null || grid[xc].blocks[yc].checked) {
@@ -119,6 +123,9 @@ public abstract class BlockStandardLevel {
 		
 	}
 
+	/**
+	 * @author John
+	 */
 	protected void drawScore() {
 		if (score > 0) {
 			scoreUpdateDelay -= Global.delta;
@@ -153,6 +160,9 @@ public abstract class BlockStandardLevel {
 		}
 	}
 	
+	/**
+	 * @author John 
+	 */
 	private Sprite getNumber(char c) {
 		switch (c) {
 			case '0':
@@ -179,6 +189,9 @@ public abstract class BlockStandardLevel {
 		}
 	}
 	
+	/**
+	 * @author John
+	 */
 	protected void drawTopLevelUI() {
 		Global.uiRed.draw(700, 16, 300, 56);
 		Global.uiBlue.draw(700, 72, 300, 96);
@@ -203,6 +216,7 @@ public abstract class BlockStandardLevel {
 	 * @param shiftRate The drop rate in pixels/second for falling blocks
 	 * @return true if blocks are currently falling within the grid, false
 	 * if no blocks are currently falling 
+	 * @author John
 	 */
 	protected final boolean drawGrid(int[] blockSize, int shiftRate) {
 		gridShiftActionDelay -= Global.delta;
@@ -271,6 +285,7 @@ public abstract class BlockStandardLevel {
 	/**
 	 * Checks against movement inputs within the grid, and adjusts the cursor
 	 * position accordingly.
+	 * @author John
 	 */
 	protected void checkCommonControls() {
 		if (Global.getControlActive(Global.GameControl.SPECIAL2)) {
@@ -346,6 +361,9 @@ public abstract class BlockStandardLevel {
 		}
 	}
 
+	/**
+	 * @author John
+	 */
 	protected final void removeMarkedBlocks() {
 		for (int xc = 0; xc < grid.length; xc++) {
 			for (int yc = 0; yc < grid[0].blocks.length; yc++) {
@@ -362,6 +380,7 @@ public abstract class BlockStandardLevel {
 	 * blocks in play would prevent normal block falling behavior.
 	 * @param blockDimensions the height of blocks used in the level. 
 	 * Used to calculate the distance blocks will be offset. 
+	 * @author John
 	 */
 	protected void dropBlocks() {
 		int dropDist = 0;
@@ -383,6 +402,9 @@ public abstract class BlockStandardLevel {
 		return ;
 	}
 	
+	/**
+	 * @author John
+	 */
 	protected void shiftGridColumns() {
 		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
 		int colDist = 0, shiftDist = 0;
@@ -446,7 +468,11 @@ public abstract class BlockStandardLevel {
 	
 	protected abstract void processActivate(); 
 	
-	
+	/**
+	 * 
+	 * @param direction
+	 * @author John
+	 */
 	private void shiftQueue(int direction) {
 		int xMax = queue.length;
 		int current, next;
@@ -459,6 +485,7 @@ public abstract class BlockStandardLevel {
 						current = (xMax + (x - i)) % xMax;
 						next = (xMax + (current - 1)) % xMax;
 						queue[current] = queue[next];
+						queue[next] = null;
 					}
 					break;
 				}
@@ -471,7 +498,8 @@ public abstract class BlockStandardLevel {
 					for (int i = 0 ; i < xMax; i++) { // shift the queue
 						current = (x + i) % xMax;
 						next = (current + 1) % xMax;
-						queue[current] = queue[next]; 
+						queue[current] = queue[next];
+						queue[next] = null;
 					}
 					break;
 				}
@@ -536,7 +564,7 @@ public abstract class BlockStandardLevel {
 	/**
 	 * @author Mario
 	 */
-	protected void draw_energy() {
+	protected void drawEnergy() {
 		emptyEnergy.draw(20, 740);
 		energyBar.bind();
 		float percent = (float) energy/(float) energyMax;
