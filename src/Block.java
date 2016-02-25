@@ -118,8 +118,8 @@ public class Block {
 			);
 		blockWedge = new Sprite(
 				blockTex,
-				new int[] { 1036, 874 },
-				new int[] { 128, 128 },
+				new int[] { 304, 0 },
+				new int[] { 32, 32 },
 				blockDrawSpace
 			);
 		blockBomb = new Sprite(
