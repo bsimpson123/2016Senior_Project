@@ -647,6 +647,8 @@ public abstract class BlockStandardLevel {
 				if (grid[i].blocks[k] != null && !grid[i].blocks[k].clearMark) {
 					if (grid[i].blocks[k].type == Block.BlockType.BOMB) {
 						count += activateBombBlock(new int[] { i, k }, radius);
+					} else if (grid[i].blocks[k].type == Block.BlockType.ROCK) { // ignore rock blocks
+						continue;
 					} else {
 						grid[i].blocks[k].clearMark = true;
 						count++;
