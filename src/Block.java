@@ -1,15 +1,16 @@
 import java.util.HashMap;
-import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
 
 public class Block {
 	/* Public Variables */
 	public enum BlockType {
-		BLOCK, WEDGE, STAR, TRASH, ROCK
+		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB
 	}
 
 	protected static Sprite blockColor[];
-	protected static Sprite blockWedge, blockStar, blockTrash, blockRock; 
+	protected static Sprite blockStar, blockStarOverlay;
+	protected static Sprite blockWedge, blockTrash, blockRock, blockBomb;
+	protected static Sprite errorBlock;
 	
 	public static final int  
 		BLUE = 0,
@@ -33,8 +34,10 @@ public class Block {
 	
 	/** Indicates whether the block has been checked for processing during a game loop.
 	 * This value should be reset to false before logic processing each game loop. */
-	protected boolean checked = false;
-	protected boolean clearMark = false;
+	public boolean checked = false;
+	public boolean clearMark = false;
+	public int dropDistance = 0;
+	 
 	
 	/* Constructors */
 	public Block(BlockType type, int colorID) {
@@ -91,7 +94,7 @@ public class Block {
 			);
 		blockColor[RED] = new Sprite(
 				blockTex,
-				new int[] { 212, 431 },
+				new int[] { 212, 233 },
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
@@ -101,17 +104,40 @@ public class Block {
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
-		blockTex = texMap.get("yellowtiles");
 		blockStar = new Sprite(
 				blockTex,
-				new int[] { 1036, 260 },
-				new int[] { 128, 128 },
+				new int[] { 65, 361 },
+				new int[] { 48, 48 },
+				blockDrawSpace
+			);
+		blockStarOverlay = new Sprite(
+				texMap.get("yellow_ui"),
+				new int[] { 417, 0 },
+				new int[] { 32, 32 },
 				blockDrawSpace
 			);
 		blockWedge = new Sprite(
 				blockTex,
-				new int[] { 1036, 874 },
-				new int[] { 128, 128 },
+				new int[] { 304, 0 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
+		blockBomb = new Sprite(
+				blockTex,
+				new int[] { 272, 0 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
+		blockRock = new Sprite(
+				blockTex,
+				new int[] { 272, 32 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
+		errorBlock = new Sprite(
+				texMap.get("red_ui"),
+				new int[] { 381, 36 },
+				new int[] { 36, 36 },
 				blockDrawSpace
 			);
 	}
@@ -131,7 +157,12 @@ public class Block {
 				// TODO: assign trash sprite to block variable
 				break;
 			case ROCK:
-				// TODO: assign rock sprite to block variable
+				block = blockRock;
+				break;
+			case BOMB:
+				block = blockBomb;
+				break;
+			default:
 				break;
 		}
 	}
@@ -147,48 +178,50 @@ public class Block {
 	
 	public void draw(int xc, int yc) {
 		if (block == null) { 
+			errorBlock.draw(xc, yc);
 			// TODO: add draw for 'error' block to indicate a problem with block texture assignment
 			return ;
 		}
 		block.draw(xc, yc);
+		if (type == BlockType.STAR) {
+			blockStarOverlay.draw(xc, yc);
+		}
+	}
+
+	public void draw(int xc, int yc, int[] size) {
+		if (block == null) {
+			errorBlock.draw(xc, yc, size);
+			return ;
+		}
+		block.draw(xc, yc, size);
+		if (type == BlockType.STAR) {
+			blockStarOverlay.draw(xc, yc, size);
+		}
 	}
 	
-	/**
-	 * 
-	 */
-	public int activate(Block[][] grid, int xPos, int yPos) {
-		int score = 0;
-		int stopWidth = grid[0].length - 1;
-		int stopHeight = grid.length - 1;
-		
-		switch (this.type) {
-		case BLOCK:
-			// Normal blocks clear all same color blocks sharing an edge
-			// Score returned equals (n-1)^2 blocks cleared.
-			// Blocks that do not share an edge with a similar color block do nothing.
-			
-			// TODO: algorithm to search for similar connected blocks, mark those blocks for removal,
-			// and count blocks that are removed.
-			
-			break;
-		case WEDGE: 
-		case ROCK:
-		case TRASH:
-			// Wedge, trash, and rock blocks cannot be activated, do nothing.
-			break;
-		case STAR:
-			// Star blocks clear all blocks in a one block radius, including diagonals,
-			// but can only be activated if at the bottom row.
-			if (yPos != 0) { // check for bottom row
+	@Override
+	public String toString() {
+		String blockID;
+		switch (type) {
+			case BLOCK:
+				blockID = "BLOCK";
 				break;
-			}
-			
-			break;
-		default:
-			break;
+			case WEDGE:
+				blockID = "WEDGE";
+				break;
+			case STAR:
+				blockID = "STAR";
+				break;
+			case ROCK:
+				blockID = "ROCK";
+				break;
+			case TRASH:
+				blockID = "TRASH";
+				break;
+			default:
+				blockID = "UNKOWN";
+				break;
 		}
-		
-		
-		return score;
+		return String.format("%s %d c:%s m:%s", blockID, colorID, checked ? "T" : "F", clearMark ? "T" : "F");
 	}
 }

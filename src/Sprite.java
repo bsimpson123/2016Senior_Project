@@ -1,7 +1,6 @@
-
-
 import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
+
 /**
  * Manages texture binding and drawing on the screen.
  * @author John Ojala
@@ -79,5 +78,38 @@ public class Sprite {
 		
 		// restore the model view matrix to prevent contamination
 		glPopMatrix();
+	}
+
+	public int[] getDefinedSpace() {
+		return drawSpace.clone();
+	}
+	
+	public void draw(int xc, int yc, int[] size) {
+		glPushMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		texture.bind();
+		glTranslatef(xc, yc, 0);
+		
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(left, top);
+			glVertex2i(0, 0);
+			
+			glTexCoord2f(left, top + height);
+			glVertex2i(0, size[1]);
+			
+			glTexCoord2f(left + width, top + height);
+			glVertex2i(size[0], size[1]);
+			
+			glTexCoord2f(left + width, top);
+			glVertex2i(size[0], 0);
+
+		} 
+		glEnd();
+		glPopMatrix();
+	}
+	
+	public void draw(int[] xy, int[] size) {
+		this.draw(xy[0], xy[1], size);
 	}
 }

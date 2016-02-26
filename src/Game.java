@@ -1,12 +1,16 @@
 import static org.lwjgl.opengl.GL11.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.input.Controller;
+import org.lwjgl.input.Controllers;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.openal.Audio;
@@ -22,8 +26,6 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class Game {
 	/* Base game variables. These are needed for the basics of the framework to function. */
-	/** Hash map for referencing textures that have been loaded. */
-	private HashMap<String, Texture> textureMap = new HashMap<String, Texture>(15);
 	/** Hash map for referencing audio files that have been loaded. */
 	private HashMap<String, Audio> soundMap = new HashMap<String, Audio>();
 	/** Indicates whether the game is to continue running and processing logic. Set to false to end the program. */
@@ -50,7 +52,8 @@ public class Game {
 	 * @author John Ojala
 	 */
 	private final int MainMenu = 0,
-		BlockMatchStandard = 1
+		GameModeSelection = 1,
+		BlockMatchStandard = 2
 		;
 	
 	/** The current game mode within the main logic loop. */
@@ -66,7 +69,7 @@ public class Game {
 	@SuppressWarnings("unused")
 	private final boolean useController = false;
 	/** Set whether the mouse cursor should be captured during game play */
-	private final boolean captureMouse = true;
+	private final boolean captureMouse = false;
 	/** Indicates the currently selected option at the main menu */
 	private int mainMenuSelection = 0;
 
@@ -91,8 +94,11 @@ public class Game {
 			new String[] { "green_ui", "media/greenSheet.png" },
 			new String[] { "red_ui", "media/redSheet.png" },
 			new String[] { "yellow_ui", "media/yellowSheet.png" },
-			new String[] { "grey_ui", "media/greysheet.png" },
-			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" }
+			new String[] { "grey_ui", "media/greySheet.png" },
+			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
+			new String[] { "main_menu_background","media/main_menu_background.png"},
+			new String[] { "uibox", "media/UI_Boxes.png" },
+			new String[] { "title", "media/TitleDisplay.png" }
 	};
 	
 	/* Menu display and control variables */
@@ -102,6 +108,10 @@ public class Game {
 	private Sprite optionFrameMid;
 	private Sprite optionFrameBottom;
 	private Sprite optionBox;
+	private Sprite menu_background;
+	private Sprite title;
+	
+	private long mouseDelay = Global.inputReadDelayTimer;
 	
 	private Thread gameModeLoader = null;
 	
@@ -203,6 +213,7 @@ public class Game {
 	private void initComponents() {
 		// grab the mouse (hides the cursor while playing)
 		Mouse.setGrabbed(captureMouse);
+		Global.globalInit();
 		// TODO: add all game variables to be loaded/initialized at the start of the program
 		// Setup default game controls.
 		Global.setKeyMap(Global.GameControl.UP, Keyboard.KEY_UP);
@@ -214,8 +225,21 @@ public class Game {
 		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_SPACE);
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_W);
 		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_ESCAPE);
+		Global.setKeyMap(Global.GameControl.PAUSE, Keyboard.KEY_F);
+		Global.setKeyMap(Global.GameControl.SPECIAL1, Keyboard.KEY_A);
+		Global.setKeyMap(Global.GameControl.SPECIAL2, Keyboard.KEY_D);
 		
-		
+		// gamepad controls
+		Controller gamepad = Global.getController();
+		if (gamepad != null) {
+			// add gamepad controls here;
+			Global.setGamePadMap(Global.GameControl.SELECT, 1);
+			Global.setGamePadMap(Global.GameControl.CANCEL, 3);
+			Global.setGamePadMap(Global.GameControl.SPECIAL1, 2);
+			Global.setGamePadMap(Global.GameControl.SPECIAL2, 0);
+			Global.setGamePadMap(Global.GameControl.PAUSE, 9);
+			
+		}
 		// Load all used textures into memory so the game will not be slowed down by loading textures later
 		Texture tex;
 		String type; // holds file type extension
@@ -226,74 +250,88 @@ public class Game {
 			tex = null;
 			source = ref[1];
 			 try {
-				 source = FileResource.requestResource(ref[1]);
-				 tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref[1]));
-				 if ( textureMap.putIfAbsent(ref[0], tex) != null) {
-					 // report error, attempting to add duplicate key entry
-					 System.out.printf("Attempting to load multiple textures to key [%s]", ref[0]);
-					 System.out.printf("Texture resource [%s] not loaded.", ref[1]);
+				source = FileResource.requestResource(ref[1]);
+				tex = TextureLoader.getTexture(type, ResourceLoader.getResourceAsStream(ref[1]));
+				if ( Global.textureMap.putIfAbsent(ref[0], tex) != null) {
+					// report error, attempting to add duplicate key entry
+					Global.writeToLog(
+						String.format("Attempting to load multiple textures to key [%s]\n" + 
+							"Texture resource [%s] not loaded.", ref[0], ref[1]), true);
 				 }
 			 } catch (IOException e) {
-				 System.out.printf("Unable to load texture resource %s\n", source);
+				 Global.writeToLog(String.format("Unable to load texture resource %s\n", source), true);
 				 e.printStackTrace();
 				 System.exit(-1);
 			 }
 		}
 		
+		Global.buildStandardUIBoxes();
 		// Example code for loading textures with Sprite objects
 		/* Loading sprites where the complete texture will be drawn to the screen
 		menuBar = new Sprite( 
-				textureMap.get("menubar"), // texture reference name
+				Global.textureMap.get("menubar"), // texture reference name
 				new int[] { 190, 48 } // draw size in the GL environment
 			);
 		
 		 * Loading sprites where only a subsection of the textures will be drawn on the screen
 		testBlock = new Sprite(
-				textureMap.get("blocksheet"), // texture reference name
+				Global.textureMap.get("blocksheet"), // texture reference name
 				new int[] { 212, 431 }, // {top, left} stating point
 				new int[] { 32, 32}, // {width, height} counting left, down
 				new int[] { 32, 32 } // draw size in the GL environment
 			); //*/
 		// TODO: Load all Sprite objects for menu navigation
 		optionFrameTop = new Sprite(
-				textureMap.get("blue_ui"),
+				Global.textureMap.get("blue_ui"),
 				new int[] { 0, 49 },
 				new int[] { 190, 20 },
 				new int[] { 250, 20 }
 			);
 		optionFrameMid = new Sprite(
-				textureMap.get("blue_ui"),
+				Global.textureMap.get("blue_ui"),
 				new int[] { 0, 59 },
 				new int[] { 190, 20 },
 				new int[] { 250, 300 }
 			);
 		optionFrameBottom = new Sprite(
-				textureMap.get("blue_ui"),
+				Global.textureMap.get("blue_ui"),
 				new int[] { 0, 69 },
 				new int[] { 190, -20 },
 				new int[] { 250, 20 }
 			);
 		
 		optionBox = new Sprite(
-				textureMap.get("green_ui"),
+				Global.textureMap.get("green_ui"),
 				new int[] { 0, 0 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		
 		selector[0] = new Sprite( // left-side arrow
-				textureMap.get("grey_ui"),
+				Global.textureMap.get("grey_ui"),
 				new int[] { 39, 478 },
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
 		selector[1] = new Sprite( // right-side arrow
-				textureMap.get("grey_ui"),
+				Global.textureMap.get("grey_ui"),
 				new int[] { 0, 478 },
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
+		menu_background = new Sprite(
+				Global.textureMap.get("main_menu_background"),
+				new int[] {0,0},
+				new int[] {1024,768},
+				new int[] {1024,768}
+			);
 		
+		title = new Sprite(
+				Global.textureMap.get("title"),
+				new int[] { 0, 0 },
+				new int[] { 1024, 256 },
+				new int[] { 1024, 256 }
+			);
 		
 		Audio sound;
 		for (String ref : soundEffectResource) {
@@ -301,32 +339,19 @@ public class Game {
 			source = ref;
 			try {
 				source = FileResource.requestResource(ref);
-				type = source.substring(source.lastIndexOf('.')).toUpperCase(); 
+				type = source.substring(source.lastIndexOf('.') + 1).toUpperCase(); 
 				sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
 				soundMap.put(ref, sound);
 			} catch (IOException e) {
-				System.out.printf("Unable to load sound resource: %s\n%s", source, e.getMessage());
+				Global.writeToLog(String.format("Unable to load sound resource: %s\n%s", source, e.getMessage()), true);
 				System.out.println(e.getMessage());
 			}
 		}
 		
 		// TODO: add static class initializers
-		Block.initializeBlocks(textureMap);
+		Block.initializeBlocks(Global.textureMap);
 		
 	}
-	
-	
-	/*
-	public static String requestResource(String file) throws IOException { 
-		Path resourcePath;
-		Path reqPath = Paths.get(file).toAbsolutePath();
-		System.out.printf("Requesting resource: %s...", file);
-		resourcePath = reqPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
-		System.out.println("Success.");
-		System.out.printf("\t%s\n", resourcePath.toString());
-		return resourcePath.toString();
-	} //*/
-
 	
 	/**
 	 * Attempts to get a preloaded texture. Attempting to request a texture that
@@ -335,55 +360,11 @@ public class Game {
 	 * @return The loaded OpenGL texture, null if the referenced texture was not available.
 	 */
 	public Texture getTexture(String reference) {
-		if (textureMap.containsKey(reference)) {
-			return textureMap.get(reference);
+		if (Global.textureMap.containsKey(reference)) {
+			return Global.textureMap.get(reference);
 		}
 		return null;
 	}
-	
-	/*
-	private void processInput() {
-		// Input needs will vary between game modes, and menus within each mode, so input handling will
-		// need to be checked in each specific section.
-		
-		/* Get mouse movement on the X and Y axis
-		 * Can only call getDX and getDY once each per game loop.
-		 * Additional calls will return 0 or a very small value as there will have been 
-		 * zero or minimal movement of the mouse within the specific game loop. 
-		 *
-		if (useMouse) {
-			mouseX = Mouse.getDX();
-			mouseY = Mouse.getDY();
-			int moveX = 0;
-			int moveY = 0;
-		}
-		
-		// This code, in whole or part, should be used in individual control loops 
-		// to check against registered input for processing
-		if (Global.getControlActive(Global.GameControl.LEFT)) { 
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.RIGHT)) { 
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.UP)) {
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.DOWN)) {
-			cursorPos++;
-			
-		}
-		if (Global.getControlActive(Global.GameControl.SELECT)) {
-			;
-		}
-		if (Global.getControlActive(Global.GameControl.CANCEL)) {
-			gameRunning = false;
-		}
-		if (Global.getControlActive(Global.GameControl.SPECIAL)) {
-			;
-		}
-		
-	} //*/
 	
 	/**
 	 * Determine the delay time since the last frame render, get the player input,
@@ -408,9 +389,20 @@ public class Game {
 			fps = 0;
 		}
 
+		// Screen location checking. this will output mouse click locations in /every/ gamemode to the console
+		if (mouseDelay <= 0) {
+			if (Mouse.isButtonDown(0)) {
+				mouseX = Mouse.getX();
+				mouseY = Global.glEnvHeight - Mouse.getY();
+				System.out.printf("Mouse click at %d, %d\n", mouseX, mouseY);
+				mouseDelay = Global.inputReadDelayTimer;
+			} 
+		} else {
+			mouseDelay -= Global.delta;
+		}
 		/* check and handle input controls */
 		// processInput(); 
-		/* input checking is handled within individual game loops, where only the necessary
+		/* input checking is handled within individual control loops, where only the necessary
 		 * inputs will be checked.
 		 */
 		
@@ -446,20 +438,21 @@ public class Game {
 				if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
 					cursorPos = 2;
 				}
-			} else if (movementInputDelay > 0) {
-				movementInputDelay -= Global.delta;
-			}
+	
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0:
 					case 1:
 						game = new BlockBreakStandard();
-						activeGameMode = BlockMatchStandard;
+						activeGameMode = GameModeSelection;
 						break;
 					case 2:
 						gameRunning = false;
 						break;
 				}
+			}
+			} else if (movementInputDelay > 0) {
+				movementInputDelay -= Global.delta;
 			}
 			// if (Global.getControlActive(Global.GameControl.SPECIAL)) { ; }
 			/*
@@ -469,26 +462,29 @@ public class Game {
 			testBlock.draw(200, 100);
 			//*/
 			// Draw the frame that will contain the option boxes
-			optionFrameTop.draw(150, 150);
-			optionFrameMid.draw(150, 170);
-			optionFrameBottom.draw(150, 470);
+			menu_background.draw(0,0);
+			title.draw(0, 50);
+			optionFrameTop.draw(400, 350);
+			optionFrameMid.draw(400, 370);
+			optionFrameBottom.draw(400, 670);
 			
 			// Draw the option boxes
-			optionBox.draw(180, 180);
-			optionBox.draw(180, 250);
-			optionBox.draw(180, 320);
+			optionBox.draw(430, 380);
+			optionBox.draw(430, 450);
+			optionBox.draw(430, 520);
 			
-			selector[0].draw(160, 187 + cursorPos * 70);
-			selector[1].draw(351, 187 + cursorPos * 70);
-			
-			
+			selector[0].draw(410, 387 + cursorPos * 70);
+			selector[1].draw(600, 387 + cursorPos * 70);
+			//selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
+			//Global.uiBlue.draw(mouseX, mouseY, 240, 48);
+
 			break;
 //		case BlockMatchStandard:
 //			break;
 		default:
 			switch(game.getState()) { 
 				case NOT_LOADED:
-					gameModeLoader = new Thread(new GameModeLoader(textureMap, game));
+					gameModeLoader = new Thread( new GameModeLoader(game) );
 					gameModeLoader.run();
 					break;
 				case LOADING_ASSETS:
@@ -539,7 +535,7 @@ public class Game {
 			sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
 			soundMap.put(file, sound);
 		} catch (IOException e) {
-			System.out.printf("Unable to load sound resource: %s\n%s", source, e.getMessage());
+			Global.writeToLog(String.format("Unable to load sound resource: %s\n%s", source, e.getMessage()));
 			return false;
 		}
 		return true;
@@ -586,14 +582,13 @@ public class Game {
 			renderGL();
 			Display.update();
 		}
+		Global.globalFinalize();
 		// release all textures loaded
-		for (String ref : textureMap.keySet()) {
-			textureMap.get(ref).release();
-		}
-		textureMap.clear();
 	}
 	
 	public static void main(String[] args) {
+		System.setProperty("java.library.path", new File("native/windows").getAbsolutePath());
+		System.setProperty("org.lwjgl.librarypath", new File("native/windows/").getAbsolutePath());
 		System.out.println("Use -fullscreen for fullscreen mode.");
 		new Game( (args.length > 0) && args[0].equalsIgnoreCase("-fullscreen") ).run();
 
@@ -602,17 +597,15 @@ public class Game {
 }
 
 class GameModeLoader implements Runnable {
-	private final HashMap<String, Texture> textureMap;
 	private final GameMode mode;
 	
-	public GameModeLoader(HashMap<String, Texture> texMap, GameMode gm) {
-		textureMap = texMap;
+	public GameModeLoader(GameMode gm) {
 		mode = gm;
-		System.out.println("Debug: Loader thread constructor called.");
+		Global.writeToLog("Debug: Loader thread constructor called.");
 	}
 	
 	public void run() {
-		System.out.println("Debug: Loader thread active.");
-		mode.initialize(textureMap);
+		Global.writeToLog("Debug: Loader thread active.");
+		mode.initialize();
 	}
 }

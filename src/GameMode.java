@@ -11,7 +11,7 @@ public interface GameMode {
 	 * before transferring control to the game mode.
 	 * @param textureMap parent texture map containing referencing already loaded textures.
 	 */
-	public void initialize(HashMap<String,Texture> textureMap);
+	public void initialize();
 	/**
 	 * Gets the current operating state of the game mode. 
 	 * @return NOT_LOADED if the game mode has not begun loading any assets.
