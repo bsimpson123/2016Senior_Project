@@ -51,6 +51,9 @@ public class Global {
 		SPECIAL1, SPECIAL2
 	}
 	
+	private static GameControls controls;
+	private static Thread inputPoller;
+	
 	// a different variable type may be needed to handle key mapping with a many-to-one keys-to-control implementation 
 	private static HashMap<Integer, GameControl> keyMap = new HashMap<Integer, GameControl>();
 	private static HashMap<Integer, GameControl> gamepadMap = new HashMap<Integer, GameControl>();
@@ -172,16 +175,18 @@ public class Global {
 	}
 	public static void writeToLog(String text) { writeToLog(text, false); }
 	public static void writeToLog(String text, boolean writeToConsole) {
-		if (writeToConsole) {
-			System.out.println(text);
-		}
-		if (logFile == null) { return ; }
-		try {
-			logFile.write(text);
-			logFile.write("\n");
-			logFile.flush();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
+		synchronized (logFile) {
+			if (writeToConsole) {
+				System.out.println(text);
+			}
+			if (logFile == null) { return ; }
+			try {
+				logFile.write(text);
+				logFile.write("\n");
+				logFile.flush();
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
 	}
 	
@@ -197,6 +202,9 @@ public class Global {
 	}
 	
 	public static void globalInit() {
+		controls = new GameControls();
+		inputPoller = new Thread(new InputPollThread(controls));
+		inputPoller.start();
 		initLog();
 		buildControllers();
 		
@@ -256,6 +264,13 @@ public class Global {
 	
 	public static void globalFinalize() {
 		closeLog();
+		synchronized (controls) { controls.GameRunning = false; }
+		try {
+			inputPoller.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		for (String ref : Global.textureMap.keySet()) {
 			Global.textureMap.get(ref).release();
 		}
