@@ -10,7 +10,8 @@ public abstract class BlockStandardLevel {
 	protected static int score;
 	protected static Sprite pauseCursor;
 	protected static Sprite cursor;
-
+	protected static Sprite[] shiftLR = new Sprite[2];
+	
 	private static int scoreDisplay = 0;
 	private static int change = 0;
 	private static long scoreUpdateDelayTimer = 50l;
@@ -60,8 +61,9 @@ public abstract class BlockStandardLevel {
 	/** Used to contain removed block counts for grid clears. */
 	protected int counter = 0;
 
-	public boolean levelFinished = false;
-	public boolean gameOver = false;
+	protected boolean levelFinished = false;
+	protected boolean gameOver = false;
+	protected boolean levelComplete = false;
 	
 	public void run() {
 		// decrement delay variables
@@ -72,6 +74,11 @@ public abstract class BlockStandardLevel {
 		/* Draw all background elements. These should always be the first items drawn to screen. */
 		background.draw(0, 0);
 		counter = 0;
+		
+		if (blocksRemaining == 0) {
+			levelComplete = true;
+			
+		}
 		
 	}
 
@@ -205,7 +212,12 @@ public abstract class BlockStandardLevel {
 			offsetX += 24;
 		}
 		drawScore();
-		
+		Global.uiGreen.draw(680, 500, 100, 100);
+		if (gridShiftDir == 1) {
+			shiftLR[1].draw(680, 500);
+		} else {
+			shiftLR[0].draw(680, 500);
+		}
 	}
 	
 	protected abstract void buildGrid(); 

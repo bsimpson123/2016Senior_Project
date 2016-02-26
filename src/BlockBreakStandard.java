@@ -26,7 +26,9 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" },
 		new String[] { "number_white", "media/numbers_sheet_white.png" }, 
 		new String[] { "energy_empty", "media/energy_bar_empty.png" },
-		new String[] { "energybar", "media/energy_bar.png" }
+		new String[] { "energybar", "media/energy_bar.png" },
+		new String[] { "white_ui_controls", "media/sheet_white2x.png" }
+
 	};
 	
 	private final int GameModeSelection = 0,
@@ -104,6 +106,18 @@ public class BlockBreakStandard implements GameMode {
 				blockOffSet
 			);
 		BlockStandardLevel.cursor = cursor;
+		BlockStandardLevel.shiftLR[0] = new Sprite( // left indicator
+				localTexMap.get("white_ui_controls"),
+				new int[] { 300, 600 },
+				new int[] { 100, 100 },
+				new int[] { 100, 100 }
+			);
+		BlockStandardLevel.shiftLR[1] = new Sprite( // right indicator
+				localTexMap.get("white_ui_controls"),
+				new int[] { 200, 300 },
+				new int[] { 100, 100 },
+				new int[] { 100, 100 }
+			);
 		BlockStandardLevel.emptyEnergy = new Sprite(
 				localTexMap.get("energy_empty"),
 				new int[] { 0, 0 },
