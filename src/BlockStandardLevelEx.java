@@ -63,19 +63,22 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		}
 		// TASK: set the block count for the level
 		this.blocksRemaining = grid.length * grid[0].blocks.length;
+		r = Global.rand.nextInt(12) + 4;
+		grid[r].blocks[0] = new Block(Block.BlockType.ROCK);
+		blocksRemaining--;
 	}
 	
 	@Override
 	public void run() {
 		super.run();
 		// draw the grid and handle grid mechanics and input if the game is not paused
-		if (!gamePaused && !gameOver) {
+		if (!gamePaused && !gameOver && !levelComplete) {
 			processQueue();
 			energy -= Global.delta;
 			if (energy < 0) { energy = 0; }
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			gridMoving = drawGrid(blockSize, 500);
+			gridMoving = drawGrid(500);
 			//shiftGrid();
 		
 			cursor.draw(
@@ -106,12 +109,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
-		drawEnergy();
-		if (gamePaused) {
-			// TODO: display the pause menu
-		} else if (gameOver) {
-			// TODO: show game over screen, high score entry calculation
-		}
 
 	}
 

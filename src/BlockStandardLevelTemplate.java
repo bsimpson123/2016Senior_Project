@@ -64,7 +64,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 			if (energy < 0) { energy = 0; }
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			gridMoving = drawGrid(blockSize, 500);
+			gridMoving = drawGrid(500);
 			//shiftGrid();
 		
 			// for cursor surrounding block

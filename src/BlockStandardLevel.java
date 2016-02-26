@@ -218,6 +218,16 @@ public abstract class BlockStandardLevel {
 		} else {
 			shiftLR[0].draw(680, 500);
 		}
+		drawEnergy();
+
+		if (levelComplete) {
+			drawGrid();
+			// TODO: level complete code
+		} else if (gamePaused) {
+			
+		} else if (gameOver) {
+			drawGrid();
+		}
 	}
 	
 	protected abstract void buildGrid(); 
@@ -230,7 +240,7 @@ public abstract class BlockStandardLevel {
 	 * if no blocks are currently falling 
 	 * @author John
 	 */
-	protected final boolean drawGrid(int[] blockSize, int shiftRate) {
+	protected final boolean drawGrid(int shiftRate) {
 		gridShiftActionDelay -= Global.delta;
 		queueManualShiftDelay -= Global.delta;
 		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 }; // distance from the left top for the bottom-left of the grid display
@@ -292,6 +302,28 @@ public abstract class BlockStandardLevel {
 		}
 		drawQueue();
 		return (blockDropActive || gridShiftActive);
+	}
+	
+	/**
+	 * Draws the block grid without processing any block movement.
+	 * @author John
+	 */
+	protected final void drawGrid() {
+		for (int i = 0; i < grid.length; i++) {
+			for (int k = 0; k < grid[0].blocks.length; k++) {
+				if (grid[i].blocks[k] != null) {
+					grid[i].blocks[k].draw(
+							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
+							gridBasePos[1] - blockSize[1] * k - grid[i].blocks[k].dropDistance,
+							blockSize
+						);
+					grid[i].blocks[k].checked = false;
+					grid[i].blocks[k].clearMark = false;
+				}
+			}
+		}
+		drawQueue();
+		
 	}
 	
 	/**
