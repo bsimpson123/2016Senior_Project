@@ -38,9 +38,6 @@ public class Global {
 	public static int winWidth = glEnvWidth;
 	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
 	 * This is the sensitivity of the input. */
-	public static long inputReadDelayTimer = 80l;
-	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
-	 * This is the sensitivity of the input. */
 	public static long inputReadDelayTimer = 150l;
 	public static UIBox 
 		uiBlue, uiRed, uiGreen, uiYellow, uiGrey;
