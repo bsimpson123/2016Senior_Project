@@ -157,6 +157,11 @@ public class BlockStandardLevel02 extends BlockStandardLevel {
 				updateScore(adj);
 				addEnergy(adj);
 				break;
+			case BOMB:
+				counter = activateBombBlock(cursorGridPos, 2);
+				updateScore(counter);
+				addEnergy(counter);
+				break;
 			default: // block does not activate, do nothing
 				break;
 		}
