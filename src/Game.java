@@ -515,7 +515,7 @@ public class Game {
 		}
 		
 		// an exit key is strongly recommended if mouse capture is enabled
-		if ( Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+		if ( Display.isCloseRequested() ) {
 			gameRunning = false; // indicate that the game is no longer running
 		}
 		

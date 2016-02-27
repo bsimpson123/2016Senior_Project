@@ -19,7 +19,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		levelMultiplier = 1.5f;
 		// Set environment textures and variables
 		background = new Sprite(
-				rootTex.get("bg_stdmode_wood1"),
+				rootTex.get("bg_space_1"),
 				new int[] { 0, 0 },
 				new int[] { 1024, 768 },
 				new int[] { Global.glEnvWidth, Global.glEnvHeight }

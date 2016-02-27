@@ -23,7 +23,7 @@ public class BlockBreakStandard implements GameMode {
 	protected String[][] texLoadList = new String[][] {
 		new String[] { "ui_base", "media/UIpackSheet_transparent.png" },
 		new String[] { "ui_stdmode", "media/StandardMode_UI.png" },
-		new String[] { "bg_stdmode_wood1", "media/StandardMode_bg_wood1.png" },
+		new String[] { "bg_space_1", "media/space_bg_1064bfa.png" },
 		new String[] { "number_white", "media/numbers_sheet_white.png" }, 
 		new String[] { "energy_empty", "media/energy_bar_empty.png" },
 		new String[] { "energybar", "media/energy_bar.png" },
@@ -164,7 +164,7 @@ public class BlockBreakStandard implements GameMode {
 					// load next level
 					switch(playLevel.level) {
 						case 1:
-							
+							playLevel = new BlockStandardLevel02(localTexMap);
 							break;
 						default:
 							break;
@@ -258,7 +258,7 @@ public class BlockBreakStandard implements GameMode {
 		if (Global.getControlActive(Global.GameControl.SELECT)) {
 			switch (cursorPos) {
 				case 0:
-					playLevel = new BlockStandardLevelEx(localTexMap);
+					playLevel = new BlockStandardLevel01(localTexMap);
 					BlockStandardLevel.score = 0;
 					//activeGameMode = BlockMatchStandard;
 					break;

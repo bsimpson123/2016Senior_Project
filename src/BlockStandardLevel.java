@@ -223,6 +223,9 @@ public abstract class BlockStandardLevel {
 		if (levelComplete) {
 			drawGrid();
 			// TODO: level complete code
+			
+			// placeholder for level advancement
+			levelFinished = true;
 		} else if (gamePaused) {
 			
 		} else if (gameOver) {
