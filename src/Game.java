@@ -98,7 +98,8 @@ public class Game {
 			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
 			new String[] { "main_menu_background","media/main_menu_background.png"},
 			new String[] { "uibox", "media/UI_Boxes.png" },
-			new String[] { "title", "media/TitleDisplay.png" }
+			new String[] { "title", "media/TitleDisplay.png" },
+			new String[] { "Text", "media/Mode_Text.png"}
 	};
 	
 	/* Menu display and control variables */

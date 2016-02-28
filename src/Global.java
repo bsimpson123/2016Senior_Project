@@ -79,7 +79,8 @@ public class Global {
 			writeToLog(String.format("Controller detected: %s\n\tButton count: %d; Axis count: %d\n", 
 					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount()), false);
 			axis = ctrlList[i].getAxisCount();
-			if (axis == 2 || axis == 4) {
+			if (axis == 2 || axis == 4 || axis == 6) {
+			//if (axis >= 2) {
 				ctrlID = i;
 				break;
 			}
