@@ -28,7 +28,7 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "energy_empty", "media/energy_bar_empty.png" },
 		new String[] { "energybar", "media/energy_bar.png" },
 		new String[] { "white_ui_controls", "media/sheet_white2x.png"},
-		new String[] { "nLevel","media/gNextlevel.png"}
+		new String[] { "nLevel", "media/gNextlevel.png" }
 	};
 	
 	private final int GameModeSelection = 0,
@@ -97,12 +97,12 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 38, 30 }
 			);
 		//author: Mario
-				BlockStandardLevel.nLevel = new Sprite(
-				Global.textureMap.get("nLevel"),
-						new int[] {0,49},
-						new int[] { 190, 20 },
-						new int[] { 250, 20 }
-						);
+		BlockStandardLevel.nLevel = new Sprite(
+				localTexMap.get("nLevel"),
+				new int[] {0,49},
+				new int[] { 190, 20 },
+				new int[] { 250, 20 }
+			);
 		// author: John
 		// update to BlockBreakStandard.cursor after code moves to separate level class
 		cursor = new Sprite(

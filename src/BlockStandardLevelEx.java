@@ -48,24 +48,28 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	protected void buildGrid() {
 		Block b = null;
 		int r = 0;
+		int count = 0;
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
-				r = Global.rand.nextInt(10000);
+				/*r = Global.rand.nextInt(10000);
 				if (r > 20) { 
 					b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
 				} else {
 					b = new Block(Block.BlockType.BOMB);
 				}
-				grid[i].blocks[k] = b;
+				grid[i].blocks[k] = b; */
+				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, (++count) % 2);
 			}
+			count++;
 		}
 		// TASK: set the block count for the level
 		this.blocksRemaining = grid.length * grid[0].blocks.length;
-		r = Global.rand.nextInt(12) + 4;
+		/*r = Global.rand.nextInt(12) + 4;
 		grid[r].blocks[0] = new Block(Block.BlockType.ROCK);
-		blocksRemaining--;
+		blocksRemaining--; */
+		grid[0].blocks[0] = grid[1].blocks[0].clone();
 	}
 	
 	@Override
@@ -116,7 +120,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	protected Block getQueueBlock() {
 		// TODO Auto-generated method stub
 		Block b = null;
-		b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
+		b = new Block(Block.BlockType.BLOCK, rand.nextInt(2));
 		return b;		
 	}
 
