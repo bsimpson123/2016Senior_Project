@@ -9,7 +9,7 @@ public class BlockBreakStandard implements GameMode {
 	protected LoadState currentState = LoadState.NOT_LOADED;
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected int cursorPos = 0;
-	//protected long inputDelay = Global.inputReadDelayTimer;
+	protected long inputDelay = Global.inputReadDelayTimer;
 	private BlockStandardLevel playLevel;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
@@ -27,8 +27,8 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "number_white", "media/numbers_sheet_white.png" }, 
 		new String[] { "energy_empty", "media/energy_bar_empty.png" },
 		new String[] { "energybar", "media/energy_bar.png" },
-		new String[] { "white_ui_controls", "media/sheet_white2x.png" }
-
+		new String[] { "white_ui_controls", "media/sheet_white2x.png"},
+		new String[] { "nLevel","media/gNextlevel.png"}
 	};
 	
 	private final int GameModeSelection = 0,
@@ -39,17 +39,8 @@ public class BlockBreakStandard implements GameMode {
 	int activeGameMode = GameModeSelection;
 
 	private int optionBoxOffset = 0;
-	private Sprite GameSelector_background;
 	private Sprite[] selector = new Sprite[2];
 	private Sprite optionBox;
-	private Sprite play_unselect;
-	private Sprite prac_unselect;
-	private Sprite back_unselect;
-	
-	private Sprite play_select;
-	private Sprite prac_select;
-	private Sprite back_select;
-	
 
 	
 	public BlockBreakStandard() {
@@ -86,12 +77,6 @@ public class BlockBreakStandard implements GameMode {
 			 }
 		}
 // author Brock
-		GameSelector_background = new Sprite(
-				Global.textureMap.get("main_menu_background"),
-				new int[] {0,0},
-				new int[] {1024,768},
-				new int[] {1024,768}
-			);
 		optionBox = new Sprite(
 				Global.textureMap.get("green_ui"),
 				new int[] { 0, 0 },
@@ -111,43 +96,13 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
-		play_unselect = new Sprite(
-				Global.textureMap.get("Text"),
-				new int[] { 0, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		play_select = new Sprite(
-				Global.textureMap.get("Text"),
-				new int[] { 190, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		prac_unselect = new Sprite(
-				Global.textureMap.get("Text"),
-				new int[] { 0, 48 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		prac_select = new Sprite(
-				Global.textureMap.get("Text"),
-				new int[] { 190, 48 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		back_unselect = new Sprite(
-				Global.textureMap.get("Text"),
-				new int[] { 0, 96 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		back_select = new Sprite(
-				Global.textureMap.get("Text"),
-				new int[] { 190, 96 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		
+		//author: Mario
+				BlockStandardLevel.nLevel = new Sprite(
+				Global.textureMap.get("nLevel"),
+						new int[] {0,49},
+						new int[] { 190, 20 },
+						new int[] { 250, 20 }
+						);
 		// author: John
 		// update to BlockBreakStandard.cursor after code moves to separate level class
 		cursor = new Sprite(
@@ -225,57 +180,43 @@ public class BlockBreakStandard implements GameMode {
 			}
 		} else {
 // @author Brock
-			GameSelector_background.draw(0, 0);
 			moveCursor();
-			optionBoxOffset = 50;
+			optionBoxOffset = 100;
 			if (cursorPos == 0) {
 				optionBox.draw(180 + optionBoxOffset, 180);
-				play_select.draw(180 + optionBoxOffset, 180);
-
 				optionBox.draw(180, 250);
-				prac_unselect.draw(180, 250);
 				optionBox.draw(180, 320);
 				optionBox.draw(180, 390);
-				back_unselect.draw(180, 390);
 				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			} 
 			if (cursorPos == 1) {
 				optionBox.draw(180, 180);
-				play_unselect.draw(180, 180);
 				optionBox.draw(180 + optionBoxOffset, 250);
-				prac_select.draw(180 + optionBoxOffset, 250);
 				optionBox.draw(180, 320);
 				optionBox.draw(180, 390);
-				back_unselect.draw(180, 390);
 				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			}
 			if (cursorPos == 2) {
 				optionBox.draw(180, 180);
-				play_unselect.draw(180, 180);
 				optionBox.draw(180, 250);
-				prac_unselect.draw(180, 250);
 				optionBox.draw(180 + optionBoxOffset, 320);
 				optionBox.draw(180, 390);
-				back_unselect.draw(180, 390);
 				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			}
 			if (cursorPos == 3) {
 				optionBox.draw(180, 180);
-				play_unselect.draw(180, 180);
 				optionBox.draw(180, 250);
-				prac_unselect.draw(180, 250);
 				optionBox.draw(180, 320);
 				optionBox.draw(180 + optionBoxOffset, 390);
-				back_select.draw(180 + optionBoxOffset, 390);
 				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
+				selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			}
 			
 		}
@@ -328,7 +269,7 @@ public class BlockBreakStandard implements GameMode {
 					//activeGameMode = BlockMatchStandard;
 					break;
 				case 1:
-					playLevel = new BlockStandardLevelEx(localTexMap);
+					playLevel = new BlockStandardLevel02(localTexMap);
 					BlockStandardLevel.score = 0;
 					//activeGameMode = BlockMatchStandard;
 					break;

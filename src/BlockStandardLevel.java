@@ -64,7 +64,7 @@ public abstract class BlockStandardLevel {
 	protected boolean levelFinished = false;
 	protected boolean gameOver = false;
 	protected boolean levelComplete = false;
-	
+	protected static Sprite nLevel;
 	public void run() {
 		// decrement delay variables
 		queueManualShiftDelay -= Global.delta;
