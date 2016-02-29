@@ -16,7 +16,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// TODO: [CUSTOM] set background and user interface sprites
 		// if these sprite must be defined or the game will crash at runtime
 		background = new Sprite(
-				rootTexMap.get("bg_stdmode_wood1"),
+				rootTexMap.get("bg_space_1"),
 				new int[] { 0, 0 },
 				new int[] { 1024, 768 },
 				new int[] { Global.glEnvWidth, Global.glEnvHeight }
@@ -86,7 +86,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 			if (specialActive) {
 				// if a special item or event has moved the selector cursor, handle that here
 				; 
-			} else { // no special circumstance, handle input normally
+			} else if (!levelComplete) { // no special circumstance, handle input normally
 				if (inputDelay <= 0l) {
 					checkCommonControls();
 					// DEBUG: back out of the game to the main menu. not to be included in finished levels
