@@ -99,7 +99,8 @@ public class Game {
 			new String[] { "main_menu_background","media/main_menu_background.png"},
 			new String[] { "uibox", "media/UI_Boxes.png" },
 			new String[] { "title", "media/TitleDisplay.png" },
-			new String[] { "Text", "media/Mode_Text.png"}
+			new String[] { "Text", "media/Mode_Text.png"},
+			new String[] { "overlay", "media/blackoverlay.png" }
 	};
 	
 	/* Menu display and control variables */

@@ -118,11 +118,10 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				r = Global.rand.nextInt(512);
-				if (r > 2) { 
-					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(2));
+				if ( (k % 3) == (i % 3) && (i % 3) == 0) {
+					b = new Block(Block.BlockType.BLOCK, 0);
 				} else {
-					b = new Block(Block.BlockType.BOMB);
+					b = new Block(Block.BlockType.BLOCK, 1);
 				}
 				grid[i].blocks[k] = b;
 			}

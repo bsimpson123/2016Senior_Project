@@ -155,7 +155,12 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 190, 48 }
 			);
 		// author: John
-		// update to BlockBreakStandard.cursor after code moves to separate level class
+		BlockStandardLevel.overlay = new Sprite(
+				Global.textureMap.get("overlay"),
+				new int[] { 0, 0 },
+				new int[] { 1024, 768 },
+				new int[] { 1024, 768 }
+			);		
 		cursor = new Sprite(
 				Global.textureMap.get("blocksheet"),
 				new int[] { 240, 0 },

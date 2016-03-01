@@ -12,6 +12,7 @@ public abstract class BlockStandardLevel {
 	protected static Sprite cursor;
 	protected static Sprite[] shiftLR = new Sprite[2];
 	protected static Sprite nLevel;
+	protected static Sprite overlay;
 	
 	private static int scoreDisplay = 0;
 	private static int change = 0;
@@ -49,8 +50,6 @@ public abstract class BlockStandardLevel {
 	private long queueManualShiftDelayTimer = 250l;
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
-	
-	private long nLevelDelay = 2000l;
 	
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int[] blockSize;
@@ -227,10 +226,11 @@ public abstract class BlockStandardLevel {
 		if (levelComplete) {
 			drawGrid();
 			// TODO: level complete code
-			nLevelDelay -= Global.delta;
-			if (nLevelDelay < 0) {
+			if (actionDelay < 0 && Global.getControlActive(Global.GameControl.SELECT)) {
 				levelFinished = true;
-			} 
+			}
+			
+			overlay.draw(0, 0);
 			nLevel.draw(200, 200);
 			// placeholder for level advancement
 		} else if (gamePaused) {
@@ -540,6 +540,7 @@ public abstract class BlockStandardLevel {
 	 * @author John
 	 */
 	private void shiftQueue(int direction) {
+		if (levelComplete) { return ; }
 		int xMax = queue.length;
 		int current, next;
 		if (direction == 1) { // shift right
@@ -577,6 +578,7 @@ public abstract class BlockStandardLevel {
 	 * @author John
 	 */
 	protected void processQueue() {
+		if (levelComplete) { return; }
 		queueStepDelay -= Global.delta;
 		int xMax = queue.length;
 		if (queueStepDelay > 0) { return; }
