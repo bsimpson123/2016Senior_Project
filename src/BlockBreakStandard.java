@@ -40,6 +40,7 @@ public class BlockBreakStandard implements GameMode {
 
 	private int optionBoxOffset = 0;
 	private Sprite GameSelector_background;
+	private Sprite optionBox_2;
 	private Sprite[] selector = new Sprite[2];
 	private Sprite optionBox;
 	private Sprite play_unselect;
@@ -50,7 +51,8 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite prac_select;
 	private Sprite back_select;
 	
-
+	public boolean gamePaused = false;
+	GameSounds moveClick; 
 	
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
@@ -86,11 +88,19 @@ public class BlockBreakStandard implements GameMode {
 			 }
 		}
 // author Brock
+		moveClick = new GameSounds(GameSounds.soundType.SOUND, "media/click3.ogg");
+		
 		GameSelector_background = new Sprite(
 				Global.textureMap.get("main_menu_background"),
 				new int[] {0,0},
 				new int[] {1024,768},
 				new int[] {1024,768}
+			);
+		optionBox_2 = new Sprite(
+				Global.textureMap.get("green_ui"),
+				new int[] {0,143},
+				new int[] {190,48},
+				new int[] {190,48}
 			);
 		optionBox = new Sprite(
 				Global.textureMap.get("green_ui"),
@@ -240,6 +250,7 @@ public class BlockBreakStandard implements GameMode {
 			moveCursor();
 			optionBoxOffset = 50;
 			if (cursorPos == 0) {
+				//optionBox_2.draw(180 + optionBoxOffset, 180);
 				optionBox.draw(180 + optionBoxOffset, 180);
 				play_select.draw(180 + optionBoxOffset, 180);
 
@@ -314,6 +325,7 @@ public class BlockBreakStandard implements GameMode {
 		if (movementInputDelay <= 0) {
 		if (Global.getControlActive(Global.GameControl.UP)) {
 			cursorPos--;
+			moveClick.playSoundEffect();
 			if (cursorPos < 0) {
 				
 				cursorPos = 3;
@@ -322,6 +334,7 @@ public class BlockBreakStandard implements GameMode {
 		}
 		if (Global.getControlActive(Global.GameControl.DOWN)) {
 			cursorPos++;
+			moveClick.playSoundEffect();
 			if (cursorPos > 3) {
 				cursorPos = 0;
 			}
@@ -330,7 +343,9 @@ public class BlockBreakStandard implements GameMode {
 		if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
 			cursorPos = 3;
 		}
-		
+		if (Global.getControlActive(Global.GameControl.PAUSE)) {
+			//BlockStandardLevel.gamePaused = true;
+		}
 		if (Global.getControlActive(Global.GameControl.SELECT)) {
 			switch (cursorPos) {
 				case 0:
