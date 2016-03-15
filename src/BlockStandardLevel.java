@@ -128,7 +128,6 @@ public abstract class BlockStandardLevel {
 		if ( (yc + 1) < grid[0].blocks.length) {
 			sum += checkGrid(xc, yc + 1, colorID);
 		}
-		
 		return sum;
 		
 	}
@@ -401,7 +400,7 @@ public abstract class BlockStandardLevel {
 						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
 					counter = 0;
 					processActivate();
-					if (counter > 0) {
+					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
 						// decrease the blocksRemaining counter after blocks are cleared
 //						blocksRemaining -= counter; // now adjusted in removeMarkedBlocks() function
 						removeMarkedBlocks();
