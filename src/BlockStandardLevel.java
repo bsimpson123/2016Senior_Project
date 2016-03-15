@@ -401,7 +401,7 @@ public abstract class BlockStandardLevel {
 						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
 					counter = 0;
 					processActivate();
-					if (counter > 1) {
+					if (counter > 0) {
 						// decrease the blocksRemaining counter after blocks are cleared
 //						blocksRemaining -= counter; // now adjusted in removeMarkedBlocks() function
 						removeMarkedBlocks();
@@ -677,10 +677,11 @@ public abstract class BlockStandardLevel {
 	 * @author John
 	 */
 	protected int activateBombBlock(int[] pos, int radius) {
-		int xMin = pos[0] - 2, 
-			xMax = pos[0] + 2,
-			yMin = pos[1] - 2, 
-			yMax = pos[1] + 2;
+		if (radius < 1) { throw new IllegalArgumentException("Invalid bomb radius."); }
+		int xMin = pos[0] - radius, 
+			xMax = pos[0] + radius,
+			yMin = pos[1] - radius, 
+			yMax = pos[1] + radius;
 		int[] xEdge = new int[] { xMin, xMax }; // edge values before range checks
 		int[] yEdge = new int[] { yMin, yMax };
 		int cornerRadius = radius / 3;
@@ -704,6 +705,8 @@ public abstract class BlockStandardLevel {
 					if (grid[i].blocks[k].type == Block.BlockType.BOMB) {
 						count += activateBombBlock(new int[] { i, k }, radius);
 					} else if (grid[i].blocks[k].type == Block.BlockType.ROCK) { // ignore rock blocks
+						continue;
+					} else if (grid[i].blocks[k].type == Block.BlockType.WEDGE) { // ignore wedge blocks
 						continue;
 					} else {
 						grid[i].blocks[k].clearMark = true;
