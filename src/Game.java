@@ -1,16 +1,14 @@
-import static org.lwjgl.opengl.GL11.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-
+import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.openal.AL;
 import org.lwjgl.input.Controller;
-import org.lwjgl.input.Controllers;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.openal.Audio;
@@ -114,7 +112,6 @@ public class Game {
 	private Sprite title;
 	
 	private long mouseDelay = Global.inputReadDelayTimer;
-	
 	private Thread gameModeLoader = null;
 	
 	/** The time remaining (milliseconds) until the next movement input can be read. */
@@ -164,7 +161,6 @@ public class Game {
 		return false;
 	}
 
-	
 	/**
 	 * Initialize OpenGL components and set OpenGL environment variables.
 	 */
@@ -174,29 +170,22 @@ public class Game {
 			Display.setTitle(WINDOW_TITLE);
 			Display.setFullscreen(fullscreen);
 			Display.create();
-			
 			glViewport(0, 0, Global.glEnvWidth, Global.glEnvHeight);
-
 			// Initialize GL matrices
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
 			// Sets 2D mode; no perspective
 			glOrtho(0, Global.glEnvWidth, Global.glEnvHeight, 0, -1, 1);
-
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
-
-
 			// disable the OpenGL depth test since only 2D graphics are used
 			glDisable(GL_DEPTH_TEST);
 			glDisable(GL_LIGHTING);
 			glDisable(GL_FOG);
 			glDisable(GL_CULL_FACE);
-			
 			// clear the screen
 			glClearColor(0f, 0f, 0f, 0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 			// enable textures
 			glEnable(GL_TEXTURE_2D);
 			// Enable alpha processing for textures
@@ -247,7 +236,6 @@ public class Game {
 		String type; // holds file type extension
 		String source; // absolute file path to resource
 		for (String ref[] : texLoadList) {
-			
 			type = ref[1].substring(ref[1].lastIndexOf('.')).toUpperCase();
 			tex = null;
 			source = ref[1];
@@ -265,24 +253,9 @@ public class Game {
 				 e.printStackTrace();
 				 System.exit(-1);
 			 }
-			 //Global.textureMap.put(source, tex);
 		}
 		
 		Global.buildStandardUIBoxes();
-		// Example code for loading textures with Sprite objects
-		/* Loading sprites where the complete texture will be drawn to the screen
-		menuBar = new Sprite( 
-				Global.textureMap.get("menubar"), // texture reference name
-				new int[] { 190, 48 } // draw size in the GL environment
-			);
-		
-		 * Loading sprites where only a subsection of the textures will be drawn on the screen
-		testBlock = new Sprite(
-				Global.textureMap.get("blocksheet"), // texture reference name
-				new int[] { 212, 431 }, // {top, left} stating point
-				new int[] { 32, 32}, // {width, height} counting left, down
-				new int[] { 32, 32 } // draw size in the GL environment
-			); //*/
 		// TODO: Load all Sprite objects for menu navigation
 		optionFrameTop = new Sprite(
 				Global.textureMap.get("blue_ui"),
@@ -353,20 +326,6 @@ public class Game {
 		
 		// TODO: add static class initializers
 		Block.initializeBlocks(Global.textureMap);
-		
-	}
-	
-	/**
-	 * Attempts to get a preloaded texture. Attempting to request a texture that
-	 * has not been loaded will return null.
-	 * @param reference File reference to the texture to load.
-	 * @return The loaded OpenGL texture, null if the referenced texture was not available.
-	 */
-	public Texture getTexture(String reference) {
-		if (Global.textureMap.containsKey(reference)) {
-			return Global.textureMap.get(reference);
-		}
-		return null;
 	}
 	
 	/**
@@ -393,6 +352,7 @@ public class Game {
 		}
 
 		// Screen location checking. this will output mouse click locations in /every/ gamemode to the console
+		// This is a dev/debug feature and will not carry over to the final version
 		if (mouseDelay <= 0) {
 			if (Mouse.isButtonDown(0)) {
 				mouseX = Mouse.getX();
@@ -403,11 +363,6 @@ public class Game {
 		} else {
 			mouseDelay -= Global.delta;
 		}
-		/* check and handle input controls */
-		// processInput(); 
-		/* input checking is handled within individual control loops, where only the necessary
-		 * inputs will be checked.
-		 */
 		
 		/* Checks for an active menu that will be drawn in place of normal game code. 
 		 * Menu comments are only suggestions, and any number can be added. Each menu
@@ -416,9 +371,6 @@ public class Game {
 		 */
 		switch (activeGameMode) {
 		case MainMenu:
-			// TODO: Main menu draw and logic
-			
-			// This code acts as a proof-of-concept for reading and responding to control input
 			if (movementInputDelay <= 0) {
 				/*// Left and Right inputs do nothing at the main menu currently
 				if (Global.getControlActive(Global.GameControl.LEFT)) { ; }
@@ -446,7 +398,6 @@ public class Game {
 				switch (cursorPos) {
 					case 0:
 					case 1:
-						//game = new GameModeSelection();
 						game = new BlockBreakStandard();
 						activeGameMode = GameModeSelection;
 						break;
@@ -458,13 +409,6 @@ public class Game {
 			} else if (movementInputDelay > 0) {
 				movementInputDelay -= Global.delta;
 			}
-			// if (Global.getControlActive(Global.GameControl.SPECIAL)) { ; }
-			/*
-			menuBar.draw(100, 100);
-			menuBarWithText.draw(100, 250);
-			cursor.draw(150, cursorPos * 50 + 100);
-			testBlock.draw(200, 100);
-			//*/
 			// Draw the frame that will contain the option boxes
 			menu_background.draw(0,0);
 			title.draw(0, 50);
@@ -483,8 +427,6 @@ public class Game {
 			//Global.uiBlue.draw(mouseX, mouseY, 240, 48);
 
 			break;
-//		case BlockMatchStandard:
-//			break;
 		default:
 			switch(game.getState()) { 
 				case NOT_LOADED:
@@ -523,54 +465,6 @@ public class Game {
 		
 	}
 	
-	/**
-	 * Loads a sound file into memory for faster access at runtime.
-	 * @param file 
-	 * @return true if the file was loaded successfully
-	 */
-	private boolean loadSound(String file) {
-		String source = file, type;
-		Audio sound = soundMap.get(file);
-		if (sound != null) { return true; } // sound has already been loaded
-		
-		try {
-			source = FileResource.requestResource(file);
-			type = source.substring(source.lastIndexOf('.')).toUpperCase(); 
-			sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
-			soundMap.put(file, sound);
-		} catch (IOException e) {
-			Global.writeToLog(String.format("Unable to load sound resource: %s\n%s", source, e.getMessage()));
-			return false;
-		}
-		return true;
-	}
-
-	public Audio getSound(String ref) {
-		return soundMap.get(ref);
-	}
-	
-	/**
-	 * Plays the audio as a sound effect. No effect if the value passed is null.
-	 * @param sfx The audio to be played
-	 */
-	private void playSoundEffect(String ref) {
-		Audio sfx = getSound(ref);
-		if (sfx == null) { return; } // check that sfx is a defined sound object
-		sfx.playAsSoundEffect(1.0f, 1.0f, false);
-		return ;
-	}
-	
-	/**
-	 * Plays the audio as repeating background music. No effect if the value passed is null.
-	 * @param music The audio to be played in the background
-	 */
-	private void playSoundMusic(Audio music) {
-		if (music == null) { return; }
-		// TODO: check for and stop previously playing music if any
-		music.playAsMusic(1.0f, 1.0f, true);
-		return ;
-	}
-
 	public Game(boolean runFullscreen) {
 		fullscreen = runFullscreen;
 		initGL(); // setup OpenGL
@@ -586,6 +480,7 @@ public class Game {
 			renderGL();
 			Display.update();
 		}
+		AL.destroy();
 		Global.globalFinalize();
 		// release all textures loaded
 	}
