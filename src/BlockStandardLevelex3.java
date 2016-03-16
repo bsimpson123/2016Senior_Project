@@ -122,7 +122,7 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 		try {
 			String parseline;
 			String[] parseCSV;
-			infile = new BufferedReader(new FileReader("media/sp1.csv"));
+			infile = new BufferedReader(new FileReader("media/sp2.csv"));
 			parseline = infile.readLine();
 			int x=0;
 			while (parseline!= null) {
@@ -130,7 +130,8 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 				grid[x] = new GridColumn(gridSize[1]);
 				for (int i = 0; i < parseCSV.length; i++) {
 					
-					grid[x].blocks[i] = new Block(Block.BlockType.BLOCK, Integer.parseInt(parseCSV[i])-1);
+					grid[x].blocks[i] = new Block(Block.BlockType.BLOCK, Integer.parseInt(parseCSV[i]));
+//change above line to account for starting at 0 or 1 in matrix  ... integer.parseInt(parseCV[i])-1);					
 				}
 				x++;
 				parseline = infile.readLine();
