@@ -17,9 +17,10 @@ public class Block {
 		YELLOW = 1,
 		GREEN = 2,
 		RED = 3,
-		PURPLE = 4
+		PURPLE = 4,
+		GREY = 5
 	;
-	public static final int blockColorCount = 5;
+	public static final int blockColorCount = 6;
 	
 	/* Protected variables */
 	/* Define the draw space that a block will take up in the grid.
@@ -72,7 +73,7 @@ public class Block {
 	/* Class methods */
 	
 	public static void initializeBlocks(HashMap<String,Texture> texMap) {
-		blockColor = new Sprite[5];
+		blockColor = new Sprite[blockColorCount];
 		Texture blockTex = texMap.get("blocksheet");
 		blockColor[BLUE] = new Sprite(
 				blockTex,
@@ -101,6 +102,12 @@ public class Block {
 		blockColor[PURPLE] = new Sprite(
 				blockTex,
 				new int[] { 240, 33 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
+		blockColor[GREY] = new Sprite (
+				blockTex,
+				new int[] { 212, 431 },
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
