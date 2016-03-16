@@ -20,18 +20,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-/*
-public class ScanCSV{
-	public static void main(String[] args) throws FileNotFoundException{
-		Scanner scanner = new Scanner(new File("2016Senior_Project/media/sp1.csv"));
-		scanner use.delimiter(",");
-		while(scanner.hasNext()){
-			System.out.print(scanner.next());
-		}
-		scanner.close();
-	}
-}
-*/
+
+
 public class BlockStandardLevelex3 extends BlockStandardLevel {
 	private boolean specialActive = false;
 	private  BufferedReader infile;
@@ -98,16 +88,7 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
 				blockSize
 			);
-			// for pointer at center of block
-			/* cursor.draw(
-				gridBasePos[0] + blockSize[0] * cursorGridPos[0] - blockSize[0]/2,
-				gridBasePos[1] - blockSize[1] * cursorGridPos[1] + blockSize[1]/2,
-				blockSize
-			); //*/
 			
-			// process left,right,up,down movement in the grid or special item area
-			// check if special circumstances for controlling movement input are active
-			// and handle accordingly
 			if (specialActive) {
 				// if a special item or event has moved the selector cursor, handle that here
 				; 
@@ -130,15 +111,8 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 		} else if (gameOver) {
 			// TODO: show game over screen
 		}
-
 			
 	}
-	
-	/*public static void main(String[] args) {
-		if (args.length < 2) { return ; }
-		String parseline;
-		String[] parseCSV;
-		boolean badData = false;*/
 
 	@Override
 	protected void buildGrid() {
@@ -146,18 +120,20 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 		//dataType[] level;
 		
 		try {
+			String parseline;
+			String[] parseCSV;
 			infile = new BufferedReader(new FileReader("media/sp1.csv"));
-			//outfile = new BufferedWriter(new FileWriter(args[1]));
 			parseline = infile.readLine();
 			int x=0;
 			while (parseline!= null) {
 				parseCSV = parseline.split(",");
+				grid[x] = new GridColumn(gridSize[1]);
 				for (int i = 0; i < parseCSV.length; i++) {
 					
 					grid[x].blocks[i] = new Block(Block.BlockType.BLOCK, Integer.parseInt(parseCSV[i])-1);
 				}
 				x++;
-				
+				parseline = infile.readLine();
 			}
 			
 			infile.close();
@@ -169,44 +145,12 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 			e.printStackTrace();
 		}
 
-		
-		/*class ScanCSV{
-			public void main(String[] args) throws FileNotFoundException{
-				Scanner scanner = new Scanner(new File("2016Senior_Project/media/sp1.csv"));
-				scanner.useDelimiter(",");
-				while(scanner.hasNext()){
-					System.out.print(scanner.next());
-				}
-				scanner.close();
-			}
-			*/
-		}		
-		
-		int r = 0;
-		Global.rand.setSeed(LocalDateTime.now().getNano());
-		for (int i = 0; i < grid.length; i++) {
-			grid[i] = new GridColumn(gridSize[1]);
-			for (int k = 0; k < grid[0].blocks.length; k++) {
-				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				r = Global.rand.nextInt(10000);
-				if (r > 20) { 
-					b = new Block(Block.BlockType.BLOCK, scanner[(i*20) + k]);
-				} else {
-					b = new Block(Block.BlockType.BLOCK, 3);
-				}
-				grid[i].blocks[k] = b;
-			}
-		}
-		
-
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
 		
-		
 	}
-
 	
 	@Override
 	protected Block getQueueBlock() {
@@ -234,9 +178,5 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 		
 	}
 
-	@Override
-	protected void buildGrid() {
-		// TODO Auto-generated method stub
-		
-	}
+
 }
