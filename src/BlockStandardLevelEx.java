@@ -42,6 +42,9 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
+		// TODO: [CUSTOM] set energy and energyMax if different than default (100000)
+		// set energy max if not default
+		energy = energyMax = 200000;		
 	}
 	
 	@Override
@@ -120,8 +123,11 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	@Override
 	protected Block getQueueBlock() {
 		// TODO Auto-generated method stub
+		if (Global.rand.nextInt(100000) == 1) {
+			return new Block(Block.BlockType.BOMB);
+		}
 		Block b = null;
-		b = new Block(Block.BlockType.BLOCK, rand.nextInt(2));
+		b = new Block(Block.BlockType.BLOCK, rand.nextInt(6));
 		return b;		
 	}
 
