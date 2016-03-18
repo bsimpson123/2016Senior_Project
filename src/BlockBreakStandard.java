@@ -28,7 +28,9 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "energy_empty", "media/energy_bar_empty.png" },
 		new String[] { "energybar", "media/energy_bar.png" },
 		new String[] { "white_ui_controls", "media/sheet_white2x.png"},
-		new String[] { "nLevel", "media/gNextlevel.png" }
+		new String[] { "nLevel", "media/gNextlevel.png" },
+		new String[] { "ex_game_screen", "media/game_screen.png"},
+		new String[] { "Text", "media/Mode_Text.png"}
 	};
 	
 	private final int GameModeSelection = 0,
@@ -50,6 +52,11 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite play_select;
 	private Sprite prac_select;
 	private Sprite back_select;
+	
+	private Sprite label_unselect[];
+	private Sprite label_select[];
+	private Sprite button_select[];
+	private Sprite ex_screen;
 	
 	public boolean gamePaused = false;
 	GameSounds moveClick; 
@@ -122,41 +129,48 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 38, 30 }
 			);
 		play_unselect = new Sprite(
-				Global.textureMap.get("Text"),
+				localTexMap.get("Text"),
 				new int[] { 0, 0 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		play_select = new Sprite(
-				Global.textureMap.get("Text"),
+				localTexMap.get("Text"),
 				new int[] { 190, 0 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		prac_unselect = new Sprite(
-				Global.textureMap.get("Text"),
+				localTexMap.get("Text"),
 				new int[] { 0, 48 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		prac_select = new Sprite(
-				Global.textureMap.get("Text"),
+				localTexMap.get("Text"),
 				new int[] { 190, 48 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		back_unselect = new Sprite(
-				Global.textureMap.get("Text"),
+				localTexMap.get("Text"),
 				new int[] { 0, 96 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
 		back_select = new Sprite(
-				Global.textureMap.get("Text"),
+				localTexMap.get("Text"),
 				new int[] { 190, 96 },
 				new int[] { 190, 48 },
 				new int[] { 190, 48 }
 			);
+		ex_screen = new Sprite (
+				localTexMap.get("ex_game_screen"),
+				new int[] { 0,0 },
+				new int[] { 1425, 768 },
+				new int[] { 1425, 600 }
+				);
+		
 		//author: Mario
 		BlockStandardLevel.nLevel = new Sprite(
 				localTexMap.get("nLevel"),
@@ -260,6 +274,8 @@ public class BlockBreakStandard implements GameMode {
 				optionBox.draw(180, 390);
 				back_unselect.draw(180, 390);
 				
+				ex_screen.draw(450, 150);
+				
 				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			} 
@@ -342,6 +358,8 @@ public class BlockBreakStandard implements GameMode {
 		}
 		if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
 			cursorPos = 3;
+				//BlockStandardLevel.gamePaused = false;
+			
 		}
 		if (Global.getControlActive(Global.GameControl.PAUSE)) {
 			//BlockStandardLevel.gamePaused = true;
