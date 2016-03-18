@@ -50,8 +50,10 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
-		
-		
+		// TODO: [CUSTOM] set energy and energyMax if different than default (100000)
+		// set energy max if not default
+		energy = energyMax = 200000;		
+	
 	}
 	
 	@Override
@@ -99,7 +101,6 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		}
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
-		drawEnergy();
 		if (gamePaused) {
 			// TODO: display the pause menu
 		} else if (gameOver) {

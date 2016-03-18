@@ -8,11 +8,11 @@ import org.newdawn.slick.opengl.Texture;
  * where necessary to set level difficulty. 
  * @author John
  */
-public class BlockStandardLevel02 extends BlockStandardLevel {
+public class BlockStandardLevel03 extends BlockStandardLevel {
 	private boolean specialActive = false;
 	
-	public BlockStandardLevel02(HashMap<String,Texture> rootTexMap) {
-		level = 2;
+	public BlockStandardLevel03(HashMap<String,Texture> rootTexMap) {
+		level = 3;
 		// TODO: [CUSTOM] set background and user interface sprites
 		// if these sprite must be defined or the game will crash at runtime
 		background = new Sprite(
@@ -52,6 +52,8 @@ public class BlockStandardLevel02 extends BlockStandardLevel {
 		cursorGridPos[1] = grid[0].blocks.length / 2;
 		// set energy max if not default
 		energy = energyMax = 200000;		
+
+		
 	}
 	
 	@Override
@@ -118,13 +120,7 @@ public class BlockStandardLevel02 extends BlockStandardLevel {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				r = Global.rand.nextInt(256);
-				if (r > 1) { 
-					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-				} else {
-					b = new Block(Block.BlockType.BOMB);
-				}
-				grid[i].blocks[k] = b;
+				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 			}
 		}
 		// set the block count for the level

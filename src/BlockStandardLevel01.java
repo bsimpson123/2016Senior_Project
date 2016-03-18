@@ -50,8 +50,8 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
-		
-		
+		// set energy max if not default
+		energy = energyMax = 200000;		
 	}
 	
 	@Override
@@ -99,7 +99,6 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 		}
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
-		drawEnergy();
 		if (gamePaused) {
 			// TODO: display the pause menu
 		} else if (gameOver) {
@@ -111,27 +110,20 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 
 	@Override
 	protected void buildGrid() {
-		Block b = null;
 		int r = 0;
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				if ( (k % 3) == (i % 3) && (i % 3) == 0) {
-					b = new Block(Block.BlockType.BLOCK, 0);
-				} else {
-					b = new Block(Block.BlockType.BLOCK, 1);
-				}
-				grid[i].blocks[k] = b;
+				r = Global.rand.nextInt(2);
+				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
 			}
 		}
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
-		
-		
 	}
 
 	@Override

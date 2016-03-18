@@ -103,6 +103,9 @@ public abstract class BlockStandardLevel {
 		if (blocksRemaining == 0) {
 			levelComplete = true;
 			
+		} else if (energy == 0) {
+			// game over
+			
 		}
 		
 	}
@@ -280,7 +283,6 @@ public abstract class BlockStandardLevel {
 
 	/**
 	 * 
-	 * @param blockSize The size of the blocks being drawn
 	 * @param shiftRate The drop rate in pixels/second for falling blocks
 	 * @return true if blocks are currently falling within the grid, false
 	 * if no blocks are currently falling 

@@ -252,6 +252,9 @@ public class BlockBreakStandard implements GameMode {
 						case 1:
 							playLevel = new BlockStandardLevel02(localTexMap);
 							break;
+						case 2:
+							playLevel = new BlockStandardLevel03(localTexMap);
+							break;
 						default:
 							break;
 					}
