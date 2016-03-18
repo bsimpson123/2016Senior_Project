@@ -53,23 +53,24 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
-				/*r = Global.rand.nextInt(10000);
+				r = Global.rand.nextInt(10000);
 				if (r > 20) { 
-					b = new Block(Block.BlockType.BLOCK, rand.nextInt(3));
+					b = new Block(Block.BlockType.BLOCK, rand.nextInt(6));
 				} else {
 					b = new Block(Block.BlockType.BOMB);
 				}
-				grid[i].blocks[k] = b; */
-				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, (++count) % 2);
+				grid[i].blocks[k] = b; //*/
+				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, (++count) % 2);
 			}
 			count++;
 		}
 		// TASK: set the block count for the level
 		this.blocksRemaining = grid.length * grid[0].blocks.length;
-		/*r = Global.rand.nextInt(12) + 4;
+		r = Global.rand.nextInt(12) + 4;
 		grid[r].blocks[0] = new Block(Block.BlockType.ROCK);
-		blocksRemaining--; */
-		grid[0].blocks[0] = grid[1].blocks[0].clone();
+		blocksRemaining--; //*/
+		grid[r].blocks[1] = new Block(Block.BlockType.BOMB);
+		//grid[0].blocks[0] = grid[1].blocks[0].clone();
 	}
 	
 	@Override
@@ -151,7 +152,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				addEnergy(counter * 5);
 				break;
 			case BOMB:
-				counter = activateBombBlock(cursorGridPos, 2);
+				counter = activateBombBlock(cursorGridPos, 5);
 				updateScore(counter);
 				addEnergy(counter);
 				break;
