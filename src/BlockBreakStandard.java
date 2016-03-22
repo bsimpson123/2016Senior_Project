@@ -265,7 +265,8 @@ public class BlockBreakStandard implements GameMode {
 		if (playLevel != null) {
 			playLevel.run();
 			if (playLevel.levelFinished) {
-				if (playLevel.gameOver) {
+				if (playLevel.gameOver || selectPractice) {
+					selectPractice = false;
 					playLevel = null;
 					movementInputDelay = Global.inputReadDelayTimer;
 				} else {
@@ -452,7 +453,7 @@ public class BlockBreakStandard implements GameMode {
 				playLevel = new BlockStandardLevel05(localTexMap);
 				break;
 			default:
-				Global.writeToLog("Attempting to load play level too high.", true);
+				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
 				break;
 		}
 	}
@@ -470,6 +471,7 @@ public class BlockBreakStandard implements GameMode {
 			movementInputDelay = Global.inputReadDelayTimer;
 		} else if (Global.getControlActive(Global.GameControl.SELECT)) {
 			loadLevel(pracLevel);
+			playLevel.practice = true;
 		} else if (Global.getControlActive(Global.GameControl.CANCEL)) {
 			selectPractice = false;
 			return;
