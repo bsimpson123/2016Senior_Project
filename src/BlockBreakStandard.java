@@ -31,7 +31,7 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "nLevel", "media/gNextlevel.png" },
 		new String[] { "ex_game_screen", "media/game_screen.png"},
 		new String[] { "Text", "media/Mode_Text.png"},
-		new String[] { "white_ui_controls" , "media/sheet_white1x.png" }
+		new String[] { "white_ui_controls" , "media/sheet_white2x.png" }
 	};
 	
 	private final int GameModeSelection = 0,
@@ -235,16 +235,15 @@ public class BlockBreakStandard implements GameMode {
 			);
 		pracArrows[0] = new Sprite(
 				localTexMap.get("white_ui_controls"),
-				//new int[] { 0, 251 },
-				new int[] { 0, 0 },
-				new int[] { 48, 48 },
-				new int[] { 48, 48 }
+				new int[] { 300, 600 },
+				new int[] { 100, 100 },
+				new int[] { 50, 50 }
 			);
 		pracArrows[1] = new Sprite(
 				localTexMap.get("white_ui_controls"),
-				new int[] { 352, 351 },
-				new int[] { 48, 48 },
-				new int[] { 48, 48 }
+				new int[] { 200, 300 },
+				new int[] { 100, 100 },
+				new int[] { 50, 50 }
 			);
 		// Update mode state when asset loading is completed
 		currentState = LoadState.LOADING_DONE;
@@ -484,8 +483,8 @@ public class BlockBreakStandard implements GameMode {
 	private void drawPracticeSelect() {
 		pracBox.draw(510, 250);
 		BlockStandardLevel.numbers[pracLevel].draw(525, 255);
-		//pracArrows[0].draw(470, 250);
-		//pracArrows[1].draw(560, 250);
+		pracArrows[0].draw(470, 250);
+		pracArrows[1].draw(550, 250);
 	}
 	
 }
