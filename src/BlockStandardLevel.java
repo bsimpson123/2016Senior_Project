@@ -84,11 +84,11 @@ public abstract class BlockStandardLevel {
 	private long movementInputDelay = Global.inputReadDelayTimer;
 	protected int pauseCursorPos = 0;
 	
-	Sprite pauseBox = new Sprite(
+	private Sprite pauseBox = new Sprite(
 			Global.textureMap.get("green_ui"),
-			new int[] {0,0},
-			new int[] {190,48},
-			new int[] {190,48}
+			new int[] { 0, 0 },
+			new int[] { 190, 48 },
+			new int[] { 180, 38 }
 		);
 	
 	public void run() {
@@ -266,12 +266,16 @@ public abstract class BlockStandardLevel {
 			optionFrameMid.draw(180, 250);
 			
 			if (pauseCursorPos == 0) {
-				pauseBox.draw(210, 370);
+				pauseBox.draw(215, 372);
+				
 				hoverBox.draw(210, 310);
+				pauseBox.draw(215, 312);
 			}
 			if (pauseCursorPos == 1) {
 				hoverBox.draw(210, 370);
-				pauseBox.draw(210, 310);
+				pauseBox.draw(215, 372);
+				
+				pauseBox.draw(215, 312);
 			}
 			
 
