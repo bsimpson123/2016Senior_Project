@@ -472,8 +472,10 @@ public class BlockBreakStandard implements GameMode {
 		} else if (Global.getControlActive(Global.GameControl.SELECT)) {
 			loadLevel(pracLevel);
 			playLevel.practice = true;
+			movementInputDelay = Global.inputReadDelayTimer;
 		} else if (Global.getControlActive(Global.GameControl.CANCEL)) {
 			selectPractice = false;
+			movementInputDelay = 2 * Global.inputReadDelayTimer;
 			return;
 		}
 		

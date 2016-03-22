@@ -8,6 +8,7 @@ public class Block {
 	}
 
 	protected static Sprite blockColor[];
+	protected static Sprite bombNumber[];
 	protected static Sprite blockStar, blockStarOverlay;
 	protected static Sprite blockWedge, blockTrash, blockRock, blockBomb;
 	protected static Sprite errorBlock;
@@ -43,8 +44,10 @@ public class Block {
 	/* Constructors */
 	public Block(BlockType type, int colorID) {
 		this.type = type;
-		if (colorID >= blockColorCount) {
-			colorID = 0;
+		if ( (colorID >= blockColorCount || colorID < 0) && type == BlockType.BLOCK) {
+			colorID = 0; 
+		} else if ( (colorID < 2 || colorID > 9) && type == BlockType.BOMB ) {
+			colorID = 2; // default,minimum bomb radius, used if set value is out of range
 		} else {
 			this.colorID = colorID;
 		}
@@ -55,6 +58,8 @@ public class Block {
 		this.type = type;
 		if (type == BlockType.BLOCK) {
 			colorID = Global.rand.nextInt(blockColorCount);
+		} else if (type == BlockType.BOMB) {
+			colorID = 2; // default bomb radius
 		} else {
 			colorID = 0;
 		}
@@ -147,6 +152,25 @@ public class Block {
 				new int[] { 36, 36 },
 				blockDrawSpace
 			);
+		
+		bombNumber = new Sprite[10];
+		for (int i = 0; i < 10; i++) {
+			if (i < 5) {
+				bombNumber[i] = new Sprite(
+						texMap.get("bomb_numbers"),
+						new int[] { i * 12, 0 },
+						new int[] { 10, 16 },
+						new int[] { 10, 16 }
+					);
+			} else {
+				bombNumber[i] = new Sprite(
+						texMap.get("bomb_numbers"),
+						new int[] { (i - 5) * 12, 16 },
+						new int[] { 10, 16 },
+						new int[] { 10, 16 }
+					);
+			}
+		}
 	}
 	
 	private void setSprite() {
@@ -192,6 +216,8 @@ public class Block {
 		block.draw(xc, yc);
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc);
+		} else if (type == BlockType.BOMB) {
+			bombNumber[colorID].draw(xc + 9, yc - 5);
 		}
 	}
 
@@ -203,6 +229,9 @@ public class Block {
 		block.draw(xc, yc, size);
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc, size);
+		} else if (type == BlockType.BOMB) {
+			float factor = size[0] / (float) blockDrawSpace[0];
+			bombNumber[colorID].draw(xc + 9, yc + 7);
 		}
 	}
 	

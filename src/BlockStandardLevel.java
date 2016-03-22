@@ -769,8 +769,8 @@ public abstract class BlockStandardLevel {
 	 * @return The number of blocks removed
 	 * @author John
 	 */
-	protected int activateBombBlock(int[] pos, int radius) {
-		if (radius < 1) { throw new IllegalArgumentException("Invalid bomb radius."); }
+	protected int activateBombBlock(int[] pos) {
+		int radius = grid[pos[0]].blocks[pos[1]].colorID;
 		int xMin = pos[0] - radius, 
 			xMax = pos[0] + radius,
 			yMin = pos[1] - radius, 
@@ -796,7 +796,7 @@ public abstract class BlockStandardLevel {
 				}
 				if (grid[i].blocks[k] != null && !grid[i].blocks[k].clearMark) {
 					if (grid[i].blocks[k].type == Block.BlockType.BOMB) {
-						count += activateBombBlock(new int[] { i, k }, radius);
+						count += activateBombBlock( new int[] { i, k } );
 					} else if (grid[i].blocks[k].type == Block.BlockType.ROCK) { // ignore rock blocks
 						continue;
 					} else if (grid[i].blocks[k].type == Block.BlockType.WEDGE) { // ignore wedge blocks

@@ -158,7 +158,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				addEnergy(counter * 5);
 				break;
 			case BOMB:
-				counter = activateBombBlock(cursorGridPos, 5);
+				counter = activateBombBlock(cursorGridPos);
 				updateScore(counter);
 				addEnergy(counter);
 				break;

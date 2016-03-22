@@ -98,7 +98,8 @@ public class Game {
 			new String[] { "uibox", "media/UI_Boxes.png" },
 			new String[] { "title", "media/TitleDisplay.png" },
 			new String[] { "Text", "media/Mode_Text.png"},
-			new String[] { "overlay", "media/blackoverlay.png" }
+			new String[] { "overlay", "media/blackoverlay.png" }, 
+			new String[] { "bomb_numbers", "media/numbers_small.png" }
 	};
 	
 	/* Menu display and control variables */

@@ -119,10 +119,10 @@ public class BlockStandardLevel02 extends BlockStandardLevel {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
 				r = Global.rand.nextInt(256);
-				if (r > 1) { 
+				if (r > 16) { 
 					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 				} else {
-					b = new Block(Block.BlockType.BOMB);
+					b = new Block(Block.BlockType.BOMB, Global.rand.nextInt(3) + 2);
 				}
 				grid[i].blocks[k] = b;
 			}
@@ -154,7 +154,7 @@ public class BlockStandardLevel02 extends BlockStandardLevel {
 				addEnergy(adj);
 				break;
 			case BOMB:
-				counter = activateBombBlock(cursorGridPos, 2);
+				counter = activateBombBlock(cursorGridPos);
 				updateScore(counter);
 				addEnergy(counter);
 				break;
