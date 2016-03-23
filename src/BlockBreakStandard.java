@@ -31,7 +31,8 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "nLevel", "media/gNextlevel.png" },
 		new String[] { "ex_game_screen", "media/game_screen.png"},
 		new String[] { "Text", "media/Mode_Text.png"},
-		new String[] { "white_ui_controls" , "media/sheet_white2x.png" }
+		new String[] { "white_ui_controls" , "media/sheet_white2x.png" },
+		new String[] { "new_test", "media/image1.png"}
 	};
 	
 	private final int GameModeSelection = 0,
@@ -48,10 +49,12 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite optionBox;
 	private Sprite play_unselect;
 	private Sprite prac_unselect;
+	private Sprite gamemode_unselect;
 	private Sprite back_unselect;
 	
 	private Sprite play_select;
 	private Sprite prac_select;
+	private Sprite gamemode_select;
 	private Sprite back_select;
 	
 	private Sprite label_unselect[];
@@ -134,40 +137,56 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 38, 30 },
 				new int[] { 38, 30 }
 			);
+		
 		play_unselect = new Sprite(
-				localTexMap.get("Text"),
+				localTexMap.get("new_test"),
 				new int[] { 0, 0 },
-				new int[] { 190, 48 },
+				new int[] { 190, 30 },
 				new int[] { 190, 48 }
 			);
 		play_select = new Sprite(
-				localTexMap.get("Text"),
+				localTexMap.get("new_test"),
 				new int[] { 190, 0 },
-				new int[] { 190, 48 },
+				new int[] { 190, 30 },
 				new int[] { 190, 48 }
 			);
+		
 		prac_unselect = new Sprite(
-				localTexMap.get("Text"),
-				new int[] { 0, 48 },
-				new int[] { 190, 48 },
+				localTexMap.get("new_test"),
+				new int[] { 0, 30 },
+				new int[] { 190, 30 },
 				new int[] { 190, 48 }
 			);
 		prac_select = new Sprite(
-				localTexMap.get("Text"),
-				new int[] { 190, 48 },
-				new int[] { 190, 48 },
+				localTexMap.get("new_test"),
+				new int[] { 190, 30 },
+				new int[] { 190, 30 },
 				new int[] { 190, 48 }
 			);
+		
+		gamemode_unselect = new Sprite(
+				localTexMap.get("new_test"),
+				new int[] { 0, 60 },
+				new int[] { 190, 30 },
+				new int[] { 190, 48 }
+			);
+		gamemode_select = new Sprite(
+				localTexMap.get("new_test"),
+				new int[] { 190, 60 },
+				new int[] { 190, 30 },
+				new int[] { 190, 48 }
+			);
+		
 		back_unselect = new Sprite(
-				localTexMap.get("Text"),
-				new int[] { 0, 96 },
-				new int[] { 190, 48 },
+				localTexMap.get("new_test"),
+				new int[] { 0, 90 },
+				new int[] { 190, 30 },
 				new int[] { 190, 48 }
 			);
 		back_select = new Sprite(
-				localTexMap.get("Text"),
-				new int[] { 190, 96 },
-				new int[] { 190, 48 },
+				localTexMap.get("new_test"),
+				new int[] { 190, 90 },
+				new int[] { 190, 30 },
 				new int[] { 190, 48 }
 			);
 		ex_screen = new Sprite (
@@ -306,15 +325,21 @@ public class BlockBreakStandard implements GameMode {
 			moveCursorMain();
 			optionBoxOffset = 50;
 			if (cursorPos == 0) {
-				//optionBox_2.draw(180 + optionBoxOffset, 180);
+				// PLAY
 				optionBox.draw(180 + optionBoxOffset, 180);
 				play_select.draw(180 + optionBoxOffset, 180);
 
+				// PRACTICE
 				optionBox.draw(180, 250);
 				prac_unselect.draw(180, 250);
+				
+				// GAME MODE
 				optionBox.draw(180, 320);
+				gamemode_unselect.draw(180, 325);
+				
+				// BACK
 				optionBox.draw(180, 390);
-				back_unselect.draw(180, 390);
+				back_unselect.draw(180, 395);
 				
 				ex_screen.draw(450, 150);
 				
@@ -322,37 +347,61 @@ public class BlockBreakStandard implements GameMode {
 				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			} 
 			if (cursorPos == 1) {
+				// PLAY
 				optionBox.draw(180, 180);
 				play_unselect.draw(180, 180);
+				
+				// PRACTICE
 				optionBox.draw(180 + optionBoxOffset, 250);
 				prac_select.draw(180 + optionBoxOffset, 250);
+				
+				// GAME MODE
 				optionBox.draw(180, 320);
+				gamemode_unselect.draw(180, 325);
+				
+				// BACK
 				optionBox.draw(180, 390);
-				back_unselect.draw(180, 390);
+				back_unselect.draw(180, 395);
 				
 				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			}
 			if (cursorPos == 2) {
+				// PLAY
 				optionBox.draw(180, 180);
 				play_unselect.draw(180, 180);
+				
+				// PRACTICE
 				optionBox.draw(180, 250);
 				prac_unselect.draw(180, 250);
+				
+				// GAME MODE
 				optionBox.draw(180 + optionBoxOffset, 320);
+				gamemode_select.draw(180 + optionBoxOffset, 325);
+				
+				// BACK
 				optionBox.draw(180, 390);
-				back_unselect.draw(180, 390);
+				back_unselect.draw(180, 395);
 				
 				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
 			}
 			if (cursorPos == 3) {
+				// PLAY
 				optionBox.draw(180, 180);
 				play_unselect.draw(180, 180);
+				
+				// PRACTICE
 				optionBox.draw(180, 250);
 				prac_unselect.draw(180, 250);
+				
+				// GAME MODE
 				optionBox.draw(180, 320);
+				gamemode_unselect.draw(180, 325);
+				
+				// BACK
 				optionBox.draw(180 + optionBoxOffset, 390);
-				back_select.draw(180 + optionBoxOffset, 390);
+				back_select.draw(180 + optionBoxOffset, 395);
 				
 				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
