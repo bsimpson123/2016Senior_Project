@@ -59,7 +59,7 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite button_select[];
 	private Sprite ex_screen;
 	
-	private boolean selectPractice = false;
+	//private boolean selectPractice = false;
 	private Sprite pracBox;
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
@@ -264,12 +264,15 @@ public class BlockBreakStandard implements GameMode {
 		if (playLevel != null) {
 			playLevel.run();
 			if (playLevel.levelFinished) {
-				if (playLevel.gameOver || selectPractice) {
-					selectPractice = false;
+				if (playLevel.gameOver || playLevel.practice) {
+					// TODO: selectPractice = false;
 					playLevel = null;
 					movementInputDelay = Global.inputReadDelayTimer;
 				} else {
 					// load next level
+					// TODO: add test for at last level and return to menu
+					loadLevel(playLevel.level + 1);
+					/*
 					switch(playLevel.level) {
 						case 1:
 							playLevel = new BlockStandardLevel02(localTexMap);
@@ -287,18 +290,20 @@ public class BlockBreakStandard implements GameMode {
 						default:
 							playLevel = null;
 							break;
-					}
+					} //*/
 				}
 				
 			}
 		} else {
 // @author Brock
 			GameSelector_background.draw(0, 0);
-			if (selectPractice) {
+			// TODO: remove if unnecessary
+			/*if (selectPractice) {
 				inputPracMenu();
 			} else {
 				moveCursorMain();
-			}
+			} //*/
+			moveCursorMain();
 			optionBoxOffset = 50;
 			if (cursorPos == 0) {
 				//optionBox_2.draw(180 + optionBoxOffset, 180);
@@ -354,7 +359,7 @@ public class BlockBreakStandard implements GameMode {
 			}
 			
 			// author John
-			if (selectPractice) {
+			if (cursorPos == 1) {
 				drawPracticeSelect();
 			}
 		}
@@ -406,6 +411,9 @@ public class BlockBreakStandard implements GameMode {
 			if (Global.getControlActive(Global.GameControl.PAUSE)) {
 				//BlockStandardLevel.gamePaused = true;
 			}
+			if (cursorPos == 1) { // practice selected, not confirmed
+				inputPracMenu();
+			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0: // normal mode
@@ -414,7 +422,10 @@ public class BlockBreakStandard implements GameMode {
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode
-						selectPractice = true;
+						loadLevel(pracLevel);
+						playLevel.practice = true;
+						movementInputDelay = Global.inputReadDelayTimer;
+						//selectPractice = true;
 						break;
 					case 2: // high score
 						//game = 
@@ -455,6 +466,7 @@ public class BlockBreakStandard implements GameMode {
 				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
 				break;
 		}
+		playLevel.level = levelID;
 	}
 		
 	private void inputPracMenu() {
@@ -468,7 +480,7 @@ public class BlockBreakStandard implements GameMode {
 			pracLevel++;
 			if (pracLevel > pracMax) { pracLevel = 1; }
 			movementInputDelay = Global.inputReadDelayTimer;
-		} else if (Global.getControlActive(Global.GameControl.SELECT)) {
+		} /* else if (Global.getControlActive(Global.GameControl.SELECT)) {
 			loadLevel(pracLevel);
 			playLevel.practice = true;
 			movementInputDelay = Global.inputReadDelayTimer;
@@ -476,7 +488,7 @@ public class BlockBreakStandard implements GameMode {
 			selectPractice = false;
 			movementInputDelay = 2 * Global.inputReadDelayTimer;
 			return;
-		}
+		} //*/
 		
 	}
 
