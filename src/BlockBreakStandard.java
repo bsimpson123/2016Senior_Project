@@ -479,6 +479,7 @@ public class BlockBreakStandard implements GameMode {
 						loadLevel(pracLevel);
 						playLevel.practice = true;
 						movementInputDelay = Global.inputReadDelayTimer;
+						BlockStandardLevel.score = 0;
 						//selectPractice = true;
 						break;
 					case 2: // high score

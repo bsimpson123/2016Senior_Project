@@ -1,10 +1,5 @@
-import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 import org.newdawn.slick.opengl.Texture;
 /**
@@ -13,15 +8,6 @@ import org.newdawn.slick.opengl.Texture;
  * where necessary to set level difficulty. 
  * @author John
  */
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
-
-
 public class BlockStandardLevel05 extends BlockStandardLevel {
 	private boolean specialActive = false;
 	private  BufferedReader infile;
@@ -116,9 +102,6 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 
 	@Override
 	protected void buildGrid() {
-		Block b = null;
-		//dataType[] level;
-		
 		try {
 			String parseline;
 			String[] parseCSV;
