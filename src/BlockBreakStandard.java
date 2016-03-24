@@ -16,6 +16,7 @@ public class BlockBreakStandard implements GameMode {
 	protected Sprite cursor;
 	protected int[] blockOffSet = new int[] { 32, 32 };
 	private long movementInputDelay = Global.inputReadDelayTimer;
+	private long actionDelay = Global.inputReadDelayTimer;
 	
 	private boolean pageBack = false;
 	/** The current game mode within the main logic loop. */
@@ -67,8 +68,7 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
 	private int pracMax = 5;
-	
-	GameSounds moveClick; 
+	 
 	
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
@@ -104,7 +104,7 @@ public class BlockBreakStandard implements GameMode {
 			 }
 		}
 // author Brock
-		moveClick = new GameSounds(GameSounds.soundType.SOUND, "media/click3.ogg");
+		//moveClick = new GameSounds(GameSounds.soundType.SOUND, "media/click3.ogg");
 		
 		GameSelector_background = new Sprite(
 				Global.textureMap.get("main_menu_background"),
@@ -195,6 +195,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 1425, 768 },
 				new int[] { 1425, 600 }
 				);
+		
 		
 		//author: Mario
 		BlockStandardLevel.nLevel = new Sprite(
@@ -323,6 +324,8 @@ public class BlockBreakStandard implements GameMode {
 				moveCursorMain();
 			} //*/
 			moveCursorMain();
+			
+
 			optionBoxOffset = 50;
 			if (cursorPos == 0) {
 				// PLAY
@@ -437,7 +440,8 @@ public class BlockBreakStandard implements GameMode {
 		if (movementInputDelay <= 0) {
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorPos--;
-				moveClick.playSoundEffect();
+				Global.sounds.playSoundEffect("button_click");
+				
 				if (cursorPos < 0) {
 					
 					cursorPos = 3;
@@ -446,7 +450,8 @@ public class BlockBreakStandard implements GameMode {
 			}
 			if (Global.getControlActive(Global.GameControl.DOWN)) {
 				cursorPos++;
-				moveClick.playSoundEffect();
+				Global.sounds.playSoundEffect("button_click");
+
 				if (cursorPos > 3) {
 					cursorPos = 0;
 				}

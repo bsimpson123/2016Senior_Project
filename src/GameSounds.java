@@ -38,33 +38,36 @@ public class GameSounds {
 			"media/Flowing Rocks.ogg"
 	};
 	
-	public GameSounds(soundType type, String input) {
+	public GameSounds(soundType type, String[][] input) {
 		//soundID = soundNum;
 		//stype = type;
-		sfile = input;
+		//sfile = input;
 		if (type == soundType.MUSIC){
-			loadMusic(input);
+			//loadMusic(input);
 		}
 		if (type == soundType.SOUND) {
-			loadSound(input);
+			//for (int i = 0; i < input.length; i++) {
+				loadSound(input);
+			//}
 
 		}
 	}
 	
-	private boolean loadSound(String file) {
-		String source = file, type;
-		Audio sound = soundMap.get(file);
-		if (sound != null) { return true; } // sound has already been loaded
-		
-		try {
-			source = FileResource.requestResource(file);
-			type = source.substring(source.lastIndexOf('.') + 1).toUpperCase(); 
-				sfile = file;
+	private boolean loadSound(String[][] audioList) {
+		String source; // = file, type;
+		String type;
+		Audio sound;
+		for (String ref[] : audioList) {
+			source = ref[1];
+			try {
+				source = FileResource.requestResource(ref[1]);
+				type = ref[1].substring(ref[1].lastIndexOf('.') + 1).toUpperCase(); 
 				sound = AudioLoader.getAudio(type, ResourceLoader.getResourceAsStream(source));
-				soundMap.put(file, sound);
-		} catch (IOException e) {
-			System.out.printf("Unable to load sound resource: %s\n%s", source, e.getMessage());
-			return false;
+				soundMap.put(ref[0], sound);
+			} catch (IOException e) {
+				System.out.printf("Unable to load sound resource: %s\n%s", source, e.getMessage());
+				return false;
+			}
 		}
 		return true;
 	}
@@ -95,8 +98,8 @@ public class GameSounds {
 	 * Plays the audio as a sound effect. No effect if the value passed is null.
 	 * @param sfx The audio to be played
 	 */
-	public void playSoundEffect() {
-		Audio sfx = getSound(sfile);
+	public void playSoundEffect(String file) {
+		Audio sfx = getSound(file);
 		if (sfx == null) { return; } // check that sfx is a defined sound object
 		sfx.playAsSoundEffect(1.0f, 1.0f, false);
 		return ;

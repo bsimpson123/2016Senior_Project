@@ -44,6 +44,13 @@ public class Global {
 	
 	private static FileWriter logFile;
 	
+	public static String[][] audioList = {
+			new String[] { "button_click", "media/click3.ogg"},
+			new String[] { "explo", "media/Explosion.wav"}
+	};
+
+	public static GameSounds sounds = new GameSounds(GameSounds.soundType.SOUND,audioList);
+
 	
 	public enum GameControl {
 		RIGHT, LEFT, UP, DOWN,
@@ -56,6 +63,7 @@ public class Global {
 	private static HashMap<Integer, GameControl> gamepadMap = new HashMap<Integer, GameControl>();
 	private static int ctrlID = -1;
 	private static Controller[] ctrlList;
+	
 
 	public static Controller getController() {
 		if (ctrlID == -1) { return null; }
@@ -79,6 +87,7 @@ public class Global {
 			writeToLog(String.format("Controller detected: %s\n\tButton count: %d; Axis count: %d\n", 
 					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount()), false);
 			axis = ctrlList[i].getAxisCount();
+			// Author Brock
 			if ( (axis == 2 || axis == 4 || axis == 6) && ctrlList[i].getButtonCount() >= 8 && ctrlList[i].getButtonCount() <= 16 ) {
 			
 				ctrlID = i;
