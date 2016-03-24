@@ -249,14 +249,32 @@ public abstract class BlockStandardLevel {
 		drawEnergy();
 
 		if (levelComplete) {
-			drawGrid();
+			//drawGrid();
 			// TODO: level complete code
-			if (actionDelay < 0 && Global.getControlActive(Global.GameControl.SELECT)) {
-				levelFinished = true;
-			}
-			
 			overlay.draw(0, 0);
 			nLevel.draw(200, 200);
+			levelFinishedControls();
+			
+			optionFrameMid.draw(180, 250);
+			
+			if (pauseCursorPos == 0) {
+				pauseBox.draw(215, 372);
+				
+				hoverBox.draw(210, 310);
+				pauseBox.draw(215, 312);
+			}
+			if (pauseCursorPos == 1) {
+				hoverBox.draw(210, 370);
+				pauseBox.draw(215, 372);
+				
+				pauseBox.draw(215, 312);
+			}
+			//if (actionDelay < 0 && Global.getControlActive(Global.GameControl.SELECT)) {
+			//	levelFinished = true;
+			//}
+			//overlay.draw(0, 0);
+			
+			
 			// placeholder for level advancement
 		} else if (gamePaused) {
 // Author: Brock
@@ -426,6 +444,59 @@ public abstract class BlockStandardLevel {
 			inputDelay -= Global.delta;
 		}
 	}
+	protected void levelFinishedControls() {
+		// Author: Mario
+				if (inputDelay <= 0) {
+					
+					if (Global.getControlActive(Global.GameControl.UP)) {
+							pauseCursorPos--;
+				
+						if (pauseCursorPos < 0) {
+								pauseCursorPos = 1;
+						}
+						inputDelay = Global.inputReadDelayTimer * 2;
+					}
+					if (Global.getControlActive(Global.GameControl.DOWN)) {
+							pauseCursorPos++;
+				
+						if (pauseCursorPos > 1) {
+							pauseCursorPos = 0;
+						}
+						inputDelay = Global.inputReadDelayTimer * 2;
+					}
+					if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
+
+					}
+					if (Global.getControlActive(Global.GameControl.PAUSE)) { // Cancel key moves the cursor to the program exit button
+							gamePaused = false;
+							inputDelay = Global.inputReadDelayTimer * 2;		
+					}
+				
+					if (Global.getControlActive(Global.GameControl.SELECT)) {
+
+						switch (pauseCursorPos) {
+							case 0:
+								//levelComplete = false;
+								//gamePaused = false;
+								//gameOver = true;
+								//levelComplete = true;
+								levelFinished = true;
+								inputDelay = Global.inputReadDelayTimer;	
+								break;
+
+							case 1:
+								levelComplete = true;
+								//gameOver = true;
+								levelFinished = true;
+								inputDelay = Global.inputReadDelayTimer;	
+								break;
+
+						}
+					}
+				} else if (inputDelay > 0) {
+					inputDelay -= Global.delta;
+				}
+			}
 	
 	/**
 	 * Checks against movement inputs within the grid, and adjusts the cursor
