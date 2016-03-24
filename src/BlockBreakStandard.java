@@ -173,7 +173,7 @@ public class BlockBreakStandard implements GameMode {
 		gamemode_select = new Sprite(
 				localTexMap.get("new_test"),
 				new int[] { 190, 60 },
-				new int[] { 190, 30 },
+				new int[] { 190, 27 },
 				new int[] { 190, 48 }
 			);
 		
