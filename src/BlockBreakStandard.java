@@ -292,25 +292,6 @@ public class BlockBreakStandard implements GameMode {
 					// load next level
 					// TODO: add test for at last level and return to menu
 					loadLevel(playLevel.level + 1);
-					/*
-					switch(playLevel.level) {
-						case 1:
-							playLevel = new BlockStandardLevel02(localTexMap);
-							break;
-						case 2:
-							playLevel = new BlockStandardLevel03(localTexMap);
-							break;
-						case 3:
-							playLevel = new BlockStandardLevel04(localTexMap);
-							playLevel.level = 4;
-							break;
-						case 4:
-							playLevel = new BlockStandardLevel05(localTexMap);
-							playLevel.level = 5;
-						default:
-							playLevel = null;
-							break;
-					} //*/
 				}
 				
 			}
