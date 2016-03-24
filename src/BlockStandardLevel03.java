@@ -60,7 +60,7 @@ public class BlockStandardLevel03 extends BlockStandardLevel {
 	public void run() {
 		super.run();
 		// draw the grid and handle grid mechanics and input if the game is not paused
-		if (!gamePaused && !gameOver) {
+		if (!gamePaused && !gameOver && !levelComplete) {
 			processQueue();
 			energy -= Global.delta;
 			if (energy < 0) { energy = 0; }

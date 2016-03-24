@@ -68,6 +68,8 @@ public abstract class BlockStandardLevel {
 	protected boolean levelComplete = false;
 	protected boolean practice = false;
 	
+	private boolean endLevelDelayed = false;
+	
 	private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
 			new int[] { 0, 59 },
@@ -103,7 +105,10 @@ public abstract class BlockStandardLevel {
 		
 		if (blocksRemaining == 0) {
 			levelComplete = true;
-			
+			if (!endLevelDelayed) {
+				endLevelDelayed = true;
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
 		} else if (energy == 0) {
 			// game over
 			
@@ -417,13 +422,13 @@ public abstract class BlockStandardLevel {
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
-
+					gamePaused = false;
+					inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.PAUSE)) { // Cancel key moves the cursor to the program exit button
 					gamePaused = false;
 					inputDelay = Global.inputReadDelayTimer * 2;		
 			}
-		
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 
 				switch (pauseCursorPos) {
@@ -433,7 +438,7 @@ public abstract class BlockStandardLevel {
 						break;
 
 					case 1:
-						levelComplete = true;
+						levelFinished = true;
 						gameOver = true;
 						inputDelay = Global.inputReadDelayTimer;	
 						break;
@@ -447,50 +452,22 @@ public abstract class BlockStandardLevel {
 	protected void levelFinishedControls() {
 		// Author: Mario
 				if (inputDelay <= 0) {
-					
-					if (Global.getControlActive(Global.GameControl.UP)) {
-							pauseCursorPos--;
-				
-						if (pauseCursorPos < 0) {
-								pauseCursorPos = 1;
-						}
+					if (Global.getControlActive(Global.GameControl.UP) || Global.getControlActive(Global.GameControl.DOWN)) {
+						pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
 						inputDelay = Global.inputReadDelayTimer * 2;
 					}
-					if (Global.getControlActive(Global.GameControl.DOWN)) {
-							pauseCursorPos++;
-				
-						if (pauseCursorPos > 1) {
-							pauseCursorPos = 0;
-						}
-						inputDelay = Global.inputReadDelayTimer * 2;
-					}
-					if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
-
-					}
-					if (Global.getControlActive(Global.GameControl.PAUSE)) { // Cancel key moves the cursor to the program exit button
-							gamePaused = false;
-							inputDelay = Global.inputReadDelayTimer * 2;		
-					}
-				
 					if (Global.getControlActive(Global.GameControl.SELECT)) {
-
 						switch (pauseCursorPos) {
 							case 0:
-								//levelComplete = false;
-								//gamePaused = false;
-								//gameOver = true;
-								//levelComplete = true;
 								levelFinished = true;
-								inputDelay = Global.inputReadDelayTimer;	
+								inputDelay = 10 * Global.inputReadDelayTimer;	
 								break;
 
 							case 1:
-								levelComplete = true;
-								//gameOver = true;
+								gameOver = true;
 								levelFinished = true;
-								inputDelay = Global.inputReadDelayTimer;	
+								inputDelay = 10 * Global.inputReadDelayTimer;	
 								break;
-
 						}
 					}
 				} else if (inputDelay > 0) {
@@ -507,9 +484,7 @@ public abstract class BlockStandardLevel {
 		if (Global.getControlActive(Global.GameControl.PAUSE)) {
 				gamePaused = true;
 				inputDelay = 1000l;		
-		}
-		else 
-		if (Global.getControlActive(Global.GameControl.SPECIAL2)) {
+		} else if (Global.getControlActive(Global.GameControl.SPECIAL2)) {
 			// queue control
 			queueHold = true;
 			if ( queueManualShiftDelay <= 0) {
