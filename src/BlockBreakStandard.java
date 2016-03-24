@@ -326,11 +326,11 @@ public class BlockBreakStandard implements GameMode {
 			moveCursorMain();
 			
 
-			optionBoxOffset = 50;
+			optionBoxOffset = 0;
 			if (cursorPos == 0) {
 				// PLAY
-				optionBox.draw(180 + optionBoxOffset, 180);
-				play_select.draw(180 + optionBoxOffset, 180);
+				optionBox.draw(180, 180);
+				play_select.draw(180, 180);
 
 				// PRACTICE
 				optionBox.draw(180, 250);
@@ -355,8 +355,8 @@ public class BlockBreakStandard implements GameMode {
 				play_unselect.draw(180, 180);
 				
 				// PRACTICE
-				optionBox.draw(180 + optionBoxOffset, 250);
-				prac_select.draw(180 + optionBoxOffset, 250);
+				optionBox.draw(180, 250);
+				prac_select.draw(180, 250);
 				
 				// GAME MODE
 				optionBox.draw(180, 320);
@@ -379,8 +379,8 @@ public class BlockBreakStandard implements GameMode {
 				prac_unselect.draw(180, 250);
 				
 				// GAME MODE
-				optionBox.draw(180 + optionBoxOffset, 320);
-				gamemode_select.draw(180 + optionBoxOffset, 325);
+				optionBox.draw(180, 320);
+				gamemode_select.draw(180, 325);
 				
 				// BACK
 				optionBox.draw(180, 390);
@@ -403,8 +403,8 @@ public class BlockBreakStandard implements GameMode {
 				gamemode_unselect.draw(180, 325);
 				
 				// BACK
-				optionBox.draw(180 + optionBoxOffset, 390);
-				back_select.draw(180 + optionBoxOffset, 395);
+				optionBox.draw(180, 390);
+				back_select.draw(180, 395);
 				
 				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
 				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
