@@ -417,13 +417,13 @@ public abstract class BlockStandardLevel {
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
-
+					gamePaused = false;
+					inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.PAUSE)) { // Cancel key moves the cursor to the program exit button
 					gamePaused = false;
 					inputDelay = Global.inputReadDelayTimer * 2;		
 			}
-		
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 
 				switch (pauseCursorPos) {
@@ -433,7 +433,7 @@ public abstract class BlockStandardLevel {
 						break;
 
 					case 1:
-						levelComplete = true;
+						levelFinished = true;
 						gameOver = true;
 						inputDelay = Global.inputReadDelayTimer;	
 						break;
