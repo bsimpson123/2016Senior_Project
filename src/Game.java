@@ -99,7 +99,8 @@ public class Game {
 			new String[] { "title", "media/TitleDisplay.png" },
 			new String[] { "Text", "media/Mode_Text.png"},
 			new String[] { "overlay", "media/blackoverlay.png" }, 
-			new String[] { "bomb_numbers", "media/numbers_small.png" }
+			new String[] { "bomb_numbers", "media/numbers_small.png" },
+			new String[] { "pause_text", "media/pause_text.png"}
 	};
 	
 	/* Menu display and control variables */
@@ -119,7 +120,6 @@ public class Game {
 	private long movementInputDelay = 0;
 	
 	private GameMode game;
-	
 	/**
 	 * Get the high resolution time in milliseconds
 	 * @return The high resolution time in milliseconds
@@ -379,6 +379,8 @@ public class Game {
 				//*/
 				if (Global.getControlActive(Global.GameControl.UP)) {
 					cursorPos--;
+					Global.sounds.playSoundEffect("button_click");
+					
 					if (cursorPos < 0) {
 						cursorPos = 2;
 					}
@@ -386,6 +388,8 @@ public class Game {
 				}
 				if (Global.getControlActive(Global.GameControl.DOWN)) {
 					cursorPos++;
+					Global.sounds.playSoundEffect("button_click");
+
 					if (cursorPos > 2) {
 						cursorPos = 0;
 					}

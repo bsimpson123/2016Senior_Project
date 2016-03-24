@@ -93,6 +93,34 @@ public abstract class BlockStandardLevel {
 			new int[] { 180, 38 }
 		);
 	
+	//private Sprite[] pauseText = new Sprite[2];
+	
+	private Sprite pause_RE_sel = new Sprite(
+			Global.textureMap.get("pause_text"),
+			new int[] { 180, 0 },
+			new int[] { 180, 26 },
+			new int[] { 180, 38 }
+		);
+	private Sprite pause_RE_unsel = new Sprite(
+			Global.textureMap.get("pause_text"),
+			new int[] { 0, 0 },
+			new int[] { 180, 26 },
+			new int[] { 180, 38 }
+		);
+	private Sprite pause_EX_sel = new Sprite(
+			Global.textureMap.get("pause_text"),
+			new int[] { 180, 26 },
+			new int[] { 180, 26 },
+			new int[] { 180, 38 }
+		);
+	private Sprite pause_EX_unsel = new Sprite(
+			Global.textureMap.get("pause_text"),
+			new int[] { 0, 26 },
+			new int[] { 180, 26 },
+			new int[] { 180, 38 }
+		);
+	
+	
 	public void run() {
 		// decrement delay variables
 		queueManualShiftDelay -= Global.delta;
@@ -265,6 +293,7 @@ public abstract class BlockStandardLevel {
 			if (pauseCursorPos == 0) {
 				pauseBox.draw(215, 372);
 				
+				
 				hoverBox.draw(210, 310);
 				pauseBox.draw(215, 312);
 			}
@@ -289,16 +318,24 @@ public abstract class BlockStandardLevel {
 			optionFrameMid.draw(180, 250);
 			
 			if (pauseCursorPos == 0) {
-				pauseBox.draw(215, 372);
-				
+				// Return
 				hoverBox.draw(210, 310);
 				pauseBox.draw(215, 312);
+				pause_RE_sel.draw(220,312);
+				
+				// Exit
+				pauseBox.draw(215, 372);
+				pause_EX_unsel.draw(217, 378);
 			}
 			if (pauseCursorPos == 1) {
+				// Return
+				pauseBox.draw(215, 312);
+				pause_RE_unsel.draw(215,313);
+				
+				// Exit
 				hoverBox.draw(210, 370);
 				pauseBox.draw(215, 372);
-				
-				pauseBox.draw(215, 312);
+				pause_EX_sel.draw(220, 376);
 			}
 			
 
