@@ -40,7 +40,9 @@ public class Global {
 	 * This is the sensitivity of the input. */
 	public static long inputReadDelayTimer = 150l;
 	public static UIBox 
-		uiBlue, uiRed, uiGreen, uiYellow, uiGrey;
+		uiBlue, uiRed, uiGreen, uiYellow, uiGrey,
+		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
+		uiTransWhite;
 	
 	private static FileWriter logFile;
 	
@@ -214,54 +216,32 @@ public class Global {
 	}
 	
 	public static void buildStandardUIBoxes() {
-		Sprite[][] box = new Sprite[3][3];
 		int[] corner = new int[] { 16, 16 };
 		Texture tex = textureMap.get("uibox");
-		int[] point = new int[2];
+		uiBlue = buildBox(tex, new int[] { 0, 0 }, corner);
+		uiRed = buildBox(tex, new int[] { 48, 0 }, corner);
+		uiGreen = buildBox(tex, new int[] { 96, 0 }, corner);
+		uiYellow = buildBox(tex, new int[] { 144, 0 }, corner);
+		uiGrey = buildBox(tex, new int[] { 192, 0 }, corner);
+		uiBlueSel = buildBox(tex, new int[] { 0, 96 }, corner);
+		uiRedSel = buildBox(tex, new int[] { 48, 96 }, corner);
+		uiGreenSel = buildBox(tex, new int[] { 96, 96 }, corner);
+		uiYellowSel = buildBox(tex, new int[] { 144, 96 }, corner);
+		
+		uiTransWhite = buildBox(tex, new int[] { 192, 48 }, corner);
+	}
+	
+	private static UIBox buildBox(Texture tex, int[] offset, int[] corner) {
+		Sprite[][] boxParts = new Sprite[3][3];
+		int[] point = new int[] { 0, 0 };
 		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16;
+			point[0] = i * corner[0] + offset[0];
 			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16 ;
-				box[i][k] = new Sprite( tex, point, corner, corner);
+				point[1] = k * corner[1] + offset[1];
+				boxParts[i][k] = new Sprite( tex, point, corner, corner);
 			}
 		}
-		uiBlue = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 48;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiRed = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 96;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiGreen = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 144;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiYellow = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 192;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiGrey = new UIBox(box, corner);
+		return new UIBox(boxParts, corner);
 	}
 	
 	public static void globalFinalize() {

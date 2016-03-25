@@ -23,23 +23,23 @@ public class UIBox {
 		int[] xy = new int[2];
 		for (int i = 0; i < 3; i++) {
 			for (int k = 0; k < 3; k++) {
-				if (i == 0) { 
+				if (i == 0) { // left edge
 					xy[0] = xc; 
 					drawSpace[0] = edge[0];
-				} else if (i == 1) {
+				} else if (i == 1) { // center horizontal
 					xy[0] = xc + edge[0];
-					drawSpace[0] = width - (2 * (edge[0] - 1)); 
-				} else { 
+					drawSpace[0] = width - (2 * (edge[0])); 
+				} else { // right edge
 					xy[0] = xc + width - edge[0];
 					drawSpace[0] = edge[0]; 
 				}
-				if (k == 0) {
+				if (k == 0) { // top edge
 					xy[1] = yc;
 					drawSpace[1] = edge[1];
-				} else if (k == 1) { 
+				} else if (k == 1) { // center vertical
 					xy[1] = yc + edge[1];
-					drawSpace[1] = height - (2 * (edge[1] - 1)); 
-				} else {
+					drawSpace[1] = height - (2 * (edge[1])); 
+				} else { // bottom edge
 					xy[1] = yc + height - edge[1];
 					drawSpace[1] = edge[1];
 				}

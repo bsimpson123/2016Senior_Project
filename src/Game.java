@@ -382,7 +382,7 @@ public class Game {
 					Global.sounds.playSoundEffect("button_click");
 					
 					if (cursorPos < 0) {
-						cursorPos = 2;
+						cursorPos = 3;
 					}
 					movementInputDelay = Global.inputReadDelayTimer;
 				}
@@ -390,23 +390,28 @@ public class Game {
 					cursorPos++;
 					Global.sounds.playSoundEffect("button_click");
 
-					if (cursorPos > 2) {
+					if (cursorPos > 3) {
 						cursorPos = 0;
 					}
 					movementInputDelay = Global.inputReadDelayTimer;
 				}
 				if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
-					cursorPos = 2;
+					cursorPos = 3;
 				}
 	
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
-					case 0:
-					case 1:
+					case 0: // Game play
 						game = new BlockBreakStandard();
 						activeGameMode = GameModeSelection;
 						break;
-					case 2:
+					case 1: // Config
+						
+						break;
+					case 2: // Credits
+						
+						break;
+					case 3:
 						gameRunning = false;
 						break;
 				}
@@ -422,15 +427,16 @@ public class Game {
 			optionFrameBottom.draw(400, 670);
 			
 			// Draw the option boxes
-			optionBox.draw(430, 380);
-			optionBox.draw(430, 450);
-			optionBox.draw(430, 520);
+			//optionBox.draw(430, 380);
+			//optionBox.draw(430, 450);
+			//optionBox.draw(430, 520);
+			for (int i = 0; i < 4; i++) {
+				Global.uiGreen.draw(430, 380 + i * 70, 190, 48);
+			}
+			//Global.uiYellowSel.draw(430, cursorPos * 70 + 380, 190, 48);
 			
 			selector[0].draw(410, 387 + cursorPos * 70);
 			selector[1].draw(600, 387 + cursorPos * 70);
-			//selector[0].draw(new int[] { mouseX, mouseY }, new int[] { 64, 64 });
-			//Global.uiBlue.draw(mouseX, mouseY, 240, 48);
-
 			break;
 		default:
 			switch(game.getState()) { 
