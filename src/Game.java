@@ -11,10 +11,13 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.input.Controller;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.openal.SoundStore;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 /**
@@ -184,6 +187,9 @@ public class Game {
 			glDisable(GL_LIGHTING);
 			glDisable(GL_FOG);
 			glDisable(GL_CULL_FACE);
+			glEnable(GL_SMOOTH);
+	        glShadeModel(GL11.GL_SMOOTH);
+
 			// clear the screen
 			glClearColor(0f, 0f, 0f, 0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -433,10 +439,18 @@ public class Game {
 			for (int i = 0; i < 4; i++) {
 				Global.uiGreen.draw(430, 380 + i * 70, 190, 48);
 			}
-			//Global.uiYellowSel.draw(430, cursorPos * 70 + 380, 190, 48);
 			
 			selector[0].draw(410, 387 + cursorPos * 70);
 			selector[1].draw(600, 387 + cursorPos * 70);
+			//Global.uiYellowSel.draw(430, cursorPos * 70 + 380, 190, 48);
+			Color.white.bind();
+			/*Global.font.drawString(430, 380, "Block Break Standard", Color.black);
+			Global.font.drawString(430, 450, "Configuration", Color.blue);
+			Global.font.drawString(430, 520, "Credits", Color.red);
+			Global.font.drawString(430, 590, "Quit", Color.green); //*/
+			Global.drawStringDefaultFont(430, 380, "Block Break Standard", Color.black);
+
+			
 			break;
 		default:
 			switch(game.getState()) { 
@@ -473,7 +487,6 @@ public class Game {
 		if ( Display.isCloseRequested() ) {
 			gameRunning = false; // indicate that the game is no longer running
 		}
-		
 	}
 	
 	public Game(boolean runFullscreen) {

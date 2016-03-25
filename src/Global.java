@@ -1,15 +1,16 @@
 import java.util.Random;
-
+import java.awt.Font;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Controller;
-import org.lwjgl.input.Controllers;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.*;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureImpl;
 
 /* 
  * When adding variables and functions to this class, remember to always mark them
@@ -43,6 +44,8 @@ public class Global {
 		uiBlue, uiRed, uiGreen, uiYellow, uiGrey,
 		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
 		uiTransWhite;
+	
+    private static TrueTypeFont font;
 	
 	private static FileWriter logFile;
 	
@@ -211,8 +214,15 @@ public class Global {
 	public static void globalInit() {
 		initLog();
 		buildControllers();
+		initFonts();
 		
-		
+	}
+	
+	private static void initFonts() {
+		TextureImpl.bindNone();
+        Font awtFont = new Font("Times New Roman", Font.BOLD, 24);
+        font = new TrueTypeFont(awtFont, true);
+
 	}
 	
 	public static void buildStandardUIBoxes() {
@@ -251,5 +261,12 @@ public class Global {
 		}
 		Global.textureMap.clear();
 
+	}
+	
+	public static void drawStringDefaultFont(int xc, int yc, String text, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		font.drawString(xc, yc, text, color);
+		font.drawString(0, 0, " ", Color.white);
 	}
 }
