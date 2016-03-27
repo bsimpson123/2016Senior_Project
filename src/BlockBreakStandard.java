@@ -69,7 +69,6 @@ public class BlockBreakStandard implements GameMode {
 	private int pracLevel = 1;
 	private int pracMax = 5;
 	 
-	
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
 		// do not load assets at this point
@@ -295,6 +294,12 @@ public class BlockBreakStandard implements GameMode {
 				}
 				
 			}
+		} else if (showHighScore) {
+			showHighScores();
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				movementInputDelay = 2 * Global.inputReadDelayTimer;
+				showHighScore = false;
+			}
 		} else {
 // @author Brock
 			GameSelector_background.draw(0, 0);
@@ -464,10 +469,7 @@ public class BlockBreakStandard implements GameMode {
 						//selectPractice = true;
 						break;
 					case 2: // high score
-						//game = 
-						//pageBack = true;
-						//activeGameMode = MainMenu;
-						//gameRunning = false;
+						showHighScore = true;
 						break;
 					case 3: // exit
 					default:
@@ -533,6 +535,22 @@ public class BlockBreakStandard implements GameMode {
 		BlockStandardLevel.numbers[pracLevel].draw(525, 255);
 		pracArrows[0].draw(470, 250);
 		pracArrows[1].draw(550, 250);
+	}
+	
+	// TODO: move high score vars to top after finished implementation
+	private boolean showHighScore = false;
+	private final int hsBarSpace = 10;
+	private final int hsBarHeight = 64;
+	private final int hsMargin = 30;
+
+	private void showHighScores() {
+		int drawWidth = 1024 - 2 * hsMargin;
+		int interval = hsBarHeight + hsBarSpace;
+		int firstDrop = 100;
+		for (int i = 0; i < 7; i++) {
+			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
+		}
+
 	}
 	
 }
