@@ -120,11 +120,7 @@ public class BlockStandardLevel04 extends BlockStandardLevel {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
 				r = Global.rand.nextInt(10000);
-				if (r > 20) { 
-					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(5));
-				} else {
-					b = new Block(Block.BlockType.BLOCK, 6);
-				}
+				b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
 				grid[i].blocks[k] = b;
 			}
 		}
@@ -138,11 +134,8 @@ public class BlockStandardLevel04 extends BlockStandardLevel {
 
 	@Override
 	protected Block getQueueBlock() {
-		Block b = null;
 		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(5));
-
-		return b;		
+		return new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
 	}
 
 	@Override

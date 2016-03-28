@@ -1,5 +1,8 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -518,39 +521,61 @@ public class BlockBreakStandard implements GameMode {
 			pracLevel++;
 			if (pracLevel > pracMax) { pracLevel = 1; }
 			movementInputDelay = Global.inputReadDelayTimer;
-		} /* else if (Global.getControlActive(Global.GameControl.SELECT)) {
-			loadLevel(pracLevel);
-			playLevel.practice = true;
-			movementInputDelay = Global.inputReadDelayTimer;
-		} else if (Global.getControlActive(Global.GameControl.CANCEL)) {
-			selectPractice = false;
-			movementInputDelay = 2 * Global.inputReadDelayTimer;
-			return;
-		} //*/
-		
+		} 		
 	}
 
 	private void drawPracticeSelect() {
 		pracBox.draw(510, 250);
 		BlockStandardLevel.numbers[pracLevel].draw(525, 255);
-		pracArrows[0].draw(470, 250);
-		pracArrows[1].draw(550, 250);
+		pracArrows[0].draw(470, 248);
+		pracArrows[1].draw(550, 248);
 	}
 	
 	// TODO: move high score vars to top after finished implementation
 	private boolean showHighScore = false;
 	private final int hsBarSpace = 10;
-	private final int hsBarHeight = 64;
+	private final int hsBarHeight = 48;
 	private final int hsMargin = 30;
+	private List<HighScoreRecord> hsRecords = new ArrayList<HighScoreRecord>(10);
 
 	private void showHighScores() {
 		int drawWidth = 1024 - 2 * hsMargin;
 		int interval = hsBarHeight + hsBarSpace;
 		int firstDrop = 100;
-		for (int i = 0; i < 7; i++) {
+		int limit = 10;
+		org.newdawn.slick.Color 
+			boxColor = org.newdawn.slick.Color.cyan,
+			textColor = org.newdawn.slick.Color.black,
+			resetColor = org.newdawn.slick.Color.white;
+		
+		for (int i = 0; i < limit; i++) {
+			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
+			resetColor.bind();
+			Global.drawStringDefaultFont(hsMargin + 10, firstDrop + i * interval + 10, "High Score Name", textColor);
+			Global.drawStringDefaultFont(hsMargin + 580, firstDrop + i * interval + 10, "01234567890123", textColor);
+			Global.drawStringDefaultFont(hsMargin + 780, firstDrop + i * interval + 10, "00/00/2016", textColor);
+			Global.drawStringDefaultFont(hsMargin + 920, firstDrop + i * interval + 10, "01", textColor);
+			
+			
 		}
-
+		org.newdawn.slick.Color.white.bind();
+	}
+	
+	/**
+	 * Load custom values and high scores from file. Loads default values for
+	 * high scores if data is not present or corrupted.
+	 */
+	private void loadPrefs() {
+		BufferedReader prefFile;
+		hsRecords.clear();
+	}
+	
+	/** 
+	 * Saves custom values and high scores to file.
+	 */
+	private void savePrefs() {
+		
 	}
 	
 }

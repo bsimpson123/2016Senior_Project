@@ -220,7 +220,7 @@ public class Global {
 	
 	private static void initFonts() {
 		TextureImpl.bindNone();
-        Font awtFont = new Font("Times New Roman", Font.BOLD, 24);
+        Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
         font = new TrueTypeFont(awtFont, true);
 
 	}
@@ -268,5 +268,9 @@ public class Global {
 		Color.white.bind();
 		font.drawString(xc, yc, text, color);
 		font.drawString(0, 0, " ", Color.white);
+	}
+	
+	public static int getDrawSize(String text) {
+		return font.getWidth(text);
 	}
 }

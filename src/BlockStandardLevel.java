@@ -41,13 +41,14 @@ public abstract class BlockStandardLevel {
 	private long gridShiftActionDelay = shiftActionDelayTimer;
 	// grid queue variables
 	protected Block[] queue;
+	/** Sets the timer between each queue shift. Lower values will cause the queue to move faster. */
 	private long queueStepDelayTimer = 500l;
 	private long queueStepDelay = queueStepDelayTimer;
 	private int queueStepReq = 4;
 	private int queueStepCount = 0;
 	private int queueCount = 0;
 	private int queueLimit = 5;
-	private long queueManualShiftDelayTimer = 250l;
+	private final long queueManualShiftDelayTimer = 250l;
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
 	
@@ -63,11 +64,20 @@ public abstract class BlockStandardLevel {
 	/** Used to contain removed block counts for grid clears. */
 	protected int counter = 0;
 
+	/** Indicates if the level is over and should no longer be called. 
+	 * Set to <code>true</code> to advance the level or return to the game mode screen. */
 	protected boolean levelFinished = false;
+	/** Indicates if the finished level was completed successfully. 
+	 * A <code>true</code> value will not allow the next level to load. */
 	protected boolean gameOver = false;
+	/** Indicates if the game play for the level is completed. If <code>true</code>
+	 * the level is over, but the game is not ready to advance to the next level. */
 	protected boolean levelComplete = false;
+	/** Indicates whether or not the level is a practice level. Levels played in practice mode will not
+	 * cause further level advancement or allow for high score recording when competed. */
 	protected boolean practice = false;
 	
+	/** Indicates whether or not the input has been delayed for end of level detection. */
 	private boolean endLevelDelayed = false;
 	
 	private Sprite optionFrameMid = new Sprite(
