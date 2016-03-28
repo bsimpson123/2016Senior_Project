@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -16,7 +18,6 @@ public class BlockBreakStandard implements GameMode {
 	private BlockStandardLevel playLevel;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
-	protected Sprite cursor;
 	protected int[] blockOffSet = new int[] { 32, 32 };
 	private long movementInputDelay = Global.inputReadDelayTimer;
 	private long actionDelay = Global.inputReadDelayTimer;
@@ -36,7 +37,8 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "ex_game_screen", "media/game_screen.png"},
 		new String[] { "Text", "media/Mode_Text.png"},
 		new String[] { "white_ui_controls" , "media/sheet_white2x.png" },
-		new String[] { "new_test", "media/image1.png"}
+		new String[] { "new_test", "media/image1.png"},
+		new String[] { "bigsky", "media/bigsky_cedf10.png" }
 	};
 	
 	private final int GameModeSelection = 0,
@@ -213,13 +215,12 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 1024, 768 },
 				new int[] { 1024, 768 }
 			);		
-		cursor = new Sprite(
+		BlockStandardLevel.cursor = new Sprite(
 				Global.textureMap.get("blocksheet"),
 				new int[] { 240, 0 },
 				new int[] { 32, 32 },
 				blockOffSet
 			);
-		BlockStandardLevel.cursor = cursor;
 		BlockStandardLevel.shiftLR[0] = new Sprite( // left indicator
 				localTexMap.get("white_ui_controls"),
 				new int[] { 300, 600 },
@@ -267,6 +268,8 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 100, 100 },
 				new int[] { 50, 50 }
 			);
+		
+		hsBack = localTexMap.get("bigsky");
 		// Update mode state when asset loading is completed
 		currentState = LoadState.LOADING_DONE;
 		return;
@@ -537,12 +540,48 @@ public class BlockBreakStandard implements GameMode {
 	private final int hsBarHeight = 48;
 	private final int hsMargin = 30;
 	private List<HighScoreRecord> hsRecords = new ArrayList<HighScoreRecord>(10);
+	private Texture hsBack;
+	private int[] hsBackShift = new int[] { 1, 0 };
+	private float[] hsBackDraw = new float[] { 1024 / 4096f, 768 / 1024f };
 
 	private void showHighScores() {
 		int drawWidth = 1024 - 2 * hsMargin;
 		int interval = hsBarHeight + hsBarSpace;
 		int firstDrop = 100;
 		int limit = 10;
+		
+		if (hsBackShift[0] == 1) {
+			hsBackShift[1] += Global.delta >> 3;
+			if (hsBackShift[1] > 3072) {
+				hsBackShift[1] = 3072;
+				hsBackShift[0] = -1;
+			}
+		} else {
+			hsBackShift[1] -= Global.delta >> 2;
+			if (hsBackShift[1] < 0) {
+				hsBackShift[1] = 0;
+				hsBackShift[0] = 1;
+			}
+		}
+		
+		float left = hsBackShift[1] / 4096f;
+		hsBack.bind();
+		glBegin(GL_QUADS); {
+			glTexCoord2f(left, 0f);
+			glVertex2i(0, 0);
+			
+			glTexCoord2f(left, hsBackDraw[1]);
+			glVertex2i(0, 768);
+			
+			glTexCoord2f(left + hsBackDraw[0], hsBackDraw[1]);
+			glVertex2i(1024, 768);
+			
+			glTexCoord2f(left + hsBackDraw[0], 0f);
+			glVertex2i(1024, 0);
+
+		} glEnd();
+		TextureImpl.bindNone();
+		
 		org.newdawn.slick.Color 
 			boxColor = org.newdawn.slick.Color.cyan,
 			textColor = org.newdawn.slick.Color.black,
