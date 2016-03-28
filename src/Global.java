@@ -221,6 +221,8 @@ public class Global {
 	private static void initFonts() {
 		TextureImpl.bindNone();
         Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
+		//Font awtFont = new Font("Lucida Handwriting", Font.BOLD, 20);
+		//Font awtFont = new Font("Lucida Calligraphy", Font.BOLD, 20);
         font = new TrueTypeFont(awtFont, true);
 
 	}

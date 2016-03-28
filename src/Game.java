@@ -116,6 +116,18 @@ public class Game {
 	private Sprite menu_background;
 	private Sprite title;
 	
+	private final String[] menuOptions = new String[] {
+		"Options",
+		"Credits",
+		"Exit"
+	};
+	private int[] menuOptionOffset = new int[3];
+	
+	private final String[] modeOptions = new String[] {
+		"Standard Mode"
+	};
+	private int[] modeOptionOffset = new int[1];
+	
 	private long mouseDelay = Global.inputReadDelayTimer;
 	private Thread gameModeLoader = null;
 	
@@ -331,6 +343,13 @@ public class Game {
 			}
 		}
 		
+		for (int i = 0; i < menuOptions.length; i++) {
+			menuOptionOffset[i] = Global.getDrawSize(menuOptions[i]) / 2;
+		}
+		for (int i = 0; i < modeOptions.length; i++) {
+			modeOptionOffset[i] = Global.getDrawSize(modeOptions[i]) / 2;
+		}
+		
 		// TODO: add static class initializers
 		Block.initializeBlocks(Global.textureMap);
 	}
@@ -440,15 +459,26 @@ public class Game {
 				Global.uiGreen.draw(430, 380 + i * 70, 190, 48);
 			}
 			
-			selector[0].draw(410, 387 + cursorPos * 70);
-			selector[1].draw(600, 387 + cursorPos * 70);
+			//selector[0].draw(410, 387 + cursorPos * 70);
+			//selector[1].draw(600, 387 + cursorPos * 70);
 			//Global.uiYellowSel.draw(430, cursorPos * 70 + 380, 190, 48);
 			Color.white.bind();
-			/*Global.font.drawString(430, 380, "Block Break Standard", Color.black);
-			Global.font.drawString(430, 450, "Configuration", Color.blue);
-			Global.font.drawString(430, 520, "Credits", Color.red);
-			Global.font.drawString(430, 590, "Quit", Color.green); //*/
-			Global.drawStringDefaultFont(430, 380, "Block Break Standard", Color.black);
+			//Global.drawStringDefaultFont(430, 380, "Standard Mode", Color.black);
+			if (cursorPos == 0) {
+				Global.drawStringDefaultFont(525 - modeOptionOffset[0], 393, modeOptions[0], Color.white);
+				//selector[1].draw(390, 387 + cursorPos * 70);
+				//selector[0].draw(620, 387 + cursorPos * 70);
+
+			} else {
+				Global.drawStringDefaultFont(525 - modeOptionOffset[0], 393, modeOptions[0], Color.black);
+			}
+			for (int i = 0; i < 3; i++) {
+				if (cursorPos == (i + 1)) {
+					Global.drawStringDefaultFont(525 - menuOptionOffset[i], 463 + i * 70, menuOptions[i], Color.white);
+				} else {
+					Global.drawStringDefaultFont(525 - menuOptionOffset[i], 463 + i * 70, menuOptions[i], Color.black);
+				}
+			}
 
 			
 			break;
