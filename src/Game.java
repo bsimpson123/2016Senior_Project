@@ -465,18 +465,18 @@ public class Game {
 			Color.white.bind();
 			//Global.drawStringDefaultFont(430, 380, "Standard Mode", Color.black);
 			if (cursorPos == 0) {
-				Global.drawStringDefaultFont(525 - modeOptionOffset[0], 393, modeOptions[0], Color.white);
+				Global.drawFont24(525 - modeOptionOffset[0], 393, modeOptions[0], Color.white);
 				//selector[1].draw(390, 387 + cursorPos * 70);
 				//selector[0].draw(620, 387 + cursorPos * 70);
 
 			} else {
-				Global.drawStringDefaultFont(525 - modeOptionOffset[0], 393, modeOptions[0], Color.black);
+				Global.drawFont24(525 - modeOptionOffset[0], 393, modeOptions[0], Color.black);
 			}
 			for (int i = 0; i < 3; i++) {
 				if (cursorPos == (i + 1)) {
-					Global.drawStringDefaultFont(525 - menuOptionOffset[i], 463 + i * 70, menuOptions[i], Color.white);
+					Global.drawFont24(525 - menuOptionOffset[i], 463 + i * 70, menuOptions[i], Color.white);
 				} else {
-					Global.drawStringDefaultFont(525 - menuOptionOffset[i], 463 + i * 70, menuOptions[i], Color.black);
+					Global.drawFont24(525 - menuOptionOffset[i], 463 + i * 70, menuOptions[i], Color.black);
 				}
 			}
 

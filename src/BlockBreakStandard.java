@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
+
+import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -67,6 +69,13 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite label_select[];
 	private Sprite button_select[];
 	private Sprite ex_screen;
+	private final String[] menuOptions = new String[] {
+		"Play",
+		"Practice",
+		"High Score",
+		"Back"
+	};
+	private int[] menuOptionOffset = new int[4];
 	
 	//private boolean selectPractice = false;
 	private Sprite pracBox;
@@ -77,6 +86,9 @@ public class BlockBreakStandard implements GameMode {
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
 		// do not load assets at this point
+		for (int i = 0; i < menuOptions.length; i++) {
+			menuOptionOffset[i] = Global.getDrawSize(menuOptions[i]) / 2;
+		}
 	}
 	
 	@Override
@@ -309,99 +321,16 @@ public class BlockBreakStandard implements GameMode {
 		} else {
 // @author Brock
 			GameSelector_background.draw(0, 0);
-			// TODO: remove if unnecessary
-			/*if (selectPractice) {
-				inputPracMenu();
-			} else {
-				moveCursorMain();
-			} //*/
 			moveCursorMain();
-			
-
 			optionBoxOffset = 0;
-			if (cursorPos == 0) {
-				// PLAY
-				optionBox.draw(180, 180);
-				play_select.draw(180, 180);
-
-				// PRACTICE
-				optionBox.draw(180, 250);
-				prac_unselect.draw(180, 250);
-				
-				// GAME MODE
-				optionBox.draw(180, 320);
-				gamemode_unselect.draw(180, 325);
-				
-				// BACK
-				optionBox.draw(180, 390);
-				back_unselect.draw(180, 395);
-				
-				ex_screen.draw(450, 150);
-				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
-			} 
-			if (cursorPos == 1) {
-				// PLAY
-				optionBox.draw(180, 180);
-				play_unselect.draw(180, 180);
-				
-				// PRACTICE
-				optionBox.draw(180, 250);
-				prac_select.draw(180, 250);
-				
-				// GAME MODE
-				optionBox.draw(180, 320);
-				gamemode_unselect.draw(180, 325);
-				
-				// BACK
-				optionBox.draw(180, 390);
-				back_unselect.draw(180, 395);
-				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
+			for (int i = 0; i < menuOptions.length; i++) {
+				optionBox.draw(180, 180 + i * 70);
+				if (cursorPos == i) {
+					Global.drawFont24(275 - menuOptionOffset[i], 190 + i * 70, menuOptions[i], Color.white);
+				} else {
+					Global.drawFont24(275 - menuOptionOffset[i], 190 + i * 70, menuOptions[i], Color.black);
+				}
 			}
-			if (cursorPos == 2) {
-				// PLAY
-				optionBox.draw(180, 180);
-				play_unselect.draw(180, 180);
-				
-				// PRACTICE
-				optionBox.draw(180, 250);
-				prac_unselect.draw(180, 250);
-				
-				// GAME MODE
-				optionBox.draw(180, 320);
-				gamemode_select.draw(180, 325);
-				
-				// BACK
-				optionBox.draw(180, 390);
-				back_unselect.draw(180, 395);
-				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
-			}
-			if (cursorPos == 3) {
-				// PLAY
-				optionBox.draw(180, 180);
-				play_unselect.draw(180, 180);
-				
-				// PRACTICE
-				optionBox.draw(180, 250);
-				prac_unselect.draw(180, 250);
-				
-				// GAME MODE
-				optionBox.draw(180, 320);
-				gamemode_unselect.draw(180, 325);
-				
-				// BACK
-				optionBox.draw(180, 390);
-				back_select.draw(180, 395);
-				
-				//selector[0].draw(160 + optionBoxOffset, 187 + cursorPos * 70);
-				//selector[1].draw(351 + optionBoxOffset, 187 + cursorPos * 70);
-			}
-			
 			// author John
 			if (cursorPos == 1) {
 				drawPracticeSelect();
@@ -591,10 +520,10 @@ public class BlockBreakStandard implements GameMode {
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
-			Global.drawStringDefaultFont(hsMargin + 10, firstDrop + i * interval + 10, "High Score Name", textColor);
-			Global.drawStringDefaultFont(hsMargin + 580, firstDrop + i * interval + 10, "01234567890123", textColor);
-			Global.drawStringDefaultFont(hsMargin + 780, firstDrop + i * interval + 10, "00/00/2016", textColor);
-			Global.drawStringDefaultFont(hsMargin + 920, firstDrop + i * interval + 10, "01", textColor);
+			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 10, "High Score Name", textColor);
+			Global.drawFont24(hsMargin + 580, firstDrop + i * interval + 10, "01234567890123", textColor);
+			Global.drawFont24(hsMargin + 780, firstDrop + i * interval + 10, "00/00/2016", textColor);
+			Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 10, "01", textColor);
 			
 			
 		}

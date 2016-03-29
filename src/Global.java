@@ -2,6 +2,7 @@ import java.util.Random;
 import java.awt.Font;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -11,6 +12,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
+import org.newdawn.slick.util.ResourceLoader;
 
 /* 
  * When adding variables and functions to this class, remember to always mark them
@@ -220,10 +222,20 @@ public class Global {
 	
 	private static void initFonts() {
 		TextureImpl.bindNone();
-        Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
-		//Font awtFont = new Font("Lucida Handwriting", Font.BOLD, 20);
-		//Font awtFont = new Font("Lucida Calligraphy", Font.BOLD, 20);
-        font = new TrueTypeFont(awtFont, true);
+        //Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
+        try {
+            InputStream inputStream = ResourceLoader.getResourceAsStream("media/fonts/SF Theramin Gothic.ttf");
+             
+            Font awtFont2 = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            awtFont2 = awtFont2.deriveFont(24f); // set font size
+            font = new TrueTypeFont(awtFont2, false);
+                 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   
+
+        
+        //font = new TrueTypeFont(awtFont, true);
 
 	}
 	
@@ -265,7 +277,7 @@ public class Global {
 
 	}
 	
-	public static void drawStringDefaultFont(int xc, int yc, String text, Color color) {
+	public static void drawFont24(int xc, int yc, String text, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();
 		font.drawString(xc, yc, text, color);
