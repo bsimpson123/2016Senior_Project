@@ -49,7 +49,7 @@ public class Global {
 		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
 		uiTransWhite, uiWhite;
 	
-    private static TrueTypeFont font;
+    private static TrueTypeFont font24, font48;
 	
 	private static FileWriter logFile;
 	
@@ -227,10 +227,13 @@ public class Global {
         //Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
         try {
             InputStream inputStream = ResourceLoader.getResourceAsStream("media/fonts/SF Theramin Gothic.ttf");
-             
+            
             Font awtFont2 = Font.createFont(Font.TRUETYPE_FONT, inputStream);
-            awtFont2 = awtFont2.deriveFont(24f); // set font size
-            font = new TrueTypeFont(awtFont2, false);
+            Font awtFontSized = awtFont2.deriveFont(24f); // set font size
+            font24 = new TrueTypeFont(awtFontSized, false);
+            awtFontSized = awtFont2.deriveFont(48f);
+            font48 = new TrueTypeFont(awtFontSized, false);
+            
                  
         } catch (Exception e) {
             e.printStackTrace();
@@ -282,11 +285,18 @@ public class Global {
 	public static void drawFont24(int xc, int yc, String text, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();
-		font.drawString(xc, yc, text, color);
-		font.drawString(0, 0, " ", Color.white);
+		font24.drawString(xc, yc, text, color);
+		font24.drawString(0, 0, " ", Color.white);
 	}
 	
+	public static void drawFont48(int xc, int yc, String text, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		font48.drawString(xc, yc, text, color);
+		font48.drawString(0, 0, " ", Color.white);
+	}
+
 	public static int getDrawSize(String text) {
-		return font.getWidth(text);
+		return font24.getWidth(text);
 	}
 }

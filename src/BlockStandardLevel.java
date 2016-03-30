@@ -275,7 +275,8 @@ public abstract class BlockStandardLevel {
 		Global.uiRed.draw(700, 16, 300, 56);
 		Global.uiBlue.draw(700, 72, 300, 96);
 		userInterface.draw(0,0);
-		Global.drawFont24(710, 60, levelTitle, Color.white);
+		Global.drawFont48(710, 25, levelTitle, Color.white);
+		Global.drawFont48(710, 80, "Score", Color.white);
 		int offsetX = 860;
 		int yPos = 16;
 		int[] numResize = new int[] { 30, 40 };
@@ -352,15 +353,21 @@ public abstract class BlockStandardLevel {
 		}
 	}
 	
+	private String goText = "Game Over";
+	private String goTextPrac = "Practice Over";
+	private int goTextSize;
+	private int goTextPracSize;
+	
 	private void showGameOver() {
 		overlay.draw(0, 0);
-		Color.orange.bind();
+		
+		Color.lightGray.bind();
 		Global.uiWhite.draw(256, 192, 512, 384);
 		Color.blue.bind();
 		Global.uiWhite.draw(288, 224, 192, 48);
-		Global.uiWhite.draw(288, 288, 192, 48);
+		Global.uiWhite.draw(546, 224, 192, 48);
 		Color.white.bind();
-		Global.uiWhite.draw(496, 224, 192, 192);
+		Global.uiWhite.draw(288, 288, 452, 192);
 		if (Global.getControlActive(Global.GameControl.CANCEL)) {
 			this.levelFinished = true;
 			Global.actionDelay = Global.inputReadDelayTimer;

@@ -392,7 +392,7 @@ public class BlockBreakStandard implements GameMode {
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0: // normal mode
-						playLevel = new BlockStandardLevel01(localTexMap);
+						loadLevel(1);
 						BlockStandardLevel.score = 0;
 						//activeGameMode = BlockMatchStandard;
 						break;
@@ -440,7 +440,7 @@ public class BlockBreakStandard implements GameMode {
 				return ;
 		}
 		playLevel.level = levelID;
-		playLevel.levelTitle = String.format("Level %0d", playLevel.level);
+		playLevel.levelTitle = String.format("Level %02d", playLevel.level);
 	}
 		
 	private void inputPracMenu() {
@@ -481,13 +481,13 @@ public class BlockBreakStandard implements GameMode {
 		int limit = 10;
 		
 		if (hsBackShift[0] == 1) {
-			hsBackShift[1] += Global.delta >> 3;
+			hsBackShift[1] += Global.delta >> 4;
 			if (hsBackShift[1] > 3072) {
 				hsBackShift[1] = 3072;
 				hsBackShift[0] = -1;
 			}
 		} else {
-			hsBackShift[1] -= Global.delta >> 2;
+			hsBackShift[1] -= Global.delta >> 4;
 			if (hsBackShift[1] < 0) {
 				hsBackShift[1] = 0;
 				hsBackShift[0] = 1;
@@ -522,8 +522,8 @@ public class BlockBreakStandard implements GameMode {
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
 			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 10, "High Score Name", textColor);
-			Global.drawFont24(hsMargin + 580, firstDrop + i * interval + 10, "01234567890123", textColor);
-			Global.drawFont24(hsMargin + 780, firstDrop + i * interval + 10, "00/00/2016", textColor);
+			Global.drawFont24(hsMargin + 560, firstDrop + i * interval + 10, "01234567890123", textColor);
+			Global.drawFont24(hsMargin + 770, firstDrop + i * interval + 10, "00/00/0000", textColor);
 			Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 10, "01", textColor);
 			
 			
