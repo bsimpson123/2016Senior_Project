@@ -1,5 +1,6 @@
 import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.Color;
 /**
  * This class serves as the base class for all Block Breaker Standard mode levels,
  * and defines and abstracts many of the functions that many level design simpler.
@@ -58,6 +59,7 @@ public abstract class BlockStandardLevel {
 	protected boolean gamePaused = false;
 	protected long inputDelay = 0;
 	protected long actionDelay = Global.inputReadDelayTimer * 2;
+	protected String levelTitle; 
 	protected int level = 1;
 	/** Sets sets the multiplier to apply to all score additions/subtractions. */
 	protected float levelMultiplier = 1.0f;
@@ -93,7 +95,6 @@ public abstract class BlockStandardLevel {
 			new int[] { 190, 48 }
 		);
 	
-	private long movementInputDelay = Global.inputReadDelayTimer;
 	protected int pauseCursorPos = 0;
 	
 	private Sprite pauseBox = new Sprite(
@@ -149,7 +150,7 @@ public abstract class BlockStandardLevel {
 			}
 		} else if (energy == 0) {
 			// game over
-			
+			gameOver = true;
 		}
 		
 	}
@@ -274,14 +275,10 @@ public abstract class BlockStandardLevel {
 		Global.uiRed.draw(700, 16, 300, 56);
 		Global.uiBlue.draw(700, 72, 300, 96);
 		userInterface.draw(0,0);
-		char[] lvl = Integer.toString(level).toCharArray();
+		Global.drawFont24(710, 60, levelTitle, Color.white);
 		int offsetX = 860;
 		int yPos = 16;
 		int[] numResize = new int[] { 30, 40 };
-		for (int i = 0; i < lvl.length; i++) {
-			getNumber(lvl[i]).draw(offsetX, yPos, numResize);
-			offsetX += 24;
-		}
 		drawScore();
 		Global.uiGreen.draw(680, 500, 100, 100);
 		if (gridShiftDir == 1) {
@@ -351,6 +348,22 @@ public abstract class BlockStandardLevel {
 
 		} else if (gameOver) {
 			drawGrid();
+			showGameOver();
+		}
+	}
+	
+	private void showGameOver() {
+		overlay.draw(0, 0);
+		Color.orange.bind();
+		Global.uiWhite.draw(256, 192, 512, 384);
+		Color.blue.bind();
+		Global.uiWhite.draw(288, 224, 192, 48);
+		Global.uiWhite.draw(288, 288, 192, 48);
+		Color.white.bind();
+		Global.uiWhite.draw(496, 224, 192, 192);
+		if (Global.getControlActive(Global.GameControl.CANCEL)) {
+			this.levelFinished = true;
+			Global.actionDelay = Global.inputReadDelayTimer;
 		}
 	}
 	

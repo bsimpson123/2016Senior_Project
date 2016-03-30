@@ -42,10 +42,12 @@ public class Global {
 	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
 	 * This is the sensitivity of the input. */
 	public static long inputReadDelayTimer = 150l;
+	public static long actionDelay = inputReadDelayTimer;
+	public static long movementDelay = inputReadDelayTimer;
 	public static UIBox 
 		uiBlue, uiRed, uiGreen, uiYellow, uiGrey,
 		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
-		uiTransWhite;
+		uiTransWhite, uiWhite;
 	
     private static TrueTypeFont font;
 	
@@ -251,7 +253,7 @@ public class Global {
 		uiRedSel = buildBox(tex, new int[] { 48, 96 }, corner);
 		uiGreenSel = buildBox(tex, new int[] { 96, 96 }, corner);
 		uiYellowSel = buildBox(tex, new int[] { 144, 96 }, corner);
-		
+		uiWhite = buildBox(tex, new int[] { 192, 96 }, corner);
 		uiTransWhite = buildBox(tex, new int[] { 192, 48 }, corner);
 	}
 	

@@ -437,9 +437,10 @@ public class BlockBreakStandard implements GameMode {
 				break;
 			default:
 				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
-				break;
+				return ;
 		}
 		playLevel.level = levelID;
+		playLevel.levelTitle = String.format("Level %0d", playLevel.level);
 	}
 		
 	private void inputPracMenu() {
