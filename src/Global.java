@@ -225,7 +225,7 @@ public class Global {
 	private static void initFonts() {
 		TextureImpl.bindNone();
         //Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
-		Font awtFont = new Font("Lucida Console", Font.PLAIN, 24);
+		Font awtFont = new Font("Lucida Console", Font.BOLD, 24);
 		Font awtFontSized = awtFont.deriveFont(24f);
 		numbers24 = new TrueTypeFont(awtFontSized, false);
 		awtFontSized = awtFont.deriveFont(48f);

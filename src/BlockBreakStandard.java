@@ -10,6 +10,7 @@ import java.util.zip.DataFormatException;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
@@ -77,6 +78,8 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
 	private int pracMax = 5;
+	
+	private boolean newHighScore = false;
 	 
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
@@ -299,6 +302,16 @@ public class BlockBreakStandard implements GameMode {
 					// TODO: selectPractice = false;
 					playLevel = null;
 					movementInputDelay = Global.inputReadDelayTimer;
+					if (!playLevel.practice) {
+						for (int i = 9; i >= 0; i--) {
+							if (hsRecords.get(i).getScore() < BlockStandardLevel.score) {
+								newHighScore = true;
+								showHighScore = true;
+								playLevel = null;
+								break;
+							}
+						}
+					}
 				} else {
 					// load next level
 					// TODO: add test for at last level and return to menu
@@ -308,10 +321,25 @@ public class BlockBreakStandard implements GameMode {
 			}
 		} else if (showHighScore) {
 			showHighScores();
-			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+			String strArray = "";
+			if (newHighScore) {
+				// TODO: get high score user data
+				char c = Keyboard.getEventCharacter();
+				if (Character.isLetter(c)) {
+					strArray += Character.toUpperCase(c);
+				} else if (Character.isSpaceChar(c)) {
+					strArray += ' ';
+				}
+				Global.drawFont24(500, 400, strArray, Color.white);
+				
+				
+				
+				
+			} else if (Global.getControlActive(Global.GameControl.CANCEL)) {
 				movementInputDelay = 2 * Global.inputReadDelayTimer;
 				showHighScore = false;
 			}
+			
 		} else {
 // @author Brock
 			GameSelector_background.draw(0, 0);
@@ -323,6 +351,17 @@ public class BlockBreakStandard implements GameMode {
 				} else {
 					Global.drawFont24(275 - menuOptionOffset[i], 190 + i * 70, menuOptions[i], Color.black);
 				}
+			}
+			switch (cursorPos) {
+				case 0:
+					ex_screen.draw(450, 150);
+					break;
+				case 1:
+					// TODO: add practice mode preview
+					break;
+				case 2: 
+					// TODO: add high score screen preview
+					break;
 			}
 			// author John
 			if (cursorPos == 1) {
