@@ -92,7 +92,7 @@ public class BlockBreakStandard implements GameMode {
 			menuOptionOffset[i] = Global.getDrawSize(menuOptions[i]) / 2;
 		}
 		for (int i = 0; i < 10; i++) {
-			hsRecords.add(HighScoreRecord.getEmptyRecord());
+			hsRecords.add(HighScoreRecord.getNewEmptyRecord());
 		}
 	}
 	
@@ -339,7 +339,9 @@ public class BlockBreakStandard implements GameMode {
 						)
 					);
 					Collections.sort(hsRecords);
-					hsRecords.remove(hsRecords.size() - 1);
+					while (hsRecords.size() > 10) {
+						hsRecords.remove(10);
+					}
 					newHighScore = false;
 				} else if (Keyboard.isKeyDown(Keyboard.KEY_BACK)) {
 					if (hsNameEntry.length() > 0) {
@@ -359,13 +361,11 @@ public class BlockBreakStandard implements GameMode {
 					}
 				}
 				Global.uiBlue.draw(256, 256, 512, 376);
-				Global.uiBlueSel.draw(276, 276, 472, 48);
-				
-				
-				Global.drawFont24(282, 292, hsNameEntry + '_', Color.black);
-				
-				
-				
+				Global.drawFont24(276, 276, "Level: " + Integer.toString(lastLevel), Color.white);
+				Global.drawFont24(276, 310, "Score:", Color.white);
+				Global.drawFont24(276, 334, Integer.toString(BlockStandardLevel.score), Color.white);
+				Global.uiBlueSel.draw(276, 360, 472, 48);
+				Global.drawFont24(282, 386, hsNameEntry + '_', Color.black);
 				
 			} else if (movementInputDelay <= 0 && Global.getControlActive(Global.GameControl.CANCEL)) {
 				movementInputDelay = 2 * Global.inputReadDelayTimer;
@@ -624,10 +624,10 @@ public class BlockBreakStandard implements GameMode {
 			} else if (line.compareToIgnoreCase("[HighScore]") == 0) {
 				int i = 0;
 				try {
+
 					line = prefFile.readLine();
-					for (i = 0; i < 10 && line != null; i++) {
-						hsr = HighScoreRecord.getEmptyRecord();
-						
+					while (line != null) {
+						hsr = HighScoreRecord.getNewEmptyRecord();
 						hsr.readRecord(line);
 						hsRecords.add(hsr);
 						line = prefFile.readLine();
@@ -636,7 +636,6 @@ public class BlockBreakStandard implements GameMode {
 					
 				}
 			}
-			
 			prefFile.close();
 		} catch (IOException err) {
 			
@@ -661,9 +660,6 @@ public class BlockBreakStandard implements GameMode {
 				prefFile.write(hsr.toString());
 				prefFile.newLine();
 			}
-			
-			
-			
 			prefFile.close();
 		} catch (IOException e) {
 			Global.writeToLog("Error opening Standard mode preferences file for writing.", true);

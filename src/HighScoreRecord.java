@@ -21,7 +21,7 @@ public final class HighScoreRecord implements Comparable<HighScoreRecord> {
 		level = "0";
 	}
 	
-	public static HighScoreRecord getEmptyRecord() { return new HighScoreRecord(); }
+	public static HighScoreRecord getNewEmptyRecord() { return new HighScoreRecord(); }
 	
 	public String getName() { return name; }
 	public String getDate() { return date; }
@@ -42,7 +42,7 @@ public final class HighScoreRecord implements Comparable<HighScoreRecord> {
 	
 	@Override
 	public String toString(){
-		return String.format("%s,%s,%d,%s\n", name, date, score, level);
+		return String.format("%s,%s,%d,%s", name, date, score, level);
 	}
 	
 	public void readRecord(String recordData) throws DataFormatException {
