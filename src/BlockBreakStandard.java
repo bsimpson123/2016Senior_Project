@@ -505,10 +505,10 @@ public class BlockBreakStandard implements GameMode {
 		} glEnd();
 		TextureImpl.bindNone();
 		
-		org.newdawn.slick.Color 
-			boxColor = org.newdawn.slick.Color.cyan,
-			textColor = org.newdawn.slick.Color.black,
-			resetColor = org.newdawn.slick.Color.white;
+		Color 
+			boxColor = Color.cyan,
+			textColor = Color.black,
+			resetColor = Color.white;
 		
 		Global.drawFont48(512 - 98, 25, "High Score", Color.white);
 		
@@ -516,14 +516,16 @@ public class BlockBreakStandard implements GameMode {
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
-			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 10, "High Score Name", textColor);
-			Global.drawFont24(hsMargin + 560, firstDrop + i * interval + 10, "01234567890123", textColor);
-			Global.drawFont24(hsMargin + 770, firstDrop + i * interval + 10, "00/00/0000", textColor);
-			Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 10, "01", textColor);
+			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "High Score Name", textColor);
+			//Global.drawFont24(hsMargin + 560, firstDrop + i * interval + 15, "01234567890123", textColor);
+			Global.drawNumbers24(hsMargin + 560, firstDrop + i * interval + 15, "01234567890123", textColor);
+			//Global.drawFont24(hsMargin + 770, firstDrop + i * interval + 15, "00/00/0000", textColor);
+			Global.drawNumbers24(hsMargin + 770, firstDrop + i * interval + 15, "00/00/0000", textColor);
+			Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 15, "01", textColor);
 			
 			
 		}
-		org.newdawn.slick.Color.white.bind();
+		Color.white.bind();
 	}
 	
 	/**

@@ -49,7 +49,7 @@ public class Global {
 		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
 		uiTransWhite, uiWhite;
 	
-    private static TrueTypeFont font24, font48;
+    private static TrueTypeFont font24, font48, numbers24, numbers48;
 	
 	private static FileWriter logFile;
 	
@@ -225,13 +225,18 @@ public class Global {
 	private static void initFonts() {
 		TextureImpl.bindNone();
         //Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
+		Font awtFont = new Font("Lucida Console", Font.PLAIN, 24);
+		Font awtFontSized = awtFont.deriveFont(24f);
+		numbers24 = new TrueTypeFont(awtFontSized, false);
+		awtFontSized = awtFont.deriveFont(48f);
+		numbers48 = new TrueTypeFont(awtFontSized, false);
         try {
             InputStream inputStream = ResourceLoader.getResourceAsStream("media/fonts/SF Theramin Gothic.ttf");
             
-            Font awtFont2 = Font.createFont(Font.TRUETYPE_FONT, inputStream);
-            Font awtFontSized = awtFont2.deriveFont(24f); // set font size
+            awtFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            awtFontSized = awtFont.deriveFont(24f); // set font size
             font24 = new TrueTypeFont(awtFontSized, false);
-            awtFontSized = awtFont2.deriveFont(48f);
+            awtFontSized = awtFont.deriveFont(48f);
             font48 = new TrueTypeFont(awtFontSized, false);
             
                  
@@ -286,16 +291,23 @@ public class Global {
 		TextureImpl.bindNone();
 		Color.white.bind();
 		font24.drawString(xc, yc, text, color);
-		font24.drawString(0, 0, " ", Color.white);
+		font24.drawString(0, 0, "", Color.white);
 	}
 	
 	public static void drawFont48(int xc, int yc, String text, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();
 		font48.drawString(xc, yc, text, color);
-		font48.drawString(0, 0, " ", Color.white);
+		font48.drawString(0, 0, "", Color.white);
 	}
 
+	public static void drawNumbers24(int xc, int yc, String numbers, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		numbers24.drawString(xc, yc, numbers, color);
+		numbers24.drawString(0, -1, "", Color.white);
+	}
+	
 	public static int getDrawSize(String text) {
 		return font24.getWidth(text);
 	}
