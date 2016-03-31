@@ -80,7 +80,8 @@ public class BlockBreakStandard implements GameMode {
 	private int pracMax = 5;
 	
 	private boolean newHighScore = false;
-	 
+	private String hsNameEntry = "";
+	
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
 		// do not load assets at this point
@@ -300,18 +301,19 @@ public class BlockBreakStandard implements GameMode {
 			if (playLevel.levelFinished) {
 				if (playLevel.gameOver || playLevel.practice) {
 					// TODO: selectPractice = false;
-					playLevel = null;
 					movementInputDelay = Global.inputReadDelayTimer;
 					if (!playLevel.practice) {
 						for (int i = 9; i >= 0; i--) {
 							if (hsRecords.get(i).getScore() < BlockStandardLevel.score) {
 								newHighScore = true;
 								showHighScore = true;
-								playLevel = null;
+								hsNameEntry = "";
+								while(Keyboard.next()) {  }
 								break;
 							}
 						}
 					}
+					playLevel = null;
 				} else {
 					// load next level
 					// TODO: add test for at last level and return to menu
@@ -321,16 +323,17 @@ public class BlockBreakStandard implements GameMode {
 			}
 		} else if (showHighScore) {
 			showHighScores();
-			String strArray = "";
 			if (newHighScore) {
 				// TODO: get high score user data
-				char c = Keyboard.getEventCharacter();
-				if (Character.isLetter(c)) {
-					strArray += Character.toUpperCase(c);
-				} else if (Character.isSpaceChar(c)) {
-					strArray += ' ';
+				while (Keyboard.next()) {
+					char c = Keyboard.getEventCharacter();
+					if (Character.isLetter(c)) {
+						hsNameEntry += Character.toUpperCase(c);
+					} else if (Character.isSpaceChar(c)) {
+						hsNameEntry += ' ';
+					}
 				}
-				Global.drawFont24(500, 400, strArray, Color.white);
+				Global.drawFont24(500, 400, hsNameEntry, Color.white);
 				
 				
 				
