@@ -330,7 +330,7 @@ public abstract class BlockStandardLevel {
 			pauseControls();
 
 			overlay.draw(0, 0);
-			optionFrameMid.draw(412, 250);
+			optionFrameMid.draw(180, 250);
 			for (int i = 0; i < pauseOptions.length; i++) {
 				pauseOptionSize[i] = Global.getDrawSize(pauseOptions[i]) / 2;
 			}
