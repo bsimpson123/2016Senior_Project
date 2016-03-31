@@ -1,6 +1,3 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.zip.DataFormatException;
 
@@ -34,8 +31,8 @@ public final class HighScoreRecord implements Comparable<HighScoreRecord> {
 
 	@Override
 	public int compareTo(HighScoreRecord record) {
-		if (score > record.score) { return 1; }
-		else if (score < record.score) { return -1; }
+		if (score < record.score) { return 1; }
+		else if (score > record.score) { return -1; }
 		// scores equal, check dates
 		int dateComp = date.compareTo(record.date);
 		if (dateComp != 0) { return dateComp; }
@@ -43,15 +40,15 @@ public final class HighScoreRecord implements Comparable<HighScoreRecord> {
 		return name.compareTo(record.name);
 	}
 	
-	public void writeRecord(BufferedWriter outStream) throws IOException {
-		outStream.write(String.format("%s,%s,%d,%d\n", name, date, score, level));
+	@Override
+	public String toString(){
+		return String.format("%s,%s,%d,%s\n", name, date, score, level);
 	}
 	
-	public void readRecord(BufferedReader inStream) throws IOException,DataFormatException {
+	public void readRecord(String recordData) throws DataFormatException {
 		String[] arrData;
 		int value;
-		String raw = inStream.readLine();
-		arrData = raw.split(",");
+		arrData = recordData.split(",");
 		if (arrData.length != 4) {
 			throw new DataFormatException("Invalid high score stream data.");
 		}
@@ -63,6 +60,7 @@ public final class HighScoreRecord implements Comparable<HighScoreRecord> {
 			throw new DataFormatException("Unparsable score in high score stream data.");
 		}
 		score = value;
+		sScore = arrData[2];
 		level = arrData[3];
 	}
 }

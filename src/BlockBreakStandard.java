@@ -3,7 +3,9 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.zip.DataFormatException;
@@ -78,6 +80,7 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
 	private int pracMax = 5;
+	private int lastLevel = 1;
 	
 	private boolean newHighScore = false;
 	private String hsNameEntry = "";
@@ -281,7 +284,7 @@ public class BlockBreakStandard implements GameMode {
 		// Update mode state when asset loading is completed
 		currentState = LoadState.LOADING_DONE;
 		
-		//loadPrefs();
+		loadPrefs();
 		return;
 	}
 
@@ -297,8 +300,9 @@ public class BlockBreakStandard implements GameMode {
 
 		
 		if (playLevel != null) {
-			playLevel.run();
-			if (playLevel.levelFinished) {
+			if (!playLevel.levelFinished) {
+				playLevel.run();
+			} else {
 				if (playLevel.gameOver || playLevel.practice) {
 					// TODO: selectPractice = false;
 					movementInputDelay = Global.inputReadDelayTimer;
@@ -313,34 +317,61 @@ public class BlockBreakStandard implements GameMode {
 							}
 						}
 					}
+					lastLevel = playLevel.level;
 					playLevel = null;
 				} else {
 					// load next level
 					// TODO: add test for at last level and return to menu
 					loadLevel(playLevel.level + 1);
 				}
-				
 			}
 		} else if (showHighScore) {
 			showHighScores();
 			if (newHighScore) {
 				// TODO: get high score user data
-				while (Keyboard.next()) {
-					char c = Keyboard.getEventCharacter();
-					if (Character.isLetter(c)) {
-						hsNameEntry += Character.toUpperCase(c);
-					} else if (Character.isSpaceChar(c)) {
-						hsNameEntry += ' ';
+				if (Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
+					hsRecords.add(
+						new HighScoreRecord(
+							hsNameEntry,
+							LocalDateTime.now(),
+							BlockStandardLevel.score,
+							lastLevel
+						)
+					);
+					Collections.sort(hsRecords);
+					hsRecords.remove(hsRecords.size() - 1);
+					newHighScore = false;
+				} else if (Keyboard.isKeyDown(Keyboard.KEY_BACK)) {
+					if (hsNameEntry.length() > 0) {
+						hsNameEntry = hsNameEntry.substring(0, hsNameEntry.length() - 1);
+					}
+				} else {
+					while (Keyboard.next()) {
+						char c = Keyboard.getEventCharacter();
+						
+						if (hsNameEntry.length() > 20) {
+							// do nothing
+						} else if (Character.isLetter(c)) {
+							hsNameEntry += Character.toUpperCase(c);
+						} else if (Character.isSpaceChar(c)) {
+							hsNameEntry += ' ';
+						} 
 					}
 				}
-				Global.drawFont24(500, 400, hsNameEntry, Color.white);
+				Global.uiBlue.draw(256, 256, 512, 376);
+				Global.uiBlueSel.draw(276, 276, 472, 48);
+				
+				
+				Global.drawFont24(282, 292, hsNameEntry + '_', Color.black);
 				
 				
 				
 				
-			} else if (Global.getControlActive(Global.GameControl.CANCEL)) {
+			} else if (movementInputDelay <= 0 && Global.getControlActive(Global.GameControl.CANCEL)) {
 				movementInputDelay = 2 * Global.inputReadDelayTimer;
 				showHighScore = false;
+			} else {
+				movementInputDelay -= Global.delta;
 			}
 			
 		} else {
@@ -382,7 +413,7 @@ public class BlockBreakStandard implements GameMode {
 			ref.release();
 		}
 		localTexMap.clear();
-		//savePrefs();
+		savePrefs();
 		/* Indicate that the game mode had complete unloading and is ready to
 		 * return control to previous control loop.
 		 */
@@ -440,6 +471,7 @@ public class BlockBreakStandard implements GameMode {
 						break;
 					case 2: // high score
 						showHighScore = true;
+						newHighScore = false;
 						break;
 					case 3: // exit
 					default:
@@ -555,17 +587,19 @@ public class BlockBreakStandard implements GameMode {
 			resetColor = Color.white;
 		
 		Global.drawFont48(512 - 98, 25, "High Score", Color.white);
-		
+		HighScoreRecord hsr;
 		for (int i = 0; i < limit; i++) {
+			hsr = hsRecords.get(i);
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
-			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "High Score Name", textColor);
+			//Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "High Score Name", textColor);
+			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, hsr.getName(), textColor);
 			//Global.drawFont24(hsMargin + 560, firstDrop + i * interval + 15, "01234567890123", textColor);
-			Global.drawNumbers24(hsMargin + 560, firstDrop + i * interval + 15, "01234567890123", textColor);
+			Global.drawNumbers24(hsMargin + 560, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
 			//Global.drawFont24(hsMargin + 770, firstDrop + i * interval + 15, "00/00/0000", textColor);
-			Global.drawNumbers24(hsMargin + 770, firstDrop + i * interval + 15, "00/00/0000", textColor);
-			Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 15, "01", textColor);
+			Global.drawNumbers24(hsMargin + 770, firstDrop + i * interval + 15, hsr.getDate(), textColor);
+			Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 15, hsr.getLevel(), textColor);
 			
 			
 		}
@@ -578,34 +612,41 @@ public class BlockBreakStandard implements GameMode {
 	 */
 	private void loadPrefs() {
 		BufferedReader prefFile;
-		hsRecords.clear();
 		String line;
 		HighScoreRecord hsr;
 
 		try {
 			prefFile = new BufferedReader(new FileReader("standard.pref"));
 			line = prefFile.readLine();
-			if (line.compareToIgnoreCase("[HighScore]") == 0) {
+			if (line == null) {
+				prefFile.close();
+				throw new IOException();
+			} else if (line.compareToIgnoreCase("[HighScore]") == 0) {
 				int i = 0;
 				try {
-					for (i = 0; i < 10; i++) {
+					line = prefFile.readLine();
+					for (i = 0; i < 10 && line != null; i++) {
 						hsr = HighScoreRecord.getEmptyRecord();
-						hsr.readRecord(prefFile);
+						
+						hsr.readRecord(line);
 						hsRecords.add(hsr);
+						line = prefFile.readLine();
 					}
 				} catch (DataFormatException dfe) {
 					
-				} finally {
-					for ( ; i < 10; i++) {
-						hsRecords.add(HighScoreRecord.getEmptyRecord());
-					}
 				}
 			}
 			
 			prefFile.close();
 		} catch (IOException err) {
 			
+		} finally {
+			Collections.sort(hsRecords);
+			while (hsRecords.size() > 10) {
+				hsRecords.remove(10);
+			}
 		}
+		
 	}
 	
 	/** 
@@ -617,7 +658,8 @@ public class BlockBreakStandard implements GameMode {
 			prefFile.write("[HighScore]");
 			prefFile.newLine();
 			for(HighScoreRecord hsr : hsRecords) {
-				hsr.writeRecord(prefFile);
+				prefFile.write(hsr.toString());
+				prefFile.newLine();
 			}
 			
 			
