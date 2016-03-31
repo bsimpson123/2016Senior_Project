@@ -1,8 +1,12 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -43,16 +47,7 @@ public class BlockBreakStandard implements GameMode {
 		new String[] { "bigsky", "media/bigsky_cedf10.png" }
 	};
 	
-	private final int GameModeSelection = 0,
-		BlockMatchStandard = 1,
-		PracticeMode = 2,
-		HighScore = 3
-		;
-	int activeGameMode = GameModeSelection;
-
-	private int optionBoxOffset = 0;
 	private Sprite GameSelector_background;
-	private Sprite optionBox_2;
 	private Sprite[] selector = new Sprite[2];
 	private Sprite optionBox;
 	private Sprite play_unselect;
@@ -88,6 +83,9 @@ public class BlockBreakStandard implements GameMode {
 		// do not load assets at this point
 		for (int i = 0; i < menuOptions.length; i++) {
 			menuOptionOffset[i] = Global.getDrawSize(menuOptions[i]) / 2;
+		}
+		for (int i = 0; i < 10; i++) {
+			hsRecords.add(HighScoreRecord.getEmptyRecord());
 		}
 	}
 	
@@ -127,12 +125,6 @@ public class BlockBreakStandard implements GameMode {
 				new int[] {0,0},
 				new int[] {1024,768},
 				new int[] {1024,768}
-			);
-		optionBox_2 = new Sprite(
-				Global.textureMap.get("green_ui"),
-				new int[] {0,143},
-				new int[] {190,48},
-				new int[] {190,48}
 			);
 		optionBox = new Sprite(
 				Global.textureMap.get("green_ui"),
@@ -284,6 +276,8 @@ public class BlockBreakStandard implements GameMode {
 		hsBack = localTexMap.get("bigsky");
 		// Update mode state when asset loading is completed
 		currentState = LoadState.LOADING_DONE;
+		
+		//loadPrefs();
 		return;
 	}
 
@@ -322,7 +316,6 @@ public class BlockBreakStandard implements GameMode {
 // @author Brock
 			GameSelector_background.draw(0, 0);
 			moveCursorMain();
-			optionBoxOffset = 0;
 			for (int i = 0; i < menuOptions.length; i++) {
 				optionBox.draw(180, 180 + i * 70);
 				if (cursorPos == i) {
@@ -347,7 +340,7 @@ public class BlockBreakStandard implements GameMode {
 			ref.release();
 		}
 		localTexMap.clear();
-		
+		//savePrefs();
 		/* Indicate that the game mode had complete unloading and is ready to
 		 * return control to previous control loop.
 		 */
@@ -517,6 +510,8 @@ public class BlockBreakStandard implements GameMode {
 			textColor = org.newdawn.slick.Color.black,
 			resetColor = org.newdawn.slick.Color.white;
 		
+		Global.drawFont48(512 - 98, 25, "High Score", Color.white);
+		
 		for (int i = 0; i < limit; i++) {
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
@@ -538,12 +533,54 @@ public class BlockBreakStandard implements GameMode {
 	private void loadPrefs() {
 		BufferedReader prefFile;
 		hsRecords.clear();
+		String line;
+		HighScoreRecord hsr;
+
+		try {
+			prefFile = new BufferedReader(new FileReader("standard.pref"));
+			line = prefFile.readLine();
+			if (line.compareToIgnoreCase("[HighScore]") == 0) {
+				int i = 0;
+				try {
+					for (i = 0; i < 10; i++) {
+						hsr = HighScoreRecord.getEmptyRecord();
+						hsr.readRecord(prefFile);
+						hsRecords.add(hsr);
+					}
+				} catch (DataFormatException dfe) {
+					
+				} finally {
+					for ( ; i < 10; i++) {
+						hsRecords.add(HighScoreRecord.getEmptyRecord());
+					}
+				}
+			}
+			
+			prefFile.close();
+		} catch (IOException err) {
+			
+		}
 	}
 	
 	/** 
 	 * Saves custom values and high scores to file.
 	 */
 	private void savePrefs() {
+		try {
+			BufferedWriter prefFile = new BufferedWriter(new FileWriter("standard.pref"));
+			prefFile.write("[HighScore]");
+			prefFile.newLine();
+			for(HighScoreRecord hsr : hsRecords) {
+				hsr.writeRecord(prefFile);
+			}
+			
+			
+			
+			prefFile.close();
+		} catch (IOException e) {
+			Global.writeToLog("Error opening Standard mode preferences file for writing.", true);
+			e.printStackTrace();
+		}
 		
 	}
 	
