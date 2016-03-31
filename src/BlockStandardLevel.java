@@ -131,6 +131,13 @@ public abstract class BlockStandardLevel {
 			new int[] { 180, 38 }
 		);
 	
+	private final String[] pauseOptions = new String[] {
+			"Resume",
+			"Quit"
+	};
+	
+	private int[] pauseOptionSize = new int[2];
+
 	
 	public void run() {
 		// decrement delay variables
@@ -293,23 +300,23 @@ public abstract class BlockStandardLevel {
 			//drawGrid();
 			// TODO: level complete code
 			overlay.draw(0, 0);
-			nLevel.draw(200, 200);
+			//nLevel.draw(200, 200);
 			levelFinishedControls();
-			
-			optionFrameMid.draw(180, 250);
-			
+			optionFrameMid.draw(412,250); //180 250
 			if (pauseCursorPos == 0) {
-				pauseBox.draw(215, 372);
-				
-				
-				hoverBox.draw(210, 310);
-				pauseBox.draw(215, 312);
+				pauseBox.draw(457, 372);
+				//hoverBox.draw(210, 310);
+				pauseBox.draw(457, 312);
+				Global.drawFont24(488, 312, "Next Level", Color.white);
+				Global.drawFont24(512, 372, "Quit", Color.black);
 			}
+			
 			if (pauseCursorPos == 1) {
-				hoverBox.draw(210, 370);
-				pauseBox.draw(215, 372);
-				
-				pauseBox.draw(215, 312);
+				//hoverBox.draw(210, 370);
+				pauseBox.draw(457, 372);
+				pauseBox.draw(457, 312);
+				Global.drawFont24(512, 372, "Quit", Color.white);
+				Global.drawFont24(488, 312, "Next Level", Color.black);
 			}
 			//if (actionDelay < 0 && Global.getControlActive(Global.GameControl.SELECT)) {
 			//	levelFinished = true;
@@ -324,26 +331,24 @@ public abstract class BlockStandardLevel {
 
 			overlay.draw(0, 0);
 			optionFrameMid.draw(180, 250);
-			
-			if (pauseCursorPos == 0) {
-				// Return
-				hoverBox.draw(210, 310);
-				pauseBox.draw(215, 312);
-				pause_RE_sel.draw(220,312);
-				
-				// Exit
-				pauseBox.draw(215, 372);
-				pause_EX_unsel.draw(217, 378);
+			for (int i = 0; i < pauseOptions.length; i++) {
+				pauseOptionSize[i] = Global.getDrawSize(pauseOptions[i]) / 2;
 			}
-			if (pauseCursorPos == 1) {
-				// Return
-				pauseBox.draw(215, 312);
-				pause_RE_unsel.draw(215,313);
+			for (int i = 0; i < pauseOptions.length; i++ ) {
 				
-				// Exit
-				hoverBox.draw(210, 370);
-				pauseBox.draw(215, 372);
-				pause_EX_sel.draw(220, 376);
+				if (pauseCursorPos == i) {
+					hoverBox.draw(210, 310 + i * 70);
+					pauseBox.draw(215, 312 + i * 70);	
+				} else {
+					pauseBox.draw(215, 312 + i * 70);
+				}
+					
+				if (pauseCursorPos == i) {
+					Global.drawFont24(305 - pauseOptionSize[i], 319 + i * 70, pauseOptions[i], Color.white);
+				} else {
+					Global.drawFont24(305 - pauseOptionSize[i], 319 + i * 70, pauseOptions[i], Color.black);
+				}
+
 			}
 			
 
