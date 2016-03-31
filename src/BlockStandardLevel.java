@@ -321,9 +321,6 @@ public abstract class BlockStandardLevel {
 			//if (actionDelay < 0 && Global.getControlActive(Global.GameControl.SELECT)) {
 			//	levelFinished = true;
 			//}
-			//overlay.draw(0, 0);
-			
-			
 			// placeholder for level advancement
 		} else if (gamePaused) {
 // Author: Brock
@@ -348,10 +345,7 @@ public abstract class BlockStandardLevel {
 				} else {
 					Global.drawFont24(305 - pauseOptionSize[i], 319 + i * 70, pauseOptions[i], Color.black);
 				}
-
-			}
-			
-
+			}			
 		} else if (gameOver) {
 			drawGrid();
 			showGameOver();

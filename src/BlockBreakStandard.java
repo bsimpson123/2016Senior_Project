@@ -441,10 +441,12 @@ public class BlockBreakStandard implements GameMode {
 		if (movementInputDelay > 0) { return; }
 		if (Global.getControlActive(Global.GameControl.LEFT)) {
 			pracLevel--;
+			Global.sounds.playSoundEffect("button_click"); //Mario
 			if (pracLevel < 1) { pracLevel = pracMax; }
 			movementInputDelay = Global.inputReadDelayTimer;
 		} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
 			pracLevel++;
+			Global.sounds.playSoundEffect("button_click"); //Mario
 			if (pracLevel > pracMax) { pracLevel = 1; }
 			movementInputDelay = Global.inputReadDelayTimer;
 		} 		
