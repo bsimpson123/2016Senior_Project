@@ -167,7 +167,7 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 				break;
 			case HEART:
 				specialActive = true;
-				actionDelay = Global.inputReadDelayTimer * 2;
+				actionDelay = Global.inputReadDelayTimer * 3;
 				break;
 			default: // block does not activate, do nothing
 				break;

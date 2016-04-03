@@ -627,7 +627,7 @@ public abstract class BlockStandardLevel {
 						dropBlocks();
 						shiftGridColumns();
 						// action delay is only increased if an action was performed and the grid was changed
-						actionDelay = Global.inputReadDelayTimer;
+						// actionDelay = Global.inputReadDelayTimer;
 					}
 					/*if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
 						// decrease the blocksRemaining counter after blocks are cleared
@@ -638,7 +638,9 @@ public abstract class BlockStandardLevel {
 						// action delay is only increased if an action was performed and the grid was changed
 						actionDelay = Global.inputReadDelayTimer;
 					}*/
-					actionDelay = Global.inputReadDelayTimer;
+					if (actionDelay < Global.inputReadDelayTimer) {
+						actionDelay = Global.inputReadDelayTimer;
+					}
 				}
 			}
 		}
