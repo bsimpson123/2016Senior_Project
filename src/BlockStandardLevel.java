@@ -53,7 +53,7 @@ public abstract class BlockStandardLevel {
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
 	
-	protected boolean specialActive = false;
+	private boolean specialActive = false;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int heartCursorPos = 0;
 	protected int[] blockSize;
@@ -149,7 +149,30 @@ public abstract class BlockStandardLevel {
 	private Block[] heartMenuBlocks = new Block[6];
 
 	
-	public void run() {
+/*	public void run() {
+		// decrement delay variables
+		queueManualShiftDelay -= Global.delta;
+		gridShiftActionDelay -= Global.delta;
+		actionDelay -= Global.delta;
+		inputDelay -= Global.delta;
+		// Draw all background elements. These should always be the first items drawn to screen. 
+		background.draw(0, 0);
+		counter = 0;
+		
+		if (blocksRemaining == 0) {
+			levelComplete = true;
+			if (!endLevelDelayed) {
+				endLevelDelayed = true;
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
+		} else if (energy == 0) {
+			// game over
+			gameOver = true;
+		}
+		
+	}//*/
+
+	public final void run() {
 		// decrement delay variables
 		queueManualShiftDelay -= Global.delta;
 		gridShiftActionDelay -= Global.delta;
@@ -169,8 +192,76 @@ public abstract class BlockStandardLevel {
 			// game over
 			gameOver = true;
 		}
+		// draw the grid and handle grid mechanics and input if the game is not paused
+		if (!gamePaused && !gameOver && !levelComplete) {
+			processQueue();
+			energy -= Global.delta;
+			if (energy < 0) { energy = 0; }
+			if (energy > energyMax) { energy = energyMax; }
+			// draw the grid, return value indicates if there are blocks still falling from the last clear
+			gridMoving = drawGrid(500);
+			//shiftGrid();
 		
+			// for cursor surrounding block
+			cursor.draw(
+				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
+				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
+				blockSize
+			);
+			// for pointer at center of block
+			/* cursor.draw(
+				gridBasePos[0] + blockSize[0] * cursorGridPos[0] - blockSize[0]/2,
+				gridBasePos[1] - blockSize[1] * cursorGridPos[1] + blockSize[1]/2,
+				blockSize
+			); //*/
+			
+			// process left,right,up,down movement in the grid or special item area
+			// check if special circumstances for controlling movement input are active
+			// and handle accordingly
+			if (specialActive) {
+				// if a special item or event has moved the selector cursor, handle that here
+				/**
+				 * @author Brock
+				 */
+				DrawHeartSelector(); 
+				heartMenuControls();
+				//inputDelay = Global.inputReadDelayTimer * 2;
+				if (clearColor) {
+					counter = activateHeartBlock(cursorGridPos);
+					updateScore(counter);
+					addEnergy(counter);
+					removeMarkedBlocks();
+					dropBlocks();
+					shiftGridColumns();
+					specialActive = false;
+					clearColor = false;
+
+				}
+ 
+			} else { // no special circumstance, handle input normally
+				if (inputDelay <= 0l) {
+					checkCommonControls();
+					// DEBUG: back out of the game to the main menu. not to be included in finished levels
+					if (Global.getControlActive(Global.GameControl.CANCEL)) {
+						levelFinished = true;
+						gameOver = true;
+					}
+				}
+			}
+		}
+		// draw the top-level UI frame, score and other elements
+		drawTopLevelUI();
+		drawEnergy();
+		if (gamePaused) {
+			// TODO: display the pause menu
+		} else if (gameOver) {
+			// TODO: show game over screen
+		}
+
+	
 	}
+
+
 
 	/**
 	 * Checks the grid for blocks of the same color sharing edges, and marks those blocks
@@ -763,7 +854,30 @@ public abstract class BlockStandardLevel {
 	
 	protected abstract Block getQueueBlock();
 	
-	protected abstract void processActivate(); 
+	protected void processActivate() {
+		// TODO: score base value calculation is to be done within each case statement
+		// [CUSTOM] add case statements for each type of block that can be activated in the level
+		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
+			case BLOCK:
+				counter = checkGrid(cursorGridPos);
+				int adj = (int)Math.pow(counter - 1, 2);
+				updateScore(adj);
+				addEnergy(adj);
+				break;
+			case BOMB:
+				counter = activateBombBlock(cursorGridPos);
+				updateScore(counter);
+				addEnergy(counter);
+				break;
+			case HEART:
+				specialActive = true;
+				actionDelay = Global.inputReadDelayTimer * 3;
+				break;
+			default: // block does not activate, do nothing
+				break;
+		}
+		
+	}
 	
 	/**
 	 * 
@@ -854,7 +968,7 @@ public abstract class BlockStandardLevel {
 	 */
 	protected void removeFromQueue(int color) {
 		for (int i = 0; i < queue.length; i++) {
-			if (queue[i] != null && queue[i].colorID == color) {
+			if (queue[i] != null && queue[i].type == Block.BlockType.BLOCK && queue[i].colorID == color) {
 				queue[i] = null;
 				queueCount--;
 			}

@@ -9,8 +9,6 @@ import org.newdawn.slick.opengl.Texture;
  * @author John
  */
 public class BlockStandardLevelEx extends BlockStandardLevel {
-	/** Defines the width and height of the blocks in the grid. */
-	private boolean specialActive = false;
 	private Random rand;
 
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
@@ -51,7 +49,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	protected void buildGrid() {
 		Block b = null;
 		int r = 0;
-		int count = 0;
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new GridColumn(gridSize[1]);
@@ -65,7 +62,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				grid[i].blocks[k] = b; //*/
 				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, (++count) % 2);
 			}
-			count++;
 		}
 		// TASK: set the block count for the level
 		this.blocksRemaining = grid.length * grid[0].blocks.length;
@@ -76,50 +72,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		//grid[0].blocks[0] = grid[1].blocks[0].clone();
 	}
 	
-	@Override
-	public void run() {
-		super.run();
-		// draw the grid and handle grid mechanics and input if the game is not paused
-		if (!gamePaused && !gameOver && !levelComplete) {
-			processQueue();
-			energy -= Global.delta;
-			if (energy < 0) { energy = 0; }
-			if (energy > energyMax) { energy = energyMax; }
-			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			gridMoving = drawGrid(500);
-			//shiftGrid();
-		
-			cursor.draw(
-				// for pointer at center of block
-/*				gridBasePos[0] + blockOffSet[0] * cursorGridPos[0] - blockOffSet[0]/2,
-				gridBasePos[1] - blockOffSet[1] * cursorGridPos[1] + blockOffSet[1]/2 //*/
-				// for selector surrounding block
-				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
-				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
-				blockSize
-			);
-		
-			// process left,right,up,down movement in the grid or special item area
-			if (specialActive) {
-				// if a special item or event has moved the selector cursor, handle that here
-				; 
-			} else {
-				if (inputDelay <= 0l) {
-					checkCommonControls();
-				}
-			}
-			// DEBUG: back out of the game to the main menu. not to be included in finished levels
-			if (Global.getControlActive(Global.GameControl.CANCEL)) {
-				levelFinished = true;
-				gameOver = true;
-			}
-		}
-		
-		// draw the top-level UI frame, score and other elements
-		drawTopLevelUI();
-
-	}
-
 	@Override
 	protected Block getQueueBlock() {
 		// TODO Auto-generated method stub

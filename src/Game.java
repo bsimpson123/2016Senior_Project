@@ -480,8 +480,6 @@ public class Game {
 					Global.drawFont24(525 - menuOptionOffset[i], 463 + i * 70, menuOptions[i], Color.black);
 				}
 			}
-
-			
 			break;
 		default:
 			switch(game.getState()) { 

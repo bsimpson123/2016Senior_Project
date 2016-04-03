@@ -9,8 +9,6 @@ import org.newdawn.slick.opengl.Texture;
  * @author John
  */
 public class BlockStandardLevel02 extends BlockStandardLevel {
-	private boolean specialActive = false;
-	
 	public BlockStandardLevel02(HashMap<String,Texture> rootTexMap) {
 		level = 2;
 		// TODO: [CUSTOM] set background and user interface sprites
@@ -54,61 +52,6 @@ public class BlockStandardLevel02 extends BlockStandardLevel {
 		energy = energyMax = 200000;		
 	}
 	
-	@Override
-	public void run() {
-		super.run();
-		// draw the grid and handle grid mechanics and input if the game is not paused
-		if (!gamePaused && !gameOver && !levelComplete) {
-			processQueue();
-			energy -= Global.delta;
-			if (energy < 0) { energy = 0; }
-			if (energy > energyMax) { energy = energyMax; }
-			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			gridMoving = drawGrid(500);
-			//shiftGrid();
-		
-			// for cursor surrounding block
-			cursor.draw(
-				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
-				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
-				blockSize
-			);
-			// for pointer at center of block
-			/* cursor.draw(
-				gridBasePos[0] + blockSize[0] * cursorGridPos[0] - blockSize[0]/2,
-				gridBasePos[1] - blockSize[1] * cursorGridPos[1] + blockSize[1]/2,
-				blockSize
-			); //*/
-			
-			// process left,right,up,down movement in the grid or special item area
-			// check if special circumstances for controlling movement input are active
-			// and handle accordingly
-			if (specialActive) {
-				// if a special item or event has moved the selector cursor, handle that here
-				; 
-			} else { // no special circumstance, handle input normally
-				if (inputDelay <= 0l) {
-					checkCommonControls();
-					// DEBUG: back out of the game to the main menu. not to be included in finished levels
-					if (Global.getControlActive(Global.GameControl.CANCEL)) {
-						levelFinished = true;
-						gameOver = true;
-					}
-				}
-			}
-		}
-		// draw the top-level UI frame, score and other elements
-		drawTopLevelUI();
-		drawEnergy();
-		if (gamePaused) {
-			// TODO: display the pause menu
-		} else if (gameOver) {
-			// TODO: show game over screen
-		}
-
-			
-	}
-
 	@Override
 	protected void buildGrid() {
 		Block b = null;
