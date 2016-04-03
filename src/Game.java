@@ -103,7 +103,8 @@ public class Game {
 			new String[] { "Text", "media/Mode_Text.png"},
 			new String[] { "overlay", "media/blackoverlay.png" }, 
 			new String[] { "bomb_numbers", "media/numbers_small.png" },
-			new String[] { "pause_text", "media/pause_text.png"}
+			new String[] { "pause_text", "media/pause_text.png"},
+			new String[] { "heart", "media/tileRed_36_small.png"}
 	};
 	
 	/* Menu display and control variables */
