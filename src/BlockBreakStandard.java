@@ -79,7 +79,7 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite pracBox;
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
-	private int pracMax = 5;
+	private int pracMax = 6;
 	private int lastLevel = 1;
 	
 	private boolean newHighScore = false;
@@ -501,6 +501,9 @@ public class BlockBreakStandard implements GameMode {
 				break;
 			case 5:
 				playLevel = new BlockStandardLevel05(localTexMap);
+				break;
+			case 6:
+				playLevel = new BlockStandardLevel06(localTexMap);
 				break;
 			default:
 				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );

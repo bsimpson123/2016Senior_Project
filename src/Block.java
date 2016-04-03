@@ -4,13 +4,13 @@ import org.newdawn.slick.opengl.Texture;
 public class Block {
 	/* Public Variables */
 	public enum BlockType {
-		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB
+		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB, HEART
 	}
 
 	protected static Sprite blockColor[];
 	protected static Sprite bombNumber[];
 	protected static Sprite blockStar, blockStarOverlay;
-	protected static Sprite blockWedge, blockTrash, blockRock, blockBomb;
+	protected static Sprite blockWedge, blockTrash, blockRock, blockBomb, blockHeart;
 	protected static Sprite errorBlock;
 	
 	public static final int  
@@ -80,6 +80,7 @@ public class Block {
 	public static void initializeBlocks(HashMap<String,Texture> texMap) {
 		blockColor = new Sprite[blockColorCount];
 		Texture blockTex = texMap.get("blocksheet");
+		Texture heartTex = texMap.get("heart");
 		blockColor[BLUE] = new Sprite(
 				blockTex,
 				new int[] { 212, 266 },
@@ -140,6 +141,12 @@ public class Block {
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
+		blockHeart = new Sprite(
+				heartTex,
+				new int[] { 0, 0 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
 		blockRock = new Sprite(
 				blockTex,
 				new int[] { 272, 32 },
@@ -192,6 +199,9 @@ public class Block {
 				break;
 			case BOMB:
 				block = blockBomb;
+				break;
+			case HEART:
+				block = blockHeart;
 				break;
 			default:
 				break;

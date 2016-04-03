@@ -54,10 +54,12 @@ public abstract class BlockStandardLevel {
 	private boolean queueHold = false;
 	
 	protected int[] cursorGridPos = new int[] { 0, 0 };
+	protected int heartCursorPos = 0;
 	protected int[] blockSize;
 	protected int blocksRemaining = 0;
 	protected boolean gamePaused = false;
-	protected long inputDelay = 0;
+	protected long inputDelay = Global.inputReadDelayTimer * 2;
+	protected long heartInputDelay = Global.inputReadDelayTimer * 2;
 	protected long actionDelay = Global.inputReadDelayTimer * 2;
 	protected String levelTitle; 
 	protected int level = 1;
@@ -81,6 +83,12 @@ public abstract class BlockStandardLevel {
 	
 	/** Indicates whether or not the input has been delayed for end of level detection. */
 	private boolean endLevelDelayed = false;
+	
+	protected int colorID;
+	protected boolean specialMenu;
+	protected boolean clearColor;
+	protected Sprite heartCursor;
+	protected int colorCount = 0;
 	
 	private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
@@ -137,6 +145,8 @@ public abstract class BlockStandardLevel {
 	};
 	
 	private int[] pauseOptionSize = new int[2];
+	
+	private Block[] heartMenuBlocks = new Block[6];
 
 	
 	public void run() {
@@ -619,6 +629,16 @@ public abstract class BlockStandardLevel {
 						// action delay is only increased if an action was performed and the grid was changed
 						actionDelay = Global.inputReadDelayTimer;
 					}
+					/*if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
+						// decrease the blocksRemaining counter after blocks are cleared
+//						blocksRemaining -= counter; // now adjusted in removeMarkedBlocks() function
+						removeMarkedBlocks();
+						dropBlocks();
+						shiftGridColumns();
+						// action delay is only increased if an action was performed and the grid was changed
+						actionDelay = Global.inputReadDelayTimer;
+					}*/
+					actionDelay = Global.inputReadDelayTimer;
 				}
 			}
 		}
@@ -925,6 +945,123 @@ public abstract class BlockStandardLevel {
 			}
 		}
 		return count;
+	}
+	
+// Author: Brock
+	protected int DrawHeartSelector() {
+		int colorID = 0;
+		for (int i = 0; i < heartMenuBlocks.length; i++) {
+			heartMenuBlocks[i] = new Block(Block.BlockType.BLOCK, i);
+		}
+		heartCursor = new Sprite (
+				Global.textureMap.get("blocksheet"),
+				new int[] { 240, 0 },
+				new int[] { 32, 32 },
+				new int[] { 32, 32 }
+				);
+		
+		overlay.draw(0, 0);
+		for (int j = 0; j < heartMenuBlocks.length; j++) {
+			heartMenuBlocks[j].draw(100 + j * 32, 100);
+			heartCursor.draw(100 + heartCursorPos * 32, 100);
+		}
+		
+		
+		return colorID;
+	}
+	
+// Author: Brock
+	protected void heartMenuControls() {
+		//heartInputDelay = Global.inputReadDelayTimer * 2;
+		if (heartInputDelay <= 0) {
+			if (Global.getControlActive(Global.GameControl.LEFT)) {
+				heartCursorPos--;
+				if (heartCursorPos < 0) {
+					heartCursorPos = 5;
+				}
+				heartInputDelay = Global.inputReadDelayTimer * 2;
+			} else
+			if (Global.getControlActive(Global.GameControl.RIGHT)) {
+				heartCursorPos++;
+				if (heartCursorPos > 5) {
+					heartCursorPos = 0;
+				}
+				heartInputDelay = Global.inputReadDelayTimer * 2;
+			}
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				specialMenu = true;
+				heartInputDelay = Global.inputReadDelayTimer * 2;
+	
+			}
+			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				
+				switch(heartCursorPos) {
+					case 0:
+						colorID = 0;
+						clearColor = true;
+						heartInputDelay = Global.inputReadDelayTimer * 2;
+						break;
+					case 1:
+						colorID = 1;
+						clearColor = true;
+						heartInputDelay = Global.inputReadDelayTimer * 2;
+						break;
+					case 2:
+						colorID = 2;
+						clearColor = true;
+						heartInputDelay = Global.inputReadDelayTimer * 2;
+						break;
+					case 3:
+						colorID = 3;
+						clearColor = true;
+						heartInputDelay = Global.inputReadDelayTimer * 2;
+						break;
+					case 4:
+						colorID = 4;
+						clearColor = true;
+						heartInputDelay = Global.inputReadDelayTimer * 2;
+						break;
+					case 5:
+						colorID = 5;
+						clearColor = true;
+						heartInputDelay = Global.inputReadDelayTimer * 2;
+						break;
+					default:
+							break;
+				}
+			}  
+			
+		} else if(heartInputDelay > 0) {
+			heartInputDelay -= Global.delta;
+			
+		}
+	}
+// Author: Brock
+	protected int activateHeartBlock(int colorID, int pos[]) {
+		int count = 0;
+		
+		grid[pos[0]].blocks[pos[1]].clearMark = true;
+		
+		for (int i = 0; i < gridSize[0]; i++) {
+			for (int j = 0; j < gridSize[1]; j++) {
+				if (grid[i].blocks[j] == null) {
+					continue;
+				}
+				if (colorID == grid[i].blocks[j].colorID) {
+					grid[i].blocks[j].clearMark = true;
+					count++;
+					colorCount++;
+				} else {
+					continue;
+				}
+			}
+		}
+		if (colorCount <= 0) {
+			clearColor = false;
+			return 0;
+		} else {
+			return count;
+		}
 	}
 }
 
