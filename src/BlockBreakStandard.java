@@ -351,7 +351,7 @@ public class BlockBreakStandard implements GameMode {
 					while (Keyboard.next()) {
 						char c = Keyboard.getEventCharacter();
 						
-						if (hsNameEntry.length() > 20) {
+						if (hsNameEntry.length() > 40) {
 							// do nothing
 						} else if (Character.isLetter(c)) {
 							hsNameEntry += Character.toUpperCase(c);

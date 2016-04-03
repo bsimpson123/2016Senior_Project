@@ -895,6 +895,7 @@ public abstract class BlockStandardLevel {
 	
 	protected void addEnergy(int baseAdjustment) {
 		energy += (int)Math.floor(baseAdjustment * energyGainMultiplier);
+		if (energy > energyMax) { energy = energyMax; }
 	}
 
 	/**

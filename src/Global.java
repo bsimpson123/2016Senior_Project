@@ -257,7 +257,7 @@ public class Global {
 		uiGreen = buildBox(tex, new int[] { 96, 0 }, corner);
 		uiYellow = buildBox(tex, new int[] { 144, 0 }, corner);
 		uiGrey = buildBox(tex, new int[] { 192, 0 }, corner);
-		uiBlueSel = buildBox(tex, new int[] { 0, 96 }, corner);
+		uiBlueSel = buildBox(tex, new int[] { 0, 48 }, corner);
 		uiRedSel = buildBox(tex, new int[] { 48, 96 }, corner);
 		uiGreenSel = buildBox(tex, new int[] { 96, 96 }, corner);
 		uiYellowSel = buildBox(tex, new int[] { 144, 96 }, corner);
