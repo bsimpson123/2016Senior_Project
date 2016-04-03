@@ -85,6 +85,9 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 			// and handle accordingly
 			if (specialActive) {
 				// if a special item or event has moved the selector cursor, handle that here
+				/**
+				 * @author Brock
+				 */
 				DrawHeartSelector(); 
 				heartMenuControls();
 				//inputDelay = Global.inputReadDelayTimer * 2;

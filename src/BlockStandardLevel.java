@@ -967,7 +967,11 @@ public abstract class BlockStandardLevel {
 		return count;
 	}
 	
-// Author: Brock
+
+	/**
+	 * Draw selector menu for heart special block
+	 * @author Brock
+	 */
 	protected int DrawHeartSelector() {
 		int colorID = 0;
 		for (int i = 0; i < heartMenuBlocks.length; i++) {
@@ -990,7 +994,10 @@ public abstract class BlockStandardLevel {
 		return colorID;
 	}
 	
-// Author: Brock
+	/**
+	 * Controls for heart selector menu
+	 * @author Brock
+	 */
 	protected void heartMenuControls() {
 		//actionDelay = Global.inputReadDelayTimer * 2;
 		if (actionDelay <= 0) {
@@ -1046,7 +1053,11 @@ public abstract class BlockStandardLevel {
 			
 		}
 	}
-// Author: Brock
+	
+	/**
+	 * Marks blocks in the grid to be cleared for the color selected
+	 * @author Brock
+	 */
 	protected int activateHeartBlock(int pos[]) {
 		int count = 0;
 		
