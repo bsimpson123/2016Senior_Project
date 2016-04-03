@@ -1068,7 +1068,7 @@ public abstract class BlockStandardLevel {
 				if (grid[i].blocks[j] == null) {
 					continue;
 				}
-				if (colorID == grid[i].blocks[j].colorID) {
+				if (grid[i].blocks[j].colorID == colorID && grid[i].blocks[j].type == Block.BlockType.BLOCK) {
 					grid[i].blocks[j].clearMark = true;
 					count++;
 					colorCount++;

@@ -129,6 +129,7 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 	@Override
 	protected void buildGrid() {
 		Block b = null;
+		Block a = null;
 		int r = 0;
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
@@ -140,8 +141,11 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 			}
 		}
 		b = new Block(Block.BlockType.HEART);
+		a = new Block(Block.BlockType.HEART);
+
 		grid[Global.rand.nextInt(grid.length)].blocks[Global.rand.nextInt(grid[0].blocks.length)] = b;
-		
+		grid[Global.rand.nextInt(grid.length)].blocks[Global.rand.nextInt(grid[0].blocks.length)] = a;
+
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
