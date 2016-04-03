@@ -10,7 +10,6 @@ import org.newdawn.slick.opengl.Texture;
  * @author John
  */
 public class BlockStandardLevel06 extends BlockStandardLevel {
-	private boolean specialActive = false;
 	private int colorCount = 0;
 	public BlockStandardLevel06(HashMap<String,Texture> rootTexMap) {
 		level = 2;
@@ -86,15 +85,11 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 			// and handle accordingly
 			if (specialActive) {
 				// if a special item or event has moved the selector cursor, handle that here
-				
-				if (specialMenu) {
-					specialActive = false;
-				}
-				heartMenuControls();
 				DrawHeartSelector(); 
+				heartMenuControls();
 				//inputDelay = Global.inputReadDelayTimer * 2;
 				if (clearColor) {
-					counter = activateHeartBlock(colorID,cursorGridPos);
+					counter = activateHeartBlock(cursorGridPos);
 					updateScore(counter);
 					addEnergy(counter);
 					removeMarkedBlocks();
@@ -172,6 +167,7 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 				break;
 			case HEART:
 				specialActive = true;
+				actionDelay = Global.inputReadDelayTimer * 2;
 				break;
 			default: // block does not activate, do nothing
 				break;

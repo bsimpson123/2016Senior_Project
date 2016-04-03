@@ -53,13 +53,13 @@ public abstract class BlockStandardLevel {
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
 	
+	protected boolean specialActive = false;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int heartCursorPos = 0;
 	protected int[] blockSize;
 	protected int blocksRemaining = 0;
 	protected boolean gamePaused = false;
 	protected long inputDelay = Global.inputReadDelayTimer * 2;
-	protected long heartInputDelay = Global.inputReadDelayTimer * 2;
 	protected long actionDelay = Global.inputReadDelayTimer * 2;
 	protected String levelTitle; 
 	protected int level = 1;
@@ -808,6 +808,7 @@ public abstract class BlockStandardLevel {
 	 */
 	protected void processQueue() {
 		if (levelComplete) { return; }
+		if (specialActive) { return; }
 		queueStepDelay -= Global.delta;
 		int xMax = queue.length;
 		if (queueStepDelay > 0) { return; }
@@ -843,6 +844,22 @@ public abstract class BlockStandardLevel {
 		queueCount++;
 
 	}
+	
+	/**
+	 * Removes all instances of a specific block from the queue
+	 * @param block The matching block color to be removed.
+	 * @author John
+	 */
+	protected void removeFromQueue(int color) {
+		for (int i = 0; i < queue.length; i++) {
+			if (queue[i] != null && queue[i].colorID == color) {
+				queue[i] = null;
+				queueCount--;
+			}
+		}
+	}
+	
+	
 	/**
 	 * @author John
 	 */
@@ -973,25 +990,25 @@ public abstract class BlockStandardLevel {
 	
 // Author: Brock
 	protected void heartMenuControls() {
-		//heartInputDelay = Global.inputReadDelayTimer * 2;
-		if (heartInputDelay <= 0) {
+		//actionDelay = Global.inputReadDelayTimer * 2;
+		if (actionDelay <= 0) {
 			if (Global.getControlActive(Global.GameControl.LEFT)) {
 				heartCursorPos--;
 				if (heartCursorPos < 0) {
 					heartCursorPos = 5;
 				}
-				heartInputDelay = Global.inputReadDelayTimer * 2;
-			} else
+				actionDelay = Global.inputReadDelayTimer * 2;
+			}
 			if (Global.getControlActive(Global.GameControl.RIGHT)) {
 				heartCursorPos++;
 				if (heartCursorPos > 5) {
 					heartCursorPos = 0;
 				}
-				heartInputDelay = Global.inputReadDelayTimer * 2;
+				actionDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) {
 				specialMenu = true;
-				heartInputDelay = Global.inputReadDelayTimer * 2;
+				actionDelay = Global.inputReadDelayTimer * 2;
 	
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
@@ -999,46 +1016,36 @@ public abstract class BlockStandardLevel {
 				switch(heartCursorPos) {
 					case 0:
 						colorID = 0;
-						clearColor = true;
-						heartInputDelay = Global.inputReadDelayTimer * 2;
 						break;
 					case 1:
 						colorID = 1;
-						clearColor = true;
-						heartInputDelay = Global.inputReadDelayTimer * 2;
 						break;
 					case 2:
 						colorID = 2;
-						clearColor = true;
-						heartInputDelay = Global.inputReadDelayTimer * 2;
 						break;
 					case 3:
 						colorID = 3;
-						clearColor = true;
-						heartInputDelay = Global.inputReadDelayTimer * 2;
 						break;
 					case 4:
 						colorID = 4;
-						clearColor = true;
-						heartInputDelay = Global.inputReadDelayTimer * 2;
 						break;
 					case 5:
 						colorID = 5;
-						clearColor = true;
-						heartInputDelay = Global.inputReadDelayTimer * 2;
 						break;
 					default:
 							break;
 				}
+				clearColor = true;
+				actionDelay = Global.inputReadDelayTimer * 2;
 			}  
 			
-		} else if(heartInputDelay > 0) {
-			heartInputDelay -= Global.delta;
+		} else {
+			actionDelay -= Global.delta;
 			
 		}
 	}
 // Author: Brock
-	protected int activateHeartBlock(int colorID, int pos[]) {
+	protected int activateHeartBlock(int pos[]) {
 		int count = 0;
 		
 		grid[pos[0]].blocks[pos[1]].clearMark = true;
@@ -1057,6 +1064,7 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		}
+		removeFromQueue(colorID);
 		if (colorCount <= 0) {
 			clearColor = false;
 			return 0;
