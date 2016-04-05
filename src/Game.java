@@ -345,10 +345,10 @@ public class Game {
 		}
 		
 		for (int i = 0; i < menuOptions.length; i++) {
-			menuOptionOffset[i] = Global.getDrawSize(menuOptions[i]) / 2;
+			menuOptionOffset[i] = Global.getFont24DrawSize(menuOptions[i]) / 2;
 		}
 		for (int i = 0; i < modeOptions.length; i++) {
-			modeOptionOffset[i] = Global.getDrawSize(modeOptions[i]) / 2;
+			modeOptionOffset[i] = Global.getFont24DrawSize(modeOptions[i]) / 2;
 		}
 		
 		// TODO: add static class initializers

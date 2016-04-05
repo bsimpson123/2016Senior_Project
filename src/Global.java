@@ -308,7 +308,15 @@ public class Global {
 		numbers24.drawString(0, -1, "", Color.white);
 	}
 	
-	public static int getDrawSize(String text) {
-		return font24.getWidth(text);
+	public static void drawNumbers48(int xc, int yc, String numbers, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		numbers48.drawString(xc, yc, numbers, color);
+		numbers48.drawString(0, -1, "", Color.white);
 	}
+
+	public static int getFont24DrawSize(String text) { return font24.getWidth(text); }
+	public static int getFont48DrawSize(String text) { return font48.getWidth(text); }
+	public static int getNumbers24DrawSize(String numbers) { return numbers24.getWidth(numbers); }
+	public static int getNumbers48DrawSize(String numbers) { return numbers48.getWidth(numbers); }
 }

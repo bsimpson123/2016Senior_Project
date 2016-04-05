@@ -88,7 +88,6 @@ public abstract class BlockStandardLevel {
 	protected boolean specialMenu;
 	protected boolean clearColor;
 	protected Sprite heartCursor;
-	protected int colorCount = 0;
 	
 	private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
@@ -430,7 +429,7 @@ public abstract class BlockStandardLevel {
 			overlay.draw(0, 0);
 			optionFrameMid.draw(180, 250);
 			for (int i = 0; i < pauseOptions.length; i++) {
-				pauseOptionSize[i] = Global.getDrawSize(pauseOptions[i]) / 2;
+				pauseOptionSize[i] = Global.getFont24DrawSize(pauseOptions[i]) / 2;
 			}
 			for (int i = 0; i < pauseOptions.length; i++ ) {
 				
@@ -1185,14 +1184,13 @@ public abstract class BlockStandardLevel {
 				if (grid[i].blocks[j].colorID == colorID && grid[i].blocks[j].type == Block.BlockType.BLOCK) {
 					grid[i].blocks[j].clearMark = true;
 					count++;
-					colorCount++;
 				} else {
 					continue;
 				}
 			}
 		}
 		removeFromQueue(colorID);
-		if (colorCount <= 0) {
+		if (count == 0) {
 			clearColor = false;
 			return 0;
 		} else {

@@ -79,7 +79,7 @@ public class BlockBreakStandard implements GameMode {
 	private Sprite pracBox;
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
-	private int pracMax = 7;
+	private int pracMax = 20;
 	private int lastLevel = 1;
 	
 	private boolean newHighScore = false;
@@ -89,7 +89,7 @@ public class BlockBreakStandard implements GameMode {
 		// TODO: set or load any custom environment variables
 		// do not load assets at this point
 		for (int i = 0; i < menuOptions.length; i++) {
-			menuOptionOffset[i] = Global.getDrawSize(menuOptions[i]) / 2;
+			menuOptionOffset[i] = Global.getFont24DrawSize(menuOptions[i]) / 2;
 		}
 		for (int i = 0; i < 10; i++) {
 			hsRecords.add(HighScoreRecord.getNewEmptyRecord());
@@ -532,12 +532,17 @@ public class BlockBreakStandard implements GameMode {
 		} 		
 	}
 
+	private static final int pracOffset = 375;
+	private static final int pracSelectDrop = 248;
+	
 	private void drawPracticeSelect() {
-		pracBox.draw(510, 250);
+		String num = Integer.toString(pracLevel);
+		int numOffset = Global.getNumbers24DrawSize(num) / 2;
+		pracArrows[0].draw(pracOffset, 248);
+		pracBox.draw(pracOffset + 40, 250);
 		//BlockStandardLevel.numbers[pracLevel].draw(525, 255);
-		Global.drawNumbers24(525, 255, Integer.toString(pracLevel), Color.white);
-		pracArrows[0].draw(470, 248);
-		pracArrows[1].draw(550, 248);
+		Global.drawNumbers24(pracOffset + 65 - numOffset, pracSelectDrop + 12, num, Color.white);
+		pracArrows[1].draw(pracOffset + 80, 248);
 	}
 	
 	// TODO: move high score vars to top after finished implementation
