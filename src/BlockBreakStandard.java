@@ -81,6 +81,7 @@ public class BlockBreakStandard implements GameMode {
 	private int pracLevel = 1;
 	private int pracMax = 20;
 	private int lastLevel = 1;
+	private int maxUnlocked = 1;
 	
 	private boolean newHighScore = false;
 	private String hsNameEntry = "";
@@ -303,6 +304,7 @@ public class BlockBreakStandard implements GameMode {
 			if (!playLevel.levelFinished) {
 				playLevel.run();
 			} else {
+				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
 					// TODO: selectPractice = false;
 					movementInputDelay = Global.inputReadDelayTimer;
@@ -463,6 +465,7 @@ public class BlockBreakStandard implements GameMode {
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode
+						if (pracLevel > maxUnlocked) { break; }
 						loadLevel(pracLevel);
 						playLevel.practice = true;
 						movementInputDelay = Global.inputReadDelayTimer;
@@ -538,10 +541,12 @@ public class BlockBreakStandard implements GameMode {
 	private void drawPracticeSelect() {
 		String num = Integer.toString(pracLevel);
 		int numOffset = Global.getNumbers24DrawSize(num) / 2;
+		Color numCol = pracLevel > this.maxUnlocked ? Color.gray : Color.white;
+		
 		pracArrows[0].draw(pracOffset, 248);
 		pracBox.draw(pracOffset + 40, 250);
 		//BlockStandardLevel.numbers[pracLevel].draw(525, 255);
-		Global.drawNumbers24(pracOffset + 65 - numOffset, pracSelectDrop + 12, num, Color.white);
+		Global.drawNumbers24(pracOffset + 65 - numOffset, pracSelectDrop + 12, num, numCol);
 		pracArrows[1].draw(pracOffset + 80, 248);
 	}
 	
@@ -630,23 +635,28 @@ public class BlockBreakStandard implements GameMode {
 		try {
 			prefFile = new BufferedReader(new FileReader("standard.pref"));
 			line = prefFile.readLine();
-			if (line == null) {
-				prefFile.close();
-				throw new IOException();
-			} else if (line.compareToIgnoreCase("[HighScore]") == 0) {
-				int i = 0;
-				try {
-
-					line = prefFile.readLine();
-					while (line != null) {
-						hsr = HighScoreRecord.getNewEmptyRecord();
-						hsr.readRecord(line);
-						hsRecords.add(hsr);
+			while (line != null) {
+				if (line.compareToIgnoreCase("[HighScore]") == 0) {
+					try {
 						line = prefFile.readLine();
+						while (line != null) {
+							hsr = HighScoreRecord.getNewEmptyRecord();
+							hsr.readRecord(line);
+							hsRecords.add(hsr);
+							line = prefFile.readLine();
+						}
+					} catch (DataFormatException dfe) {
+						continue;
 					}
-				} catch (DataFormatException dfe) {
-					
+				} else if (line.compareToIgnoreCase("[TopLevel]") == 0) {
+					line = prefFile.readLine();
+					try {
+						maxUnlocked = Integer.parseInt(line);
+					} catch (NumberFormatException nfe) {
+						maxUnlocked = 1;
+					}
 				}
+				line = prefFile.readLine();
 			}
 			prefFile.close();
 		} catch (IOException err) {
@@ -666,6 +676,10 @@ public class BlockBreakStandard implements GameMode {
 	private void savePrefs() {
 		try {
 			BufferedWriter prefFile = new BufferedWriter(new FileWriter("standard.pref"));
+			prefFile.write("[TopLevel]");
+			prefFile.newLine();
+			prefFile.write(Integer.toString(maxUnlocked));
+			prefFile.newLine();
 			prefFile.write("[HighScore]");
 			prefFile.newLine();
 			for(HighScoreRecord hsr : hsRecords) {
