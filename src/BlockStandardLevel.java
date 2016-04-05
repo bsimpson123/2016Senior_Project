@@ -684,7 +684,7 @@ public abstract class BlockStandardLevel {
 					if (Global.getControlActive(Global.GameControl.SELECT)) {
 						switch (pauseCursorPos) {
 							case 0:
-								levelFinished = false;
+								levelFinished = true;
 								gameOver = false;
 								inputDelay = 10 * Global.inputReadDelayTimer;	
 								break;
