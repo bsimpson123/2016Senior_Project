@@ -88,6 +88,7 @@ public abstract class BlockStandardLevel {
 	protected boolean specialMenu;
 	protected boolean clearColor;
 	protected Sprite heartCursor;
+	protected int colorCount = 0;
 	
 	private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
@@ -459,14 +460,29 @@ public abstract class BlockStandardLevel {
 	
 	private void showGameOver() {
 		overlay.draw(0, 0);
+		gameOverControls();
 		
 		Color.lightGray.bind();
 		Global.uiWhite.draw(256, 192, 512, 384);
 		Color.blue.bind();
-		Global.uiWhite.draw(288, 224, 192, 48);
-		Global.uiWhite.draw(546, 224, 192, 48);
+		Global.uiWhite.draw(288, 224, 192, 48); // left button
+		Global.uiWhite.draw(546, 224, 192, 48); // right button
 		Color.white.bind();
 		Global.uiWhite.draw(288, 288, 452, 192);
+		
+		if (pauseCursorPos == 0) {
+			Global.drawFont24(330, 240, "Continue?", Color.white);
+			Global.drawFont24(618, 240, "Quit", Color.black);
+			Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
+			Global.drawFont24(308, 350, "your current score.",Color.black);
+		}
+		
+		if (pauseCursorPos == 1) {
+			Global.drawFont24(330, 240, "Continue?", Color.black);
+			Global.drawFont24(618, 240, "Quit", Color.white);
+			Global.drawFont24(440, 380, "Quit the level.", Color.black);
+		}
+		
 		if (Global.getControlActive(Global.GameControl.CANCEL)) {
 			this.levelFinished = true;
 			Global.actionDelay = Global.inputReadDelayTimer;
@@ -615,17 +631,24 @@ public abstract class BlockStandardLevel {
 			inputDelay -= Global.delta;
 		}
 	}
-	protected void levelFinishedControls() {
+	protected void gameOverControls() {
 		// Author: Mario
 				if (inputDelay <= 0) {
-					if (Global.getControlActive(Global.GameControl.UP) || Global.getControlActive(Global.GameControl.DOWN)) {
+					if (Global.getControlActive(Global.GameControl.LEFT) || Global.getControlActive(Global.GameControl.DOWN)) {
 						pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
 						inputDelay = Global.inputReadDelayTimer * 2;
 					}
+					if (Global.getControlActive(Global.GameControl.RIGHT) || Global.getControlActive(Global.GameControl.DOWN)) {
+						pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
+						inputDelay = Global.inputReadDelayTimer * 2;
+					}
+					
 					if (Global.getControlActive(Global.GameControl.SELECT)) {
 						switch (pauseCursorPos) {
 							case 0:
-								levelFinished = true;
+								gameOver = false;
+								energy = energyMax;
+								score = score/2;
 								inputDelay = 10 * Global.inputReadDelayTimer;	
 								break;
 
@@ -641,6 +664,42 @@ public abstract class BlockStandardLevel {
 				}
 			}
 	
+	protected void levelFinishedControls() {
+		// Author: Mario
+		if (inputDelay <= 0) {
+			if (Global.getControlActive(Global.GameControl.UP)) {
+				pauseCursorPos--;
+			if (pauseCursorPos < 0) {
+				pauseCursorPos = 1;
+				}
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
+			if (Global.getControlActive(Global.GameControl.DOWN)) {
+					pauseCursorPos++;
+				if (pauseCursorPos > 1) {
+					pauseCursorPos = 0;
+				}
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
+					if (Global.getControlActive(Global.GameControl.SELECT)) {
+						switch (pauseCursorPos) {
+							case 0:
+								levelFinished = false;
+								gameOver = false;
+								inputDelay = 10 * Global.inputReadDelayTimer;	
+								break;
+
+							case 1:
+								gameOver = true;
+								levelFinished = true;
+								inputDelay = 10 * Global.inputReadDelayTimer;	
+								break;
+						}
+					}
+				} else if (inputDelay > 0) {
+					inputDelay -= Global.delta;
+				}
+			}
 	/**
 	 * Checks against movement inputs within the grid, and adjusts the cursor
 	 * position accordingly.
@@ -1184,13 +1243,14 @@ public abstract class BlockStandardLevel {
 				if (grid[i].blocks[j].colorID == colorID && grid[i].blocks[j].type == Block.BlockType.BLOCK) {
 					grid[i].blocks[j].clearMark = true;
 					count++;
+					colorCount++;
 				} else {
 					continue;
 				}
 			}
 		}
 		removeFromQueue(colorID);
-		if (count == 0) {
+		if (colorCount <= 0) {
 			clearColor = false;
 			return 0;
 		} else {

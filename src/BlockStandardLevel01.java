@@ -49,7 +49,7 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
 		// set energy max if not default
-		energy = energyMax = 200000;		
+		energy = energyMax = 9000;	//200000	
 	}
 	
 	@Override
