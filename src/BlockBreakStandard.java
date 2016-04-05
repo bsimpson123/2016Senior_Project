@@ -85,6 +85,8 @@ public class BlockBreakStandard implements GameMode {
 	
 	private boolean newHighScore = false;
 	private String hsNameEntry = "";
+	private boolean preClearComplete = false;
+
 	
 	public BlockBreakStandard() {
 		// TODO: set or load any custom environment variables
@@ -314,7 +316,7 @@ public class BlockBreakStandard implements GameMode {
 								newHighScore = true;
 								showHighScore = true;
 								hsNameEntry = "";
-								while(Keyboard.next()) {  }
+								preClearComplete = false;
 								break;
 							}
 						}
@@ -331,7 +333,16 @@ public class BlockBreakStandard implements GameMode {
 			showHighScores();
 			if (newHighScore) {
 				// TODO: get high score user data
-				if (Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
+				if (!preClearComplete) {
+					int c = Keyboard.getNumKeyboardEvents();
+					if (c > 0) {
+						while (Keyboard.next()) {
+							c = Keyboard.getEventKey();
+						}
+					} else {
+						preClearComplete = true;
+					}
+				} else if (Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
 					hsRecords.add(
 						new HighScoreRecord(
 							hsNameEntry,
