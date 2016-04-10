@@ -53,7 +53,7 @@ public abstract class BlockStandardLevel {
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
 	
-	private boolean specialActive = false;
+	private boolean heartSpecialActive = false;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	protected int heartCursorPos = 0;
 	protected int[] blockSize;
@@ -200,26 +200,16 @@ public abstract class BlockStandardLevel {
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			gridMoving = drawGrid(500);
-			//shiftGrid();
-		
+
 			// for cursor surrounding block
 			cursor.draw(
 				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
 				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
 				blockSize
 			);
-			// for pointer at center of block
-			/* cursor.draw(
-				gridBasePos[0] + blockSize[0] * cursorGridPos[0] - blockSize[0]/2,
-				gridBasePos[1] - blockSize[1] * cursorGridPos[1] + blockSize[1]/2,
-				blockSize
-			); //*/
 			
-			// process left,right,up,down movement in the grid or special item area
-			// check if special circumstances for controlling movement input are active
-			// and handle accordingly
-			if (specialActive) {
-				// if a special item or event has moved the selector cursor, handle that here
+			// check if heart special control is active and handle accordingly
+			if (heartSpecialActive) {
 				/**
 				 * @author Brock
 				 */
@@ -233,11 +223,10 @@ public abstract class BlockStandardLevel {
 					removeMarkedBlocks();
 					dropBlocks();
 					shiftGridColumns();
-					specialActive = false;
+					heartSpecialActive = false;
 					clearColor = false;
 
 				}
- 
 			} else { // no special circumstance, handle input normally
 				if (inputDelay <= 0l) {
 					checkCommonControls();
@@ -252,16 +241,7 @@ public abstract class BlockStandardLevel {
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
 		drawEnergy();
-		if (gamePaused) {
-			// TODO: display the pause menu
-		} else if (gameOver) {
-			// TODO: show game over screen
-		}
-
-	
 	}
-
-
 
 	/**
 	 * Checks the grid for blocks of the same color sharing edges, and marks those blocks
@@ -307,7 +287,6 @@ public abstract class BlockStandardLevel {
 			sum += checkGrid(xc, yc + 1, colorID);
 		}
 		return sum;
-		
 	}
 
 	/**
@@ -492,7 +471,8 @@ public abstract class BlockStandardLevel {
 	protected abstract void buildGrid(); 
 
 	/**
-	 * 
+	 * Draw the contents of the <code>Block</code> grid to the screen and
+	 * adjusts the position of moving blocks.
 	 * @param shiftRate The drop rate in pixels/second for falling blocks
 	 * @return true if blocks are currently falling within the grid, false
 	 * if no blocks are currently falling 
@@ -563,7 +543,7 @@ public abstract class BlockStandardLevel {
 	}
 	
 	/**
-	 * Draws the block grid without processing any block movement.
+	 * Draws the <code>Block</code> grid without processing any block movement.
 	 * @author John
 	 */
 	protected final void drawGrid() {
@@ -581,38 +561,36 @@ public abstract class BlockStandardLevel {
 			}
 		}
 		drawQueue();
-		
 	}
+	
+	/**
+	 * @author Brock
+	 */
 	protected void pauseControls() {
-// Author: Brock
 		if (inputDelay <= 0) {
-			
 			if (Global.getControlActive(Global.GameControl.UP)) {
-					pauseCursorPos--;
-		
+				pauseCursorPos--;
 				if (pauseCursorPos < 0) {
 						pauseCursorPos = 1;
 				}
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.DOWN)) {
-					pauseCursorPos++;
-		
+				pauseCursorPos++;
 				if (pauseCursorPos > 1) {
 					pauseCursorPos = 0;
 				}
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
-					gamePaused = false;
-					inputDelay = Global.inputReadDelayTimer * 2;
+				gamePaused = false;
+				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.PAUSE)) { // Cancel key moves the cursor to the program exit button
-					gamePaused = false;
-					inputDelay = Global.inputReadDelayTimer * 2;		
+				gamePaused = false;
+				inputDelay = Global.inputReadDelayTimer * 2;		
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
-
 				switch (pauseCursorPos) {
 					case 0:
 						gamePaused = false;
@@ -624,91 +602,89 @@ public abstract class BlockStandardLevel {
 						gameOver = true;
 						inputDelay = Global.inputReadDelayTimer;	
 						break;
-
 				}
 			}
 		} else if (inputDelay > 0) {
 			inputDelay -= Global.delta;
 		}
 	}
+	
 	protected void gameOverControls() {
 		// Author: Mario
-				if (inputDelay <= 0) {
-					if (Global.getControlActive(Global.GameControl.LEFT) || Global.getControlActive(Global.GameControl.DOWN)) {
-						pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
-						inputDelay = Global.inputReadDelayTimer * 2;
-					}
-					if (Global.getControlActive(Global.GameControl.RIGHT) || Global.getControlActive(Global.GameControl.DOWN)) {
-						pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
-						inputDelay = Global.inputReadDelayTimer * 2;
-					}
-					
-					if (Global.getControlActive(Global.GameControl.SELECT)) {
-						switch (pauseCursorPos) {
-							case 0:
-								gameOver = false;
-								energy = energyMax;
-								score = score/2;
-								inputDelay = 10 * Global.inputReadDelayTimer;	
-								break;
-
-							case 1:
-								gameOver = true;
-								levelFinished = true;
-								inputDelay = 10 * Global.inputReadDelayTimer;	
-								break;
-						}
-					}
-				} else if (inputDelay > 0) {
-					inputDelay -= Global.delta;
+		if (inputDelay <= 0) {
+			if (Global.getControlActive(Global.GameControl.LEFT) || Global.getControlActive(Global.GameControl.DOWN)) {
+				pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
+			if (Global.getControlActive(Global.GameControl.RIGHT) || Global.getControlActive(Global.GameControl.DOWN)) {
+				pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
+			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				switch (pauseCursorPos) {
+					case 0:
+						gameOver = false;
+						energy = energyMax;
+						score = score/2;
+						inputDelay = 10 * Global.inputReadDelayTimer;	
+						break;
+					case 1:
+						gameOver = true;
+						levelFinished = true;
+						inputDelay = 10 * Global.inputReadDelayTimer;	
+						break;
 				}
 			}
+		} else if (inputDelay > 0) {
+			inputDelay -= Global.delta;
+		}
+	}
 	
+	/** @author Mario */
 	protected void levelFinishedControls() {
-		// Author: Mario
 		if (inputDelay <= 0) {
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				pauseCursorPos--;
-			if (pauseCursorPos < 0) {
-				pauseCursorPos = 1;
+				if (pauseCursorPos < 0) {
+					pauseCursorPos = 1;
 				}
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.DOWN)) {
-					pauseCursorPos++;
+				pauseCursorPos++;
 				if (pauseCursorPos > 1) {
 					pauseCursorPos = 0;
 				}
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
-					if (Global.getControlActive(Global.GameControl.SELECT)) {
-						switch (pauseCursorPos) {
-							case 0:
-								levelFinished = true;
-								gameOver = false;
-								inputDelay = 10 * Global.inputReadDelayTimer;	
-								break;
-
-							case 1:
-								gameOver = true;
-								levelFinished = true;
-								inputDelay = 10 * Global.inputReadDelayTimer;	
-								break;
-						}
-					}
-				} else if (inputDelay > 0) {
-					inputDelay -= Global.delta;
+			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				switch (pauseCursorPos) {
+					case 0:
+						levelFinished = true;
+						gameOver = false;
+						inputDelay = 10 * Global.inputReadDelayTimer;	
+						break;
+	
+					case 1:
+						gameOver = true;
+						levelFinished = true;
+						inputDelay = 10 * Global.inputReadDelayTimer;	
+						break;
 				}
 			}
-	/**
-	 * Checks against movement inputs within the grid, and adjusts the cursor
+		} else if (inputDelay > 0) {
+			inputDelay -= Global.delta;
+		}
+	}
+
+	/** Checks against movement inputs within the grid, and adjusts the cursor
 	 * position accordingly.
 	 * @author John
 	 */
 	protected void checkCommonControls() {
 		if (Global.getControlActive(Global.GameControl.PAUSE)) {
-				gamePaused = true;
-				inputDelay = 1000l;		
+			gamePaused = true;
+			inputDelay = 1000l;		
 		} else if (Global.getControlActive(Global.GameControl.SPECIAL2)) {
 			// queue control
 			queueHold = true;
@@ -737,7 +713,6 @@ public abstract class BlockStandardLevel {
 				gridShiftDir *= -1;
 				shiftGridColumns();
 			}
-			
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorGridPos[1]++;
 				if (cursorGridPos[1] >= grid[0].blocks.length) {
@@ -771,22 +746,12 @@ public abstract class BlockStandardLevel {
 					processActivate();
 					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
 						// decrease the blocksRemaining counter after blocks are cleared
-//						blocksRemaining -= counter; // now adjusted in removeMarkedBlocks() function
 						removeMarkedBlocks();
 						dropBlocks();
 						shiftGridColumns();
 						// action delay is only increased if an action was performed and the grid was changed
 						// actionDelay = Global.inputReadDelayTimer;
 					}
-					/*if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
-						// decrease the blocksRemaining counter after blocks are cleared
-//						blocksRemaining -= counter; // now adjusted in removeMarkedBlocks() function
-						removeMarkedBlocks();
-						dropBlocks();
-						shiftGridColumns();
-						// action delay is only increased if an action was performed and the grid was changed
-						actionDelay = Global.inputReadDelayTimer;
-					}*/
 					if (actionDelay < Global.inputReadDelayTimer) {
 						actionDelay = Global.inputReadDelayTimer;
 					}
@@ -914,7 +879,6 @@ public abstract class BlockStandardLevel {
 	
 	protected void processActivate() {
 		// TODO: score base value calculation is to be done within each case statement
-		// [CUSTOM] add case statements for each type of block that can be activated in the level
 		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
 			case BLOCK:
 				counter = checkGrid(cursorGridPos);
@@ -928,7 +892,7 @@ public abstract class BlockStandardLevel {
 				addEnergy(counter);
 				break;
 			case HEART:
-				specialActive = true;
+				heartSpecialActive = true;
 				actionDelay = Global.inputReadDelayTimer * 3;
 				break;
 			default: // block does not activate, do nothing
@@ -938,8 +902,8 @@ public abstract class BlockStandardLevel {
 	}
 	
 	/**
-	 * 
-	 * @param direction
+	 * Shifts the <code>Block</code> queue across the screen 
+	 * @param direction 1 to shift the queue to the right, eles shift to the left
 	 * @author John
 	 */
 	private void shiftQueue(int direction) {
@@ -977,12 +941,13 @@ public abstract class BlockStandardLevel {
 			
 		}
 	}
+	
 	/**
 	 * @author John
 	 */
 	protected void processQueue() {
 		if (levelComplete) { return; }
-		if (specialActive) { return; }
+		if (heartSpecialActive) { return; }
 		queueStepDelay -= Global.delta;
 		int xMax = queue.length;
 		if (queueStepDelay > 0) { return; }
@@ -1150,19 +1115,17 @@ public abstract class BlockStandardLevel {
 			heartMenuBlocks[i] = new Block(Block.BlockType.BLOCK, i);
 		}
 		heartCursor = new Sprite (
-				Global.textureMap.get("blocksheet"),
-				new int[] { 240, 0 },
-				new int[] { 32, 32 },
-				new int[] { 32, 32 }
-				);
+			Global.textureMap.get("blocksheet"),
+			new int[] { 240, 0 },
+			new int[] { 32, 32 },
+			new int[] { 32, 32 }
+			);
 		
 		overlay.draw(0, 0);
 		for (int j = 0; j < heartMenuBlocks.length; j++) {
 			heartMenuBlocks[j].draw(100 + j * 32, 100);
 			heartCursor.draw(100 + heartCursorPos * 32, 100);
 		}
-		
-		
 		return colorID;
 	}
 	
@@ -1193,7 +1156,6 @@ public abstract class BlockStandardLevel {
 	
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
-				
 				switch(heartCursorPos) {
 					case 0:
 						colorID = 0;
@@ -1219,10 +1181,8 @@ public abstract class BlockStandardLevel {
 				clearColor = true;
 				actionDelay = Global.inputReadDelayTimer * 2;
 			}  
-			
 		} else {
 			actionDelay -= Global.delta;
-			
 		}
 	}
 	
@@ -1232,7 +1192,6 @@ public abstract class BlockStandardLevel {
 	 */
 	protected int activateHeartBlock(int pos[]) {
 		int count = 0;
-		
 		grid[pos[0]].blocks[pos[1]].clearMark = true;
 		
 		for (int i = 0; i < gridSize[0]; i++) {
