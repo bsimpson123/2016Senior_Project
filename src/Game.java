@@ -97,7 +97,8 @@ public class Game {
 			new String[] { "yellow_ui", "media/yellowSheet.png" },
 			new String[] { "grey_ui", "media/greySheet.png" },
 			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
-			new String[] { "main_menu_background","media/main_menu_background.png"},
+			//new String[] { "main_menu_background","media/main_menu_background.png"},
+			new String[] { "main_menu_background", "media/title_68e14f.png" },
 			new String[] { "uibox", "media/UI_Boxes.png" },
 			new String[] { "title", "media/TitleDisplay.png" },
 			new String[] { "Text", "media/Mode_Text.png"},
@@ -448,18 +449,19 @@ public class Game {
 			// Draw the frame that will contain the option boxes
 			menu_background.draw(0,0);
 			title.draw(0, 50);
-			optionFrameTop.draw(400, 350);
-			optionFrameMid.draw(400, 370);
-			optionFrameBottom.draw(400, 670);
+			//optionFrameTop.draw(400, 350);
+			//optionFrameMid.draw(400, 370);
+			//optionFrameBottom.draw(400, 670);
 			
 			// Draw the option boxes
 			//optionBox.draw(430, 380);
 			//optionBox.draw(430, 450);
 			//optionBox.draw(430, 520);
+			Global.menuButtonShader.bind();
 			for (int i = 0; i < 4; i++) {
-				Global.uiGreen.draw(430, 380 + i * 70, 190, 48);
+				Global.uiTransWhite.draw(430, 380 + i * 70, 190, 48);
 			}
-			
+			Color.white.bind();
 			//selector[0].draw(410, 387 + cursorPos * 70);
 			//selector[1].draw(600, 387 + cursorPos * 70);
 			//Global.uiYellowSel.draw(430, cursorPos * 70 + 380, 190, 48);

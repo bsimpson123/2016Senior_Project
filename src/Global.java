@@ -49,6 +49,8 @@ public class Global {
 		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
 		uiTransWhite, uiWhite;
 	
+	public static Color menuButtonShader = new Color(79, 187, 101);
+	
     private static TrueTypeFont font24, font48, numbers24, numbers48;
 	
 	private static FileWriter logFile;
@@ -262,7 +264,7 @@ public class Global {
 		uiGreenSel = buildBox(tex, new int[] { 96, 96 }, corner);
 		uiYellowSel = buildBox(tex, new int[] { 144, 96 }, corner);
 		uiWhite = buildBox(tex, new int[] { 192, 96 }, corner);
-		uiTransWhite = buildBox(tex, new int[] { 192, 48 }, corner);
+		uiTransWhite = buildBox(tex, new int[] { 192, 146 }, corner);
 	}
 	
 	private static UIBox buildBox(Texture tex, int[] offset, int[] corner) {
