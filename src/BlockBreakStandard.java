@@ -392,7 +392,10 @@ public class BlockBreakStandard implements GameMode {
 			GameSelector_background.draw(0, 0);
 			moveCursorMain();
 			for (int i = 0; i < menuOptions.length; i++) {
-				optionBox.draw(180, 180 + i * 70);
+				//optionBox.draw(180, 180 + i * 70);
+				Global.menuButtonShader.bind();
+				Global.uiTransWhite.draw(180, 180 + i * 70, 190, 48);
+				Color.white.bind();
 				if (cursorPos == i) {
 					Global.drawFont24(275 - menuOptionOffset[i], 190 + i * 70, menuOptions[i], Color.white);
 				} else {
@@ -616,22 +619,24 @@ public class BlockBreakStandard implements GameMode {
 		
 		Global.drawFont48(512 - 98, 25, "High Score", Color.white);
 		HighScoreRecord hsr;
+		int scoreOff = 0;
 		for (int i = 0; i < limit; i++) {
 			hsr = hsRecords.get(i);
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
-			//Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "High Score Name", textColor);
 			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, hsr.getName(), textColor);
-			//Global.drawFont24(hsMargin + 560, firstDrop + i * interval + 15, "01234567890123", textColor);
-			Global.drawNumbers24(hsMargin + 560, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
-			//Global.drawFont24(hsMargin + 770, firstDrop + i * interval + 15, "00/00/0000", textColor);
+			scoreOff = Global.getNumbers24DrawSize(hsr.getScoreAsString()); 
+			//Global.drawNumbers24(hsMargin + 560, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
+			Global.drawNumbers24(hsMargin + 740 - scoreOff, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
 			Global.drawNumbers24(hsMargin + 770, firstDrop + i * interval + 15, hsr.getDate(), textColor);
-			Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 15, hsr.getLevel(), textColor);
-			
-			
+			//Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 15, hsr.getLevel(), textColor);
 		}
 		Color.white.bind();
+		//Global.menuButtonShader.bind();
+		Global.uiTransWhite.draw(512 - 250, 700, 500, 48);
+		//Color.white.bind();
+		Global.drawFont24(512, 715, "Press [CANCEL] to return to game menu.", Color.black, true);
 	}
 	
 	/**

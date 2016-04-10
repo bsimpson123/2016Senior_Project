@@ -289,6 +289,12 @@ public class Global {
 
 	}
 	
+	public static void drawFont24(int xc, int yc, String text, Color color, boolean centered) {
+		if (!centered) { drawFont24(xc, yc, text, color); return; }
+		int w = font24.getWidth(text) / 2;
+		drawFont24(xc - w, yc, text, color);
+	}
+	
 	public static void drawFont24(int xc, int yc, String text, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();
