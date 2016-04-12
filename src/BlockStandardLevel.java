@@ -28,16 +28,17 @@ public abstract class BlockStandardLevel {
 	protected int energyMax = 100000;
 	protected int energy = energyMax;
 	protected float energyGainMultiplier = 1.0f;
+	private int energyDisplay = energyMax;
 
 	// grid variables
 	protected GridColumn[] grid;
 	protected int[] gridSize;
 	protected int[] gridBasePos;
 	// grid shifting variables
-	protected boolean gridShiftActive = false;
-	protected boolean blockDropActive = false;
-	protected boolean gridMoving = false;
-	protected int gridShiftDir = 1;
+	private boolean gridShiftActive = false;
+	private boolean blockDropActive = false;
+	private boolean gridMoving = false;
+	private int gridShiftDir = 1;
 	private long shiftActionDelayTimer = 1000l;
 	private long gridShiftActionDelay = shiftActionDelayTimer;
 	// grid queue variables
@@ -58,9 +59,9 @@ public abstract class BlockStandardLevel {
 	protected int heartCursorPos = 0;
 	protected int[] blockSize;
 	protected int blocksRemaining = 0;
-	protected boolean gamePaused = false;
-	protected long inputDelay = Global.inputReadDelayTimer * 2;
-	protected long actionDelay = Global.inputReadDelayTimer * 2;
+	private boolean gamePaused = false;
+	private long inputDelay = Global.inputReadDelayTimer * 2;
+	private long actionDelay = Global.inputReadDelayTimer * 2;
 	protected String levelTitle; 
 	protected int level = 1;
 	/** Sets sets the multiplier to apply to all score additions/subtractions. */
@@ -1020,7 +1021,13 @@ public abstract class BlockStandardLevel {
 	protected void drawEnergy() {
 		emptyEnergy.draw(20, 740);
 		energyBar.bind();
-		float percent = (float) energy/(float) energyMax;
+		if (energy > energyDisplay) {
+			energyDisplay += Global.delta * 100;
+		} else {
+			energyDisplay = energy;
+		}
+		
+		float percent = (float) energyDisplay/(float) energyMax;
 		glPushMatrix();
 		glTranslatef(20,740,0); // x y z
 		glBegin(GL_QUADS);
