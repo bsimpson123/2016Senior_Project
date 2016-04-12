@@ -187,6 +187,7 @@ public abstract class BlockStandardLevel {
 			levelComplete = true;
 			if (!endLevelDelayed) {
 				endLevelDelayed = true;
+				pauseCursorPos = 0;
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 		} else if (energy == 0) {
@@ -684,8 +685,9 @@ public abstract class BlockStandardLevel {
 	 */
 	protected void checkCommonControls() {
 		if (Global.getControlActive(Global.GameControl.PAUSE)) {
+			pauseCursorPos = 0;
 			gamePaused = true;
-			inputDelay = 1000l;		
+			inputDelay = 1000l;
 		} else if (Global.getControlActive(Global.GameControl.SPECIAL2)) {
 			// queue control
 			queueHold = true;
