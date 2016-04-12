@@ -397,9 +397,9 @@ public class BlockBreakStandard implements GameMode {
 				Global.uiTransWhite.draw(180, 180 + i * 70, 190, 48);
 				Color.white.bind();
 				if (cursorPos == i) {
-					Global.drawFont24(275 - menuOptionOffset[i], 190 + i * 70, menuOptions[i], Color.white);
+					Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.white);
 				} else {
-					Global.drawFont24(275 - menuOptionOffset[i], 190 + i * 70, menuOptions[i], Color.black);
+					Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.black);
 				}
 			}
 			switch (cursorPos) {
@@ -524,6 +524,45 @@ public class BlockBreakStandard implements GameMode {
 				break;
 			case 7:
 				playLevel = new BlockStandardLevel07(localTexMap);
+				break;
+			case 8:
+				playLevel = new BlockStandardLevel08(localTexMap);
+				break;
+			case 9:
+				playLevel = new BlockStandardLevel09(localTexMap);
+				break;
+			case 10: 
+				playLevel = new BlockStandardLevel10(localTexMap);
+				break;
+			case 11:
+				playLevel = new BlockStandardLevel11(localTexMap);
+				break;
+			case 12:
+				playLevel = new BlockStandardLevel12(localTexMap);
+				break;
+			case 13:
+				playLevel = new BlockStandardLevel13(localTexMap);
+				break;
+			case 14:
+				playLevel = new BlockStandardLevel14(localTexMap);
+				break;
+			case 15:
+				playLevel = new BlockStandardLevel15(localTexMap);
+				break;
+			case 16:
+				playLevel = new BlockStandardLevel16(localTexMap);
+				break;
+			case 17:
+				playLevel = new BlockStandardLevel17(localTexMap);
+				break;
+			case 18:
+				playLevel = new BlockStandardLevel18(localTexMap);
+				break;
+			case 19:
+				playLevel = new BlockStandardLevel19(localTexMap);
+				break;
+			case 20:
+				playLevel = new BlockStandardLevel20(localTexMap);
 				break;
 			default:
 				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
