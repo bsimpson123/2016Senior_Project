@@ -188,11 +188,14 @@ public abstract class BlockStandardLevel {
 			if (!endLevelDelayed) {
 				endLevelDelayed = true;
 				pauseCursorPos = 0;
+				score += energy >> 6;
+				energy = 0;
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 		} else if (energy == 0) {
 			// game over
 			gameOver = true;
+			pauseCursorPos = 0;
 		}
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver && !levelComplete) {
@@ -897,6 +900,7 @@ public abstract class BlockStandardLevel {
 			case HEART:
 				heartSpecialActive = true;
 				actionDelay = Global.inputReadDelayTimer * 3;
+				energy += energyMax / 10; // regenerate 10% of max energy on use
 				break;
 			default: // block does not activate, do nothing
 				break;
@@ -1025,6 +1029,8 @@ public abstract class BlockStandardLevel {
 		energyBar.bind();
 		if (energy > energyDisplay) {
 			energyDisplay += Global.delta * 100;
+		} else if (energy == 0 && energyDisplay > 0) {
+			energyDisplay -= Global.delta * 100;
 		} else {
 			energyDisplay = energy;
 		}
