@@ -192,7 +192,7 @@ public abstract class BlockStandardLevel {
 				energy = 0;
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
-		} else if (energy == 0) {
+		} else if (energy == 0 && !gameOver) {
 			// game over
 			gameOver = true;
 			pauseCursorPos = 0;
@@ -385,7 +385,6 @@ public abstract class BlockStandardLevel {
 			//drawGrid();
 			// TODO: level complete code
 			overlay.draw(0, 0);
-			//nLevel.draw(200, 200);
 			levelFinishedControls();
 			optionFrameMid.draw(412,250); //180 250
 			if (pauseCursorPos == 0) {
@@ -455,16 +454,21 @@ public abstract class BlockStandardLevel {
 		Global.uiWhite.draw(288, 288, 452, 192);
 		
 		if (pauseCursorPos == 0) {
-			Global.drawFont24(330, 240, "Continue?", Color.white);
-			Global.drawFont24(618, 240, "Quit", Color.black);
-			Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
-			Global.drawFont24(308, 350, "your current score.",Color.black);
+			if(!practice){
+				Global.drawFont24(330, 240, "Continue?", Color.white);
+				Global.drawFont24(618, 240, "Quit", Color.black);
+				Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
+				Global.drawFont24(308, 350, "your current score.",Color.black);
+			}
+			else
+				Global.drawFont24(360, 240, "Quit", Color.white);
+				Global.drawFont24(618, 240, "", Color.black);
 		}
 		
 		if (pauseCursorPos == 1) {
-			Global.drawFont24(330, 240, "Continue?", Color.black);
-			Global.drawFont24(618, 240, "Quit", Color.white);
-			Global.drawFont24(440, 380, "Quit the level.", Color.black);
+				Global.drawFont24(330, 240, "Continue?", Color.black);
+				Global.drawFont24(618, 240, "Quit", Color.white);
+				Global.drawFont24(440, 380, "Quit the level.", Color.black);
 		}
 		
 		if (Global.getControlActive(Global.GameControl.CANCEL)) {
@@ -617,15 +621,28 @@ public abstract class BlockStandardLevel {
 	protected void gameOverControls() {
 		// Author: Mario
 		if (inputDelay <= 0) {
-			if (Global.getControlActive(Global.GameControl.LEFT) || Global.getControlActive(Global.GameControl.DOWN)) {
-				pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
-				inputDelay = Global.inputReadDelayTimer * 2;
-			}
-			if (Global.getControlActive(Global.GameControl.RIGHT) || Global.getControlActive(Global.GameControl.DOWN)) {
-				pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
-				inputDelay = Global.inputReadDelayTimer * 2;
-			}
+			if(!practice){
+				if (Global.getControlActive(Global.GameControl.LEFT) || Global.getControlActive(Global.GameControl.DOWN)) {
+					pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
+					inputDelay = Global.inputReadDelayTimer * 2;
+					}
+				if (Global.getControlActive(Global.GameControl.RIGHT) || Global.getControlActive(Global.GameControl.DOWN)) {
+					pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
+					inputDelay = Global.inputReadDelayTimer * 2;
+					}
+				}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				if(practice==true){
+					switch(pauseCursorPos){
+					
+					case 0:
+						gameOver = true;
+						levelFinished = true;
+						inputDelay = 10 * Global.inputReadDelayTimer;	
+						
+						break;
+					}
+				}
 				switch (pauseCursorPos) {
 					case 0:
 						gameOver = false;
