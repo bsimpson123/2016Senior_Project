@@ -192,7 +192,7 @@ public abstract class BlockStandardLevel {
 				energy = 0;
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
-		} else if (energy == 0) {
+		} else if (energy == 0 && !gameOver) {
 			// game over
 			gameOver = true;
 			pauseCursorPos = 0;
@@ -546,6 +546,64 @@ public abstract class BlockStandardLevel {
 		drawQueue();
 		return (blockDropActive || gridShiftActive);
 	}
+
+	
+	private int wedgeColumn = -1;
+	private final int blockMoveRate = 1;
+	private final long blockMoveDelayTimer = 30l;
+	private long blockMoveDelay = 0;
+	//TODO: new grid shift
+	protected void processGridMovement() {
+		blockMoveDelay -= Global.delta;
+		if (blockMoveDelay > 0) { return; }
+		blockMoveDelay += blockMoveDelayTimer;
+		gridMoving = false;
+		int ySearchLimit = grid[0].blocks.length - 1;
+		// drop blocks down first
+		for (int x = 0; x < grid.length; x ++) {
+			
+			for (int y = 0; y < ySearchLimit; y++) {
+				// find null blocks with not at the top of the grid
+				if (grid[x].blocks[y] == null && y < grid[x].blocks.length - 1) {
+					if (grid[x].blocks[y+1] != null && grid[x].blocks[y+1].dropDistance <= 0) {
+						for (int yy = y; yy < ySearchLimit; yy++) {
+							if (grid[x].blocks[yy] == null) { break; }
+							grid[x].blocks[yy] = grid[x].blocks[yy+1];
+							grid[x].blocks[yy].dropDistance += blockSize[1];
+						}
+						if (x == wedgeColumn) {
+							y = wedgeColumn;
+							continue; // continue checking at the block above the wedge
+						} else {
+							break; // exit for-loop(y)
+						}
+						
+					}
+				} else if (grid[x].blocks[y].dropDistance > 0) {
+					grid[x].blocks[y].dropDistance -= blockMoveRate;
+				} else if (grid[x].blocks[y].type == Block.BlockType.WEDGE) {
+					if (gridShiftDir == 1) { // right shift
+						
+					} else { // left shift
+						
+					}
+				}
+				
+			}
+			
+		}
+		
+		if (gridMoving) { return; } // stop if blocks are falling
+		// shift columns if no blocks are falling down
+		for (int x = 0; x < grid.length; x++) {
+			
+		}
+		
+		
+		
+		return;
+	}
+	
 	
 	/**
 	 * Draws the <code>Block</code> grid without processing any block movement.
