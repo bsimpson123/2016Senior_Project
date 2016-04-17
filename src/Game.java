@@ -105,7 +105,8 @@ public class Game {
 			new String[] { "overlay", "media/blackoverlay.png" }, 
 			new String[] { "bomb_numbers", "media/numbers_small.png" },
 			new String[] { "pause_text", "media/pause_text.png"},
-			new String[] { "heart", "media/tileRed_36_small.png"}
+			new String[] { "heart", "media/tileRed_36_small.png"},
+			new String[] { "white_ui_controls", "media/sheet_white2x.png"}
 	};
 	
 	/* Menu display and control variables */
@@ -118,6 +119,7 @@ public class Game {
 	private Sprite menu_background;
 	private Sprite title;
 	
+
 	private final String[] menuOptions = new String[] {
 		"Options",
 		"Credits",
@@ -126,9 +128,10 @@ public class Game {
 	private int[] menuOptionOffset = new int[3];
 	
 	private final String[] modeOptions = new String[] {
-		"Standard Mode"
+		"Standard Mode",
+		"Puzzle Mode"
 	};
-	private int[] modeOptionOffset = new int[1];
+	private int[] modeOptionOffset = new int[2];
 	
 	private long mouseDelay = Global.inputReadDelayTimer;
 	private Thread gameModeLoader = null;
@@ -137,6 +140,9 @@ public class Game {
 	private long movementInputDelay = 0;
 	
 	private GameMode game;
+	
+	private int GameModeType = 0;
+	private Sprite[] GameModeArrows = new Sprite[2];
 	/**
 	 * Get the high resolution time in milliseconds
 	 * @return The high resolution time in milliseconds
@@ -329,7 +335,18 @@ public class Game {
 				new int[] { 1024, 256 },
 				new int[] { 1024, 256 }
 			);
-		
+		GameModeArrows[0] = new Sprite(
+				Global.textureMap.get("white_ui_controls"),
+				new int[] { 300, 600 },
+				new int[] { 100, 100 },
+				new int[] { 50, 50 }
+			);
+		GameModeArrows[1] = new Sprite(
+				Global.textureMap.get("white_ui_controls"),
+				new int[] { 200, 300 },
+				new int[] { 100, 100 },
+				new int[] { 50, 50 }
+			);
 		Audio sound;
 		for (String ref : soundEffectResource) {
 			sound = null;
@@ -404,10 +421,15 @@ public class Game {
 				if (Global.getControlActive(Global.GameControl.LEFT)) { ; }
 				if (Global.getControlActive(Global.GameControl.RIGHT)) { ; }
 				//*/
+				if (cursorPos == 0) {
+					inputGameModeMenu();
+				}
 				if (Global.getControlActive(Global.GameControl.UP)) {
 					cursorPos--;
 					Global.sounds.playSoundEffect("button_click");
-					
+					//if (cursorPos == 0) {
+					//	inputGameModeMenu();
+					//}
 					if (cursorPos < 0) {
 						cursorPos = 3;
 					}
@@ -417,6 +439,9 @@ public class Game {
 					cursorPos++;
 					Global.sounds.playSoundEffect("button_click");
 
+					//if (cursorPos == 0) {
+					//	inputGameModeMenu();
+					//}
 					if (cursorPos > 3) {
 						cursorPos = 0;
 					}
@@ -429,7 +454,16 @@ public class Game {
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0: // Game play
-						game = new BlockBreakStandard();
+						switch (GameModeType) {
+							case 0:
+								game = new BlockBreakStandard();
+								break;
+							case 1:
+								game = new BlockPuzzleMode();
+								break;
+							default:
+								break;
+						}
 						activeGameMode = GameModeSelection;
 						break;
 					case 1: // Config
@@ -468,12 +502,14 @@ public class Game {
 			Color.white.bind();
 			//Global.drawStringDefaultFont(430, 380, "Standard Mode", Color.black);
 			if (cursorPos == 0) {
-				Global.drawFont24(525 - modeOptionOffset[0], 393, modeOptions[0], Color.white);
+				GameModeArrows[0].draw(390, 378);
+				Global.drawFont24(525 - modeOptionOffset[GameModeType], 393, modeOptions[GameModeType], Color.white);
+				GameModeArrows[1].draw(610, 378);
 				//selector[1].draw(390, 387 + cursorPos * 70);
 				//selector[0].draw(620, 387 + cursorPos * 70);
 
 			} else {
-				Global.drawFont24(525 - modeOptionOffset[0], 393, modeOptions[0], Color.black);
+					Global.drawFont24(525 - modeOptionOffset[GameModeType], 393, modeOptions[GameModeType], Color.black);
 			}
 			for (int i = 0; i < 3; i++) {
 				if (cursorPos == (i + 1)) {
@@ -518,6 +554,27 @@ public class Game {
 		if ( Display.isCloseRequested() ) {
 			gameRunning = false; // indicate that the game is no longer running
 		}
+	}
+	
+	/*
+	 * @Author Brock
+	 */
+	private void inputGameModeMenu() {
+		movementInputDelay -= Global.delta;
+		
+		if (movementInputDelay > 0) { return; }
+		
+		if (Global.getControlActive(Global.GameControl.LEFT)) {
+			GameModeType--;
+			Global.sounds.playSoundEffect("button_click"); 
+			if (GameModeType < 0) { GameModeType = 1; }
+			movementInputDelay = Global.inputReadDelayTimer;
+		} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
+			GameModeType++;
+			Global.sounds.playSoundEffect("button_click"); 
+			if (GameModeType > 1) { GameModeType = 0; }
+			movementInputDelay = Global.inputReadDelayTimer;
+		} 		
 	}
 	
 	public Game(boolean runFullscreen) {
