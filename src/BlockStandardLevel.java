@@ -3,7 +3,7 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
 /**
  * This class serves as the base class for all Block Breaker Standard mode levels,
- * and defines and abstracts many of the functions that many level design simpler.
+ * and defines and abstracts many of the functions that make level design simpler.
  * @author John Ojala
  */
 public abstract class BlockStandardLevel {
@@ -607,6 +607,38 @@ public abstract class BlockStandardLevel {
 		
 		return;
 	}
+	
+	private int[] wedgePos = new int[] { -1, -1 };
+	private int blocksMoving = 0;
+	private final int VERTMOVEMENT = 1;
+	private final int HORIZMOVEMENT = 2;
+	
+	protected void processGridBlocks(GridColumn[] grid) {
+		int[][] starPos = new int[10][2];
+		int xMax = grid.length - 1;
+		int yMax = grid[0].blocks.length - 1;
+		int[] topblock = new int[grid.length]; // contains the position of the topmost block per column
+		GridColumn gc;
+		for (int x = 0; x <= xMax; x++) {
+			gc = grid[x];
+			for (int y = yMax; y > 0; y--) {
+				if (gc.blocks[y] == null) { continue; }
+				if (gc.blocks[y].type == Block.BlockType.WEDGE) {
+					
+				}
+				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
+					// TODO: check for null under block or adjust falling offset
+					
+				}
+				
+				
+			}
+			
+		}
+		
+		
+	}
+	
 	
 	
 	/**
