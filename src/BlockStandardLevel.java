@@ -609,32 +609,60 @@ public abstract class BlockStandardLevel {
 	}
 	
 	private int[] wedgePos = new int[] { -1, -1 };
-	private int blocksMoving = 0;
-	private final int VERTMOVEMENT = 1;
-	private final int HORIZMOVEMENT = 2;
+	private boolean queueDropWaiting = false;
+	private final int blockDropRate = 1;
+	private final long blockDropDelayTimer = 32;
+	private long blockDropDelay = blockDropDelayTimer;
 	
 	protected void processGridBlocks(GridColumn[] grid) {
+		blockDropDelay -= Global.delta;
+		if (blockDropDelay > 0) { return; }
+		blockDropDelay += blockDropDelayTimer;
+		
 		int[][] starPos = new int[10][2];
 		int xMax = grid.length - 1;
 		int yMax = grid[0].blocks.length - 1;
-		int[] topblock = new int[grid.length]; // contains the position of the topmost block per column
+		// contains the position of the topmost block per column. used to determine if a column can shift under a wedge block
+		int[] topblock = new int[grid.length]; 
 		GridColumn gc;
+		
+		// process all down movement
 		for (int x = 0; x <= xMax; x++) {
 			gc = grid[x];
-			for (int y = yMax; y > 0; y--) {
+			for (int y = 1; y <= yMax; y++) {
+			//for (int y = yMax; y > 0; y--) {
 				if (gc.blocks[y] == null) { continue; }
-				if (gc.blocks[y].type == Block.BlockType.WEDGE) {
-					
-				}
+				gc.blocks[y].checked = false; // clear checked mark every loop
+				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { }
 				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
-					// TODO: check for null under block or adjust falling offset
+					// always add to dropDistance even if there is a block below
+					gc.blocks[y].dropDistance += blockDropRate;
+					if (gc.blocks[y-1] == null) { // space below is empty
+						if (gc.blocks[y].dropDistance >= blockSize[1]) { // is dropDistance >= block height?
+							// move block to slot below and decrement dropDistance by block height
+							gc.blocks[y].dropDistance -= blockSize[1];
+							gc.blocks[y-1] = gc.blocks[y];
+							gc.blocks[y] = null;
+						}
+					} else if (gc.blocks[y-1].dropDistance > 0) {
+						// block below is moving, also move into that space
+						
+					} else {
+						gc.blocks[y].dropDistance = 0;
+						
+					}
+					if (x != wedgePos[0] || y < wedgePos[1]) {
+						// set the position of the topmost block for column (x), 
+						// or topmost under the wedge block if present in this column
+						topblock[x] = y;
+					}
 					
 				}
 				
 				
-			}
+			} // end for(y)
 			
-		}
+		} // end for(x)
 		
 		
 	}
