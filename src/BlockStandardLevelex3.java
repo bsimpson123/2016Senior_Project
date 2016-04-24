@@ -57,7 +57,7 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 		try {
 			String parseline;
 			String[] parseCSV;
-			infile = new BufferedReader(new FileReader("media/sp2.csv"));
+			infile = new BufferedReader(new FileReader("media/sp6.csv"));
 			parseline = infile.readLine();
 			int x=0;
 			while (parseline!= null) {
