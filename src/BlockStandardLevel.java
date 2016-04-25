@@ -204,8 +204,11 @@ public abstract class BlockStandardLevel {
 			if (energy < 0) { energy = 0; }
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			gridMoving = drawGrid(500);
-
+			//gridMoving = drawGrid(500);
+			this.drawGridRework(grid);
+			gridMoving = blocksMoving;
+			
+			
 			// for cursor surrounding block
 			cursor.draw(
 				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
@@ -383,8 +386,8 @@ public abstract class BlockStandardLevel {
 
 		if (levelComplete) {
 			//drawGrid();
-			// TODO: level complete code
 			overlay.draw(0, 0);
+			//nLevel.draw(200, 200);
 			levelFinishedControls();
 			optionFrameMid.draw(412,250); //180 250
 			if (pauseCursorPos == 0) {
@@ -454,21 +457,16 @@ public abstract class BlockStandardLevel {
 		Global.uiWhite.draw(288, 288, 452, 192);
 		
 		if (pauseCursorPos == 0) {
-			if(!practice){
-				Global.drawFont24(330, 240, "Continue?", Color.white);
-				Global.drawFont24(618, 240, "Quit", Color.black);
-				Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
-				Global.drawFont24(308, 350, "your current score.",Color.black);
-			}
-			else
-				Global.drawFont24(360, 240, "Quit", Color.white);
-				Global.drawFont24(618, 240, "", Color.black);
+			Global.drawFont24(330, 240, "Continue?", Color.white);
+			Global.drawFont24(618, 240, "Quit", Color.black);
+			Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
+			Global.drawFont24(308, 350, "your current score.",Color.black);
 		}
 		
 		if (pauseCursorPos == 1) {
-				Global.drawFont24(330, 240, "Continue?", Color.black);
-				Global.drawFont24(618, 240, "Quit", Color.white);
-				Global.drawFont24(440, 380, "Quit the level.", Color.black);
+			Global.drawFont24(330, 240, "Continue?", Color.black);
+			Global.drawFont24(618, 240, "Quit", Color.white);
+			Global.drawFont24(440, 380, "Quit the level.", Color.black);
 		}
 		
 		if (Global.getControlActive(Global.GameControl.CANCEL)) {
@@ -551,110 +549,46 @@ public abstract class BlockStandardLevel {
 		return (blockDropActive || gridShiftActive);
 	}
 
-	
-	private int wedgeColumn = -1;
-	private final int blockMoveRate = 1;
-	private final long blockMoveDelayTimer = 30l;
-	private long blockMoveDelay = 0;
-	//TODO: new grid shift
-	protected void processGridMovement() {
-		blockMoveDelay -= Global.delta;
-		if (blockMoveDelay > 0) { return; }
-		blockMoveDelay += blockMoveDelayTimer;
-		gridMoving = false;
-		int ySearchLimit = grid[0].blocks.length - 1;
-		// drop blocks down first
-		for (int x = 0; x < grid.length; x ++) {
-			
-			for (int y = 0; y < ySearchLimit; y++) {
-				// find null blocks with not at the top of the grid
-				if (grid[x].blocks[y] == null && y < grid[x].blocks.length - 1) {
-					if (grid[x].blocks[y+1] != null && grid[x].blocks[y+1].dropDistance <= 0) {
-						for (int yy = y; yy < ySearchLimit; yy++) {
-							if (grid[x].blocks[yy] == null) { break; }
-							grid[x].blocks[yy] = grid[x].blocks[yy+1];
-							grid[x].blocks[yy].dropDistance += blockSize[1];
-						}
-						if (x == wedgeColumn) {
-							y = wedgeColumn;
-							continue; // continue checking at the block above the wedge
-						} else {
-							break; // exit for-loop(y)
-						}
-						
-					}
-				} else if (grid[x].blocks[y].dropDistance > 0) {
-					grid[x].blocks[y].dropDistance -= blockMoveRate;
-				} else if (grid[x].blocks[y].type == Block.BlockType.WEDGE) {
-					if (gridShiftDir == 1) { // right shift
-						
-					} else { // left shift
-						
-					}
-				}
-				
-			}
-			
-		}
-		
-		if (gridMoving) { return; } // stop if blocks are falling
-		// shift columns if no blocks are falling down
-		for (int x = 0; x < grid.length; x++) {
-			
-		}
-		
-		
-		
-		return;
-	}
-	
 	private int[] wedgePos = new int[] { -1, -1 };
-	private boolean queueDropWaiting = false;
-	private final int blockDropRate = 1;
-	private final long blockDropDelayTimer = 32;
+	private final long blockDropDelayTimer = 32l;
 	private long blockDropDelay = blockDropDelayTimer;
+	private final int blockDropRate = 10;
+	private boolean blocksMoving = false;
 	
+	// TODO: grid rework
 	protected void processGridBlocks(GridColumn[] grid) {
 		blockDropDelay -= Global.delta;
-		if (blockDropDelay > 0) { return; }
+		if (blockDropDelay > 0) { return ; }
 		blockDropDelay += blockDropDelayTimer;
+		blocksMoving = false;
 		
-		int[][] starPos = new int[10][2];
 		int xMax = grid.length - 1;
 		int yMax = grid[0].blocks.length - 1;
-		// contains the position of the topmost block per column. used to determine if a column can shift under a wedge block
-		int[] topblock = new int[grid.length]; 
+		int[] topblock = new int[grid.length]; // contains the position of the topmost block per column
 		GridColumn gc;
-		
-		// process all down movement
 		for (int x = 0; x <= xMax; x++) {
 			gc = grid[x];
 			for (int y = 1; y <= yMax; y++) {
 			//for (int y = yMax; y > 0; y--) {
 				if (gc.blocks[y] == null) { continue; }
-				gc.blocks[y].checked = false; // clear checked mark every loop
-				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { }
-				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
-					// always add to dropDistance even if there is a block below
+				if (gc.blocks[y].type == Block.BlockType.WEDGE) { }
+				else if (gc.blocks[y].type != Block.BlockType.WEDGE) {
 					gc.blocks[y].dropDistance += blockDropRate;
 					if (gc.blocks[y-1] == null) { // space below is empty
-						if (gc.blocks[y].dropDistance >= blockSize[1]) { // is dropDistance >= block height?
-							// move block to slot below and decrement dropDistance by block height
+						if (gc.blocks[y].dropDistance > blockSize[1]) {
 							gc.blocks[y].dropDistance -= blockSize[1];
 							gc.blocks[y-1] = gc.blocks[y];
 							gc.blocks[y] = null;
 						}
+						blocksMoving = true;
 					} else if (gc.blocks[y-1].dropDistance > 0) {
-						// block below is moving, also move into that space
-						
+						blocksMoving = true;
 					} else {
 						gc.blocks[y].dropDistance = 0;
+						if (x != wedgePos[0] || y < wedgePos[1]) {
+							topblock[x] = y;
+						}
 						
-					}
-					if (x != wedgePos[0] || y < wedgePos[1]) {
-						// set the position of the topmost block for column (x), 
-						// or topmost under the wedge block if present in this column
-						topblock[x] = y;
 					}
 					
 				}
@@ -663,10 +597,24 @@ public abstract class BlockStandardLevel {
 			} // end for(y)
 			
 		} // end for(x)
-
+		
 	}
 	
 	
+	protected void drawGridRework(GridColumn[] grid) {
+		processGridBlocks(grid);
+		for (int i = 0; i < grid.length; i++) {
+			for (int k = 0; k < grid[0].blocks.length; k++) {
+				if (grid[i].blocks[k] != null) {
+					grid[i].blocks[k].draw(
+							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
+							gridBasePos[1] - blockSize[1] * k + grid[i].blocks[k].dropDistance,
+							blockSize
+						);
+				}
+			}
+		}
+	}
 	
 	/**
 	 * Draws the <code>Block</code> grid without processing any block movement.
@@ -738,28 +686,15 @@ public abstract class BlockStandardLevel {
 	protected void gameOverControls() {
 		// Author: Mario
 		if (inputDelay <= 0) {
-			if(!practice){
-				if (Global.getControlActive(Global.GameControl.LEFT) || Global.getControlActive(Global.GameControl.DOWN)) {
-					pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
-					inputDelay = Global.inputReadDelayTimer * 2;
-					}
-				if (Global.getControlActive(Global.GameControl.RIGHT) || Global.getControlActive(Global.GameControl.DOWN)) {
-					pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
-					inputDelay = Global.inputReadDelayTimer * 2;
-					}
-				}
+			if (Global.getControlActive(Global.GameControl.LEFT) || Global.getControlActive(Global.GameControl.DOWN)) {
+				pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
+			if (Global.getControlActive(Global.GameControl.RIGHT) || Global.getControlActive(Global.GameControl.DOWN)) {
+				pauseCursorPos = pauseCursorPos == 0 ? 1 : 0;
+				inputDelay = Global.inputReadDelayTimer * 2;
+			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
-				if(practice==true){
-					switch(pauseCursorPos){
-					
-					case 0:
-						gameOver = true;
-						levelFinished = true;
-						inputDelay = 10 * Global.inputReadDelayTimer;	
-						
-						break;
-					}
-				}
 				switch (pauseCursorPos) {
 					case 0:
 						gameOver = false;
