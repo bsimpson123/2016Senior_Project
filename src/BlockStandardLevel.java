@@ -550,10 +550,11 @@ public abstract class BlockStandardLevel {
 	}
 
 	private int[] wedgePos = new int[] { -1, -1 };
-	private final long blockDropDelayTimer = 32l;
+	private final long blockDropDelayTimer = 32l; // 32 is approx. 30/sec
 	private long blockDropDelay = blockDropDelayTimer;
-	private final int blockDropRate = 10;
+	private final int blockDropRate = 1;
 	private boolean blocksMoving = false;
+	private final boolean cascadeFall = true; 
 	
 	// TODO: grid rework
 	protected void processGridBlocks(GridColumn[] grid) {
@@ -564,7 +565,8 @@ public abstract class BlockStandardLevel {
 		
 		int xMax = grid.length - 1;
 		int yMax = grid[0].blocks.length - 1;
-		int[] topblock = new int[grid.length]; // contains the position of the topmost block per column
+		// contains the position of the topmost block per column. will be checked when attempting to move under a wedge block
+		int[] topblock = new int[grid.length]; 
 		GridColumn gc;
 		for (int x = 0; x <= xMax; x++) {
 			gc = grid[x];
@@ -573,15 +575,20 @@ public abstract class BlockStandardLevel {
 				if (gc.blocks[y] == null) { continue; }
 				if (gc.blocks[y].type == Block.BlockType.WEDGE) { }
 				else if (gc.blocks[y].type != Block.BlockType.WEDGE) {
-					gc.blocks[y].dropDistance += blockDropRate;
+					if (!cascadeFall) {
+						gc.blocks[y].dropDistance += blockDropRate; // set block as moving. this value is reset if the block cannot fall.
+					}
 					if (gc.blocks[y-1] == null) { // space below is empty
+						if (cascadeFall) {
+							gc.blocks[y].dropDistance += blockDropRate;
+						}
 						if (gc.blocks[y].dropDistance > blockSize[1]) {
 							gc.blocks[y].dropDistance -= blockSize[1];
 							gc.blocks[y-1] = gc.blocks[y];
 							gc.blocks[y] = null;
 						}
 						blocksMoving = true;
-					} else if (gc.blocks[y-1].dropDistance > 0) {
+					} else if (gc.blocks[y-1].dropDistance > 0) { // check if block below is moving
 						blocksMoving = true;
 					} else {
 						gc.blocks[y].dropDistance = 0;
@@ -608,7 +615,7 @@ public abstract class BlockStandardLevel {
 				if (grid[i].blocks[k] != null) {
 					grid[i].blocks[k].draw(
 							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
-							gridBasePos[1] - blockSize[1] * k + grid[i].blocks[k].dropDistance,
+							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
 							blockSize
 						);
 				}
