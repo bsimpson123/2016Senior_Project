@@ -35,6 +35,12 @@ public class BlockPuzzleMode implements GameMode {
 	private long movementInputDelay = Global.inputReadDelayTimer;
 	private long actionDelay = Global.inputReadDelayTimer;
 	
+	//protected int[] levelArray = new int[3];
+	//private HighScoreRecord[] hsLevelArray = new HighScoreRecord[3];
+	//protected ArrayList<HighScoreRecord>[] hsLevelArray = (ArrayList<HighScoreRecord>[])new ArrayList[2];
+	//protected ArrayList<HighScoreRecord>[] hsLevelArray = new ArrayList<HighScoreRecord>[2];
+	
+	
 	private boolean pageBack = false;
 	/** The current game mode within the main logic loop. */
 
@@ -91,9 +97,10 @@ public class BlockPuzzleMode implements GameMode {
 	private boolean newHighScore = false;
 	private String hsNameEntry = "";
 	private boolean preClearComplete = false;
-
+	private int level = 1;
 	
 	public BlockPuzzleMode() {
+		
 		// TODO: set or load any custom environment variables
 		// do not load assets at this point
 		for (int i = 0; i < menuOptions.length; i++) {
@@ -134,7 +141,7 @@ public class BlockPuzzleMode implements GameMode {
 		}
 // author Brock
 		//moveClick = new GameSounds(GameSounds.soundType.SOUND, "media/click3.ogg");
-		
+
 		GameSelector_background = new Sprite(
 				Global.textureMap.get("main_menu_background"),
 				new int[] {0,0},
@@ -218,7 +225,8 @@ public class BlockPuzzleMode implements GameMode {
 				new int[] { 1425, 768 },
 				new int[] { 1425, 600 }
 				);*/
-		
+
+		//ArrayList<Individual>[] group = (ArrayList<Individual>[])new ArrayList[4];
 		
 		//author: Mario
 		PuzzleModeLevel.nLevel = new Sprite(
@@ -401,6 +409,7 @@ public class BlockPuzzleMode implements GameMode {
 				Global.menuButtonShader.bind();
 				Global.uiTransWhite.draw(180, 180 + i * 70, 190, 48);
 				Color.white.bind();
+				Global.drawFont48(400, 100, "Puzzle Mode", Color.white);
 				if (cursorPos == i) {
 					Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.white);
 				} else {
@@ -510,7 +519,10 @@ public class BlockPuzzleMode implements GameMode {
 	private void loadLevel(int levelID) {
 		switch (levelID) {
 			case 1:
-				playLevel = new PuzzleModeLevel(localTexMap);
+				playLevel = new PuzzleModeLevelTemplate(localTexMap);
+				break;
+			case 2:
+				playLevel = new PuzzleModeLevel01(localTexMap);
 				break;
 			default:
 				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
@@ -609,6 +621,7 @@ public class BlockPuzzleMode implements GameMode {
 		int scoreOff = 0;
 		for (int i = 0; i < limit; i++) {
 			hsr = hsRecords.get(i);
+			//hsr = ((ArrayList<HighScoreRecord>) hsLevelArray[i]).get(i);
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
@@ -635,10 +648,14 @@ public class BlockPuzzleMode implements GameMode {
 		String line;
 		HighScoreRecord hsr;
 
+		
+
+
 		try {
 			prefFile = new BufferedReader(new FileReader("puzzle.pref"));
 			line = prefFile.readLine();
 			while (line != null) {
+				//for (int i = 1; i < 3; i++) {
 				if (line.compareToIgnoreCase("[HighScore]") == 0) {
 					try {
 						line = prefFile.readLine();
@@ -659,6 +676,7 @@ public class BlockPuzzleMode implements GameMode {
 						maxUnlocked = 1;
 					}
 				}
+				//}
 				line = prefFile.readLine();
 			}
 			prefFile.close();
@@ -683,12 +701,16 @@ public class BlockPuzzleMode implements GameMode {
 			prefFile.newLine();
 			prefFile.write(Integer.toString(maxUnlocked));
 			prefFile.newLine();
-			prefFile.write("[HighScore]");
-			prefFile.newLine();
-			for(HighScoreRecord hsr : hsRecords) {
-				prefFile.write(hsr.toString());
-				prefFile.newLine();
-			}
+			//for (int i = 1; i < 3; i++) {
+				prefFile.write("[HighScore]");
+				//if (maxUnlocked == playLevel.level) {
+					prefFile.newLine();
+					for(HighScoreRecord hsr : hsRecords) {
+						prefFile.write(hsr.toString());
+						prefFile.newLine();
+					}
+				//}
+			//}
 			prefFile.close();
 		} catch (IOException e) {
 			Global.writeToLog("Error opening Standard mode preferences file for writing.", true);
