@@ -663,8 +663,7 @@ public abstract class BlockStandardLevel {
 			} // end for(y)
 			
 		} // end for(x)
-		
-		
+
 	}
 	
 	
