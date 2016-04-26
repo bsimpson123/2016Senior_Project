@@ -111,7 +111,8 @@ public abstract class PuzzleModeLevel {
 	protected boolean clearMoves = false;
 	protected boolean clearCertColor = false;
 	
-	
+	protected static int nLevels = 2;
+	protected static int[] medals = new int[nLevels + 1];
 	
 	protected boolean noMoves = false;
 	protected static int sumMoves = 0;
@@ -177,10 +178,11 @@ public abstract class PuzzleModeLevel {
 	
 	private final String[] pauseOptions = new String[] {
 			"Resume",
+			"Restart",
 			"Quit"
 	};
 	
-	private int[] pauseOptionSize = new int[2];
+	private int[] pauseOptionSize = new int[3];
 	
 	private Block[] heartMenuBlocks = new Block[6];
 	
@@ -299,6 +301,16 @@ public abstract class PuzzleModeLevel {
 				endLevelDelayed = true;
 				pauseCursorPos = 0;
 				score += energy >> 6;
+				
+				if (score < 25000) {
+					medals[level] = 1;
+				}
+				if (score >= 25000 && score < 150000) {
+					medals[level] = 2;
+				}
+				if (score >= 150000) {
+					medals[level] = 3;
+				}
 				energy = 0;
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
@@ -327,7 +339,7 @@ public abstract class PuzzleModeLevel {
 			gameOver = true;
 			pauseCursorPos = 0;
 			
-		} else if (blocksRemaining != 0 && remainClears > 0) {
+		} else if (blocksRemaining != 0 && remainClears > 0 && blockDropDelay == 0) {
 			// If not out of clears but no moves left, then game over
 			for (int i = 0; i < gridSize[0]; i++) {
 				for (int j = 0; j < gridSize[1]; j++) {
@@ -354,7 +366,9 @@ public abstract class PuzzleModeLevel {
 			if (energy < 0) { energy = 0; }
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			gridMoving = drawGrid(500);
+			processGridBlocks(grid);
+			this.drawGridRework(grid);
+			gridMoving = blocksMoving;//drawGrid(500);
 
 			// for cursor surrounding block
 			cursor.draw(
@@ -376,8 +390,8 @@ public abstract class PuzzleModeLevel {
 					updateScore(counter);
 					addEnergy(counter);
 					removeMarkedBlocks();
-					dropBlocks();
-					shiftGridColumns();
+					//dropBlocks();
+					//shiftGridColumns();
 					heartSpecialActive = false;
 					clearColor = false;
 
@@ -664,19 +678,25 @@ public abstract class PuzzleModeLevel {
 			pauseControls();
 
 			overlay.draw(0, 0);
-			optionFrameMid.draw(180, 250);
+			//optionFrameMid.draw(180, 250);
+			//Global.menuButtonShader.bind();
+			//Global.uiTransWhite.draw(180, 280, 250, 250);
+			Global.uiWhite.draw(180, 280, 250, 250);
 			for (int i = 0; i < pauseOptions.length; i++) {
 				pauseOptionSize[i] = Global.getFont24DrawSize(pauseOptions[i]) / 2;
 			}
+			
 			for (int i = 0; i < pauseOptions.length; i++ ) {
 				
-				if (pauseCursorPos == i) {
-					hoverBox.draw(210, 310 + i * 70);
-					pauseBox.draw(215, 312 + i * 70);	
+				/*if (pauseCursorPos == i) {
+					//hoverBox.draw(210, 310 + i * 70);
+					//pauseBox.draw(215, 312 + i * 70);	
 				} else {
-					pauseBox.draw(215, 312 + i * 70);
-				}
-					
+					//pauseBox.draw(215, 312 + i * 70);
+				}*/
+				Global.menuButtonShader.bind();
+				Global.uiTransWhite.draw(212, 305 + i * 70, 190, 48);
+				Color.white.bind();
 				if (pauseCursorPos == i) {
 					Global.drawFont24(305 - pauseOptionSize[i], 319 + i * 70, pauseOptions[i], Color.white);
 				} else {
@@ -838,6 +858,230 @@ public abstract class PuzzleModeLevel {
 		return (blockDropActive || gridShiftActive);
 	}
 	
+	protected int[] wedgePos = new int[] { -1, -1 };
+	private final long blockDropDelayTimer = 16l; // 32 is approx. 30/sec
+	private long blockDropDelay = blockDropDelayTimer;
+	private final int blockMoveRate = 8;
+	private boolean blocksMoving = false;
+	private boolean cascadeGridShift = false;
+	
+	protected void processGridBlocks(GridColumn[] grid) {
+		blockDropDelay -= Global.delta;
+		if (blockDropDelay > 0) { return ; }
+		blockDropDelay += blockDropDelayTimer;
+		blocksMoving = false;
+		int starBlockCounter = 0; // if 2 or more star blocks are present on the grid, they will be checked for sharing edges after all movement is completed
+		
+		int xMax = grid.length - 1;
+		int yMax = grid[0].blocks.length - 1;
+		// contains the position of the topmost block per column. will be checked when attempting to move under a wedge block
+		int[] topblock = new int[grid.length];
+		for (int i = 0; i < topblock.length; i++) { topblock[i] = -1; }
+		GridColumn gc;
+		for (int x = 0; x <= xMax; x++) {
+			gc = grid[x];
+			for (int y = 0; y <= yMax; y++) {
+				if (gc.blocks[y] == null) { continue; }
+				
+				gc.blocks[y].checked = false; // reset checked flag each loop
+				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { } else 
+				if (y == 0) { continue; } // do not check for fall if at bottom row
+				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
+					if (gc.blocks[y].type == Block.BlockType.STAR) { starBlockCounter++; }
+					// set block as moving. this value will be reset if the block cannot fall.
+					if (!cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
+					
+					if (gc.blocks[y-1] == null) { // space below is empty
+						// set block as moving. this value will be reset if the block cannot fall.
+						if (cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
+						if (gc.blocks[y].dropDistance > blockSize[1]) {
+							gc.blocks[y].dropDistance -= blockSize[1];
+							if (y == 1) { // move into last row check
+								gc.blocks[y].dropDistance = 0;
+							}
+							gc.blocks[y-1] = gc.blocks[y].clone();
+							gc.blocks[y] = null;
+						}
+						blocksMoving = true;
+					} else if (gc.blocks[y].dropDistance > gc.blocks[y-1].dropDistance) {
+						gc.blocks[y].dropDistance = gc.blocks[y-1].dropDistance;
+						if (gc.blocks[y].dropDistance > 0) {
+							blocksMoving = true; 
+						}
+					} else if (gc.blocks[y-1].dropDistance > 0) { // check if block below is moving
+						
+					} else {
+						gc.blocks[y].dropDistance = 0;
+					}
+					if (gc.blocks[y] != null) {
+						if (x != wedgePos[0] || y < wedgePos[1]) {
+							topblock[x] = y;
+						}
+					}
+				}
+			} // end for(y)
+		} // end for(x)
+		
+		// wedge block mechanics
+		if (wedgePos[0] >= 0 && wedgePos[1] >= 0) {
+			int xc = wedgePos[0], yc = wedgePos[1];
+			GridColumn moveFrom = grid[xc];
+			GridColumn moveTo = null;
+			// if the grid shift is disabled (set to 0), the wedge will just stop blocks from falling
+			// logic assumes that the wedge is never against an edge
+			if (grid[xc].blocks[yc+1] == null || gridShiftDir == 0) { } // no block to move or grid shift disabled
+			else {
+				if (gridShiftDir == 1) { // right-shift
+					if (topblock[xc+1] <= yc) { moveTo = grid[xc+1]; }
+				} else if (gridShiftDir == -1) { // left-shift
+					if (topblock[xc-1] <= yc) { moveTo = grid[xc-1]; }
+				}
+				
+				if (moveTo != null && moveTo.blocks[yc] == null && moveTo.blocks[yc+1] == null) {
+					moveTo.blocks[yc+1] = moveFrom.blocks[yc+1].clone();
+					moveFrom.blocks[yc+1] = null;
+					blocksMoving = true;
+				}
+			}
+		}
+		
+		if (blocksMoving) {  // check for falling blocks before horizontal movement 
+			return; 
+		}
+		
+		// left-right grid shift after all block fall mechanics have been handled
+		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
+		if (gridShiftDir == 1) { // right-shift
+			// next should always be (xc + 1)
+			for (int xc = xMax - 1, next = xMax; xc >= 0; xc--, next--) {
+				
+				// check conditions that prevent column movement
+				if (grid[xc].blocks[0] == null) { continue; }
+				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
+				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
+				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
+					grid[xc].columnOffset = 0;
+					continue; 
+				}
+				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
+					grid[xc].columnOffset = 0;
+					continue;
+				}
+				grid[xc].columnOffset += blockMoveRate;
+				blocksMoving = true;
+				if (grid[xc].columnOffset >= blockSize[0]) {
+					grid[xc].columnOffset -= blockSize[0];
+					if (next == wedgePos[0]) { // moving into the column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+						
+					} else if (xc == wedgePos[0]) { // moving out of column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+					} else {
+						grid[next] = grid[xc];
+						grid[xc] = emptyset.clone();
+					}
+				}
+			}
+		} else if (gridShiftDir == -1) { // left-shift
+			// next should always be (xc - 1)
+			for (int xc = 1, next = 0; xc <= xMax; xc++, next++) {
+				
+				// check conditions that prevent column movement
+				if (grid[xc].blocks[0] == null) { continue; }
+				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
+				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
+				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
+					grid[xc].columnOffset = 0;
+					continue; 
+				}
+				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
+					grid[xc].columnOffset = 0;
+					continue;
+				}
+				grid[xc].columnOffset -= blockMoveRate;
+				blocksMoving = true;
+				if (grid[xc].columnOffset <= -blockSize[0]) {
+					grid[xc].columnOffset += blockSize[0];
+					if (next == wedgePos[0]) { // moving into the column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+						
+					} else if (xc == wedgePos[0]) { // moving out of column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+					} else {
+						grid[next] = grid[xc];
+						grid[xc] = emptyset.clone();
+					}
+				}
+			}
+		}
+		if (blocksMoving || starBlockCounter < 2) {
+			return;
+		}
+		
+		for (int x = 0; x < grid.length; x++) {
+			for (int y = 0; y < grid[0].blocks.length; y++) {
+				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
+					// TODO: add activation call for star blocks found sharing an edge
+					if (grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					} else 
+					if (grid[x-1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					} else 
+					if (grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					} else
+					if (grid[x].blocks[y-1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					}
+				}
+			}
+		}
+		
+	}
+	
+	/** Draws the grid to the screen u
+	 * 
+	 * @param grid
+	 * @author John
+	 */
+	protected void drawGridRework(GridColumn[] grid) {
+		// The old grid draw functions will not work with the new grid management algorithm, the math will not move the blocks the same
+		for (int i = 0; i < grid.length; i++) {
+			for (int k = 0; k < grid[0].blocks.length; k++) {
+				if (grid[i].blocks[k] == null) { continue; }
+				if (grid[i].blocks[k].type == Block.BlockType.WEDGE) { // wedge blocks are not drawn with grid column offset adjustment
+					grid[i].blocks[k].draw(
+							gridBasePos[0] + blockSize[0] * i,
+							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
+							blockSize
+						);
+				} else {
+					grid[i].blocks[k].draw(
+							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
+							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
+							blockSize
+						);
+				}
+			}
+		}
+		drawQueue();
+	}
+	
+	
+	
 	/**
 	 * Draws the <code>Block</code> grid without processing any block movement.
 	 * @author John
@@ -867,13 +1111,13 @@ public abstract class PuzzleModeLevel {
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				pauseCursorPos--;
 				if (pauseCursorPos < 0) {
-						pauseCursorPos = 1;
+						pauseCursorPos = 2;
 				}
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.DOWN)) {
 				pauseCursorPos++;
-				if (pauseCursorPos > 1) {
+				if (pauseCursorPos > 2) {
 					pauseCursorPos = 0;
 				}
 				inputDelay = Global.inputReadDelayTimer * 2;
@@ -894,6 +1138,17 @@ public abstract class PuzzleModeLevel {
 						break;
 
 					case 1:
+						gameOver = false;
+						remainClears = totalClears;
+						noMoves = false;
+						noRemainClears = false;
+						buildGrid();
+						score = 0;
+						gamePaused = false;
+						inputDelay = Global.inputReadDelayTimer;	
+						break;
+						
+					case 2:
 						levelFinished = true;
 						gameOver = true;
 						inputDelay = Global.inputReadDelayTimer;	
@@ -1054,8 +1309,8 @@ public abstract class PuzzleModeLevel {
 					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
 						// decrease the blocksRemaining counter after blocks are cleared
 						removeMarkedBlocks();
-						dropBlocks();
-						shiftGridColumns();
+						//dropBlocks();
+						//shiftGridColumns();
 						remainClears -= 1;
 						// action delay is only increased if an action was performed and the grid was changed
 						// actionDelay = Global.inputReadDelayTimer;
@@ -1179,8 +1434,8 @@ public abstract class PuzzleModeLevel {
 		if (overflow < queueCount) {
 			gridMoving = true;
 		}
-		dropBlocks();
-		shiftGridColumns();
+		//dropBlocks();
+		//shiftGridColumns();
 		queueCount = 0;
 		return overflow;
 	}

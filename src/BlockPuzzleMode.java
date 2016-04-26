@@ -57,7 +57,10 @@ public class BlockPuzzleMode implements GameMode {
 		new String[] { "Text", "media/Mode_Text.png"},
 		new String[] { "white_ui_controls" , "media/sheet_white2x.png" },
 		new String[] { "new_test", "media/image1.png"},
-		new String[] { "bigsky", "media/bigsky_cedf10.png" }
+		new String[] { "bigsky", "media/bigsky_cedf10.png" },
+		//new String[] { "Gold_Star", "media/tileYellow_09.png"},
+		new String[] { "Gold_Star", "media/flat_medal8.png"},
+		new String[] { "Silver_Star", "media/tileGrey_09.png"}
 	};
 	
 	private Sprite GameSelector_background;
@@ -87,6 +90,9 @@ public class BlockPuzzleMode implements GameMode {
 	private int[] menuOptionOffset = new int[4];
 	
 	//private boolean selectPractice = false;
+	protected Sprite Yellow_star;
+	protected Sprite Silver_star;
+	
 	private Sprite pracBox;
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
@@ -98,6 +104,7 @@ public class BlockPuzzleMode implements GameMode {
 	private String hsNameEntry = "";
 	private boolean preClearComplete = false;
 	private int level = 1;
+	protected int[] medals = PuzzleModeLevel.medals;
 	
 	public BlockPuzzleMode() {
 		
@@ -148,6 +155,27 @@ public class BlockPuzzleMode implements GameMode {
 				new int[] {1024,768},
 				new int[] {1024,768}
 			);
+		/*Yellow_star = new Sprite(
+				localTexMap.get("Gold_Star"),
+				new int[] {0,0},
+				new int[] {129,120},
+				new int[] {55,45}
+			);*/
+		Yellow_star = new Sprite(
+				localTexMap.get("Gold_Star"),
+				new int[] {0,0},
+				new int[] {41,74},
+				new int[] {41,74}
+			);
+		Silver_star = new Sprite(
+				localTexMap.get("Silver_Star"),
+				new int[] {0,0},
+				new int[] {129,120},
+				new int[] {129,120}
+			);
+		for (int i = 0; i < medals.length; i++) {
+			medals[i] = 0;
+		}
 		/*optionBox = new Sprite(
 				Global.textureMap.get("green_ui"),
 				new int[] { 0, 0 },
@@ -550,6 +578,7 @@ public class BlockPuzzleMode implements GameMode {
 
 	private static final int pracOffset = 375;
 	private static final int pracSelectDrop = 248;
+	private static int medalOffset = 30;
 	
 	private void drawPracticeSelect() {
 		String num = Integer.toString(pracLevel);
@@ -561,6 +590,16 @@ public class BlockPuzzleMode implements GameMode {
 		//PuzzleModeLevel.numbers[pracLevel].draw(525, 255);
 		Global.drawNumbers24(pracOffset + 65 - numOffset, pracSelectDrop + 12, num, numCol);
 		pracArrows[1].draw(pracOffset + 80, 248);
+		//for (int i = 0; i < medals.length; i++) {
+		if (pracLevel <= PuzzleModeLevel.nLevels) {
+			if (medals[pracLevel] > 0) {
+				for (int j = 1; j <= medals[pracLevel]; j++) {
+					Yellow_star.draw(medalOffset * j + 500, 250);
+					//medalOffset -= 5;
+				}
+			}
+		}
+		//}
 	}
 	
 	// TODO: move high score vars to top after finished implementation
