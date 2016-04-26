@@ -553,9 +553,9 @@ public abstract class BlockStandardLevel {
 	protected int[] wedgePos = new int[] { -1, -1 };
 	private final long blockDropDelayTimer = 16l; // 32 is approx. 30/sec
 	private long blockDropDelay = blockDropDelayTimer;
-	private final int blockDropRate = 8;
+	private final int blockMoveRate = 8;
 	private boolean blocksMoving = false;
-	private final boolean cascadeGridShift = true; 
+	private boolean cascadeGridShift = true;
 	
 	// TODO: grid rework
 	protected void processGridBlocks(GridColumn[] grid) {
@@ -567,7 +567,8 @@ public abstract class BlockStandardLevel {
 		int xMax = grid.length - 1;
 		int yMax = grid[0].blocks.length - 1;
 		// contains the position of the topmost block per column. will be checked when attempting to move under a wedge block
-		int[] topblock = new int[grid.length]; 
+		int[] topblock = new int[grid.length];
+		for (int i = 0; i < topblock.length; i++) { topblock[i] = -1; }
 		GridColumn gc;
 		for (int x = 0; x <= xMax; x++) {
 			gc = grid[x];
@@ -579,12 +580,12 @@ public abstract class BlockStandardLevel {
 				if (y == 0) { continue; } // do not check for fall if at bottom row
 				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
 					if (!cascadeGridShift) {
-						gc.blocks[y].dropDistance += blockDropRate; // set block as moving. this value is reset if the block cannot fall.
+						gc.blocks[y].dropDistance += blockMoveRate; // set block as moving. this value is reset if the block cannot fall.
 					}
 					
 					if (gc.blocks[y-1] == null) { // space below is empty
 						if (cascadeGridShift) {
-							gc.blocks[y].dropDistance += blockDropRate;
+							gc.blocks[y].dropDistance += blockMoveRate;
 						}
 						if (gc.blocks[y].dropDistance > blockSize[1]) {
 							gc.blocks[y].dropDistance -= blockSize[1];
@@ -604,6 +605,8 @@ public abstract class BlockStandardLevel {
 						
 					} else {
 						gc.blocks[y].dropDistance = 0;
+					}
+					if (gc.blocks[y] != null) {
 						if (x != wedgePos[0] || y < wedgePos[1]) {
 							topblock[x] = y;
 						}
@@ -611,8 +614,6 @@ public abstract class BlockStandardLevel {
 				}
 			} // end for(y)
 		} // end for(x)
-		
-		// if (blocksMoving) { return; } // return if any blocks are falling at this point
 		
 		// wedge block mechanics
 		if (wedgePos[0] >= 0 && wedgePos[1] >= 0) {
@@ -625,7 +626,7 @@ public abstract class BlockStandardLevel {
 			else {
 				if (gridShiftDir == 1) { // right-shift
 					if (topblock[xc+1] <= yc) { moveTo = grid[xc+1]; }
-				} else { // left-shift
+				} else if (gridShiftDir == -1) { // left-shift
 					if (topblock[xc-1] <= yc) { moveTo = grid[xc-1]; }
 				}
 				
@@ -637,23 +638,84 @@ public abstract class BlockStandardLevel {
 			}
 		}
 		
-		if (blocksMoving) { return; } // second check for falling blocks
+		if (blocksMoving) { return; } // check for falling blocks before horizontal movement
 		
 		// left-right grid shift after all block fall mechanics have been handled
+		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
 		if (gridShiftDir == 1) { // right-shift
-			for (int x = xMax - 1; x >= 0; x--) {
-				// check if empty column
-				if (grid[x].blocks[0] == null) { continue; }
+			// next should always be (xc + 1)
+			for (int xc = xMax - 1, next = xMax; xc >= 0; xc--, next--) {
 				
-				if (grid[x+1].columnOffset == 0) { continue; } // no room to move
-				
+				// check conditions that prevent column movement
+				if (grid[xc].blocks[0] == null) { continue; }
+				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
+				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
+				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
+					grid[xc].columnOffset = 0;
+					continue; 
+				}
+				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
+					grid[xc].columnOffset = 0;
+					continue;
+				}
+				grid[xc].columnOffset += blockMoveRate;
+				blocksMoving = true;
+				if (grid[xc].columnOffset >= blockSize[0]) {
+					grid[xc].columnOffset -= blockSize[0];
+					if (next == wedgePos[0]) { // moving into the column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+						
+					} else if (xc == wedgePos[0]) { // moving out of column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+					} else {
+						grid[next] = grid[xc];
+						grid[xc] = emptyset.clone();
+					}
+				}
 			}
-			
-			
 		} else if (gridShiftDir == -1) { // left-shift
-			
-			
-			
+			// next should always be (xc - 1)
+			for (int xc = 1, next = 0; xc <= xMax; xc++, next++) {
+				
+				// check conditions that prevent column movement
+				if (grid[xc].blocks[0] == null) { continue; }
+				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
+				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
+				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
+					grid[xc].columnOffset = 0;
+					continue; 
+				}
+				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
+					grid[xc].columnOffset = 0;
+					continue;
+				}
+				grid[xc].columnOffset -= blockMoveRate;
+				blocksMoving = true;
+				if (grid[xc].columnOffset <= -blockSize[0]) {
+					grid[xc].columnOffset += blockSize[0];
+					if (next == wedgePos[0]) { // moving into the column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+						
+					} else if (xc == wedgePos[0]) { // moving out of column with wedge block
+						for (int k = 0; k < wedgePos[1]; k++) {
+							grid[next].blocks[k] = grid[xc].blocks[k];
+							grid[xc].blocks[k] = null;
+						}
+					} else {
+						grid[next] = grid[xc];
+						grid[xc] = emptyset.clone();
+					}
+				}
+			}
 		}
 		
 	}
@@ -661,7 +723,14 @@ public abstract class BlockStandardLevel {
 	protected void drawGridRework(GridColumn[] grid) {
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
-				if (grid[i].blocks[k] != null) {
+				if (grid[i].blocks[k] == null) { continue; }
+				if (grid[i].blocks[k].type == Block.BlockType.WEDGE) { // wedge blocks are not drawn with grid column offset adjustment
+					grid[i].blocks[k].draw(
+							gridBasePos[0] + blockSize[0] * i,
+							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
+							blockSize
+						);
+				} else {
 					grid[i].blocks[k].draw(
 							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
 							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
