@@ -283,10 +283,11 @@ public class BlockBreakStandard implements GameMode {
 			);
 		
 		hsBack = localTexMap.get("bigsky");
-		// Update mode state when asset loading is completed
-		currentState = LoadState.LOADING_DONE;
 		
 		loadPrefs();
+
+		// Update mode state when asset loading is completed
+		currentState = LoadState.LOADING_DONE;
 		return;
 	}
 
