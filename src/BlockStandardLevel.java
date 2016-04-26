@@ -205,6 +205,7 @@ public abstract class BlockStandardLevel {
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			//gridMoving = drawGrid(500);
+			processGridBlocks(grid);
 			this.drawGridRework(grid);
 			gridMoving = blocksMoving;
 			
@@ -229,8 +230,8 @@ public abstract class BlockStandardLevel {
 					updateScore(counter);
 					addEnergy(counter);
 					removeMarkedBlocks();
-					dropBlocks();
-					shiftGridColumns();
+					//dropBlocks();
+					//shiftGridColumns();
 					heartSpecialActive = false;
 					clearColor = false;
 
@@ -550,9 +551,9 @@ public abstract class BlockStandardLevel {
 	}
 
 	private int[] wedgePos = new int[] { -1, -1 };
-	private final long blockDropDelayTimer = 32l; // 32 is approx. 30/sec
+	private final long blockDropDelayTimer = 16l; // 32 is approx. 30/sec
 	private long blockDropDelay = blockDropDelayTimer;
-	private final int blockDropRate = 1;
+	private final int blockDropRate = 8;
 	private boolean blocksMoving = false;
 	private final boolean cascadeFall = true; 
 	
@@ -570,26 +571,38 @@ public abstract class BlockStandardLevel {
 		GridColumn gc;
 		for (int x = 0; x <= xMax; x++) {
 			gc = grid[x];
-			for (int y = 1; y <= yMax; y++) {
+			for (int y = 0; y <= yMax; y++) {
 			//for (int y = yMax; y > 0; y--) {
 				if (gc.blocks[y] == null) { continue; }
-				if (gc.blocks[y].type == Block.BlockType.WEDGE) { }
-				else if (gc.blocks[y].type != Block.BlockType.WEDGE) {
+				
+				gc.blocks[y].checked = false; // reset checked flag each loop
+				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { } else 
+				if (y == 0) { continue; } // do not check for fall if at bottom row
+				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
 					if (!cascadeFall) {
 						gc.blocks[y].dropDistance += blockDropRate; // set block as moving. this value is reset if the block cannot fall.
 					}
+					
 					if (gc.blocks[y-1] == null) { // space below is empty
 						if (cascadeFall) {
 							gc.blocks[y].dropDistance += blockDropRate;
 						}
 						if (gc.blocks[y].dropDistance > blockSize[1]) {
 							gc.blocks[y].dropDistance -= blockSize[1];
-							gc.blocks[y-1] = gc.blocks[y];
+							if (y == 1) { // move into last row check
+								gc.blocks[y].dropDistance = 0;
+							}
+							gc.blocks[y-1] = gc.blocks[y].clone();
 							gc.blocks[y] = null;
 						}
 						blocksMoving = true;
+					} else if (gc.blocks[y].dropDistance > gc.blocks[y-1].dropDistance) {
+						gc.blocks[y].dropDistance = gc.blocks[y-1].dropDistance;
+						if (gc.blocks[y].dropDistance > 0) {
+							blocksMoving = true; 
+						}
 					} else if (gc.blocks[y-1].dropDistance > 0) { // check if block below is moving
-						blocksMoving = true;
+						
 					} else {
 						gc.blocks[y].dropDistance = 0;
 						if (x != wedgePos[0] || y < wedgePos[1]) {
@@ -607,9 +620,7 @@ public abstract class BlockStandardLevel {
 		
 	}
 	
-	
 	protected void drawGridRework(GridColumn[] grid) {
-		processGridBlocks(grid);
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				if (grid[i].blocks[k] != null) {
@@ -621,6 +632,7 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		}
+		drawQueue();
 	}
 	
 	/**
@@ -793,7 +805,7 @@ public abstract class BlockStandardLevel {
 				gridShiftActionDelay = shiftActionDelayTimer;
 				gridShiftActive = true;
 				gridShiftDir *= -1;
-				shiftGridColumns();
+				//shiftGridColumns();
 			}
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorGridPos[1]++;
@@ -829,8 +841,8 @@ public abstract class BlockStandardLevel {
 					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
 						// decrease the blocksRemaining counter after blocks are cleared
 						removeMarkedBlocks();
-						dropBlocks();
-						shiftGridColumns();
+						//dropBlocks(); // TODO: these functions are handled by the new grid management algorithm
+						//shiftGridColumns();
 						// action delay is only increased if an action was performed and the grid was changed
 						// actionDelay = Global.inputReadDelayTimer;
 					}
@@ -864,7 +876,7 @@ public abstract class BlockStandardLevel {
 	 * Used to calculate the distance blocks will be offset. 
 	 * @author John
 	 */
-	protected void dropBlocks() {
+	private void dropBlocks() {
 		int dropDist = 0;
 		int slotDist = 0;
 		for (int i = 0; i < grid.length; i++) {
@@ -887,7 +899,7 @@ public abstract class BlockStandardLevel {
 	/**
 	 * @author John
 	 */
-	protected void shiftGridColumns() {
+	private void shiftGridColumns() {
 		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
 		int colDist = 0, shiftDist = 0;
 		if (gridShiftDir == 1) {
@@ -948,11 +960,11 @@ public abstract class BlockStandardLevel {
 				queue[x] = null;
 			}
 		}
-		if (overflow < queueCount) {
+		/*if (overflow < queueCount) {
 			gridMoving = true;
-		}
-		dropBlocks();
-		shiftGridColumns();
+		} //*/
+		//dropBlocks();
+		//shiftGridColumns();
 		queueCount = 0;
 		return overflow;
 	}

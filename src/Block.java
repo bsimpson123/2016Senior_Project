@@ -74,6 +74,9 @@ public class Block {
 		this.type = clone.type;
 		this.block = clone.block;
 		this.colorID = clone.colorID;
+		this.dropDistance = clone.dropDistance;
+		this.dropDistancef = clone.dropDistancef;
+		
 	}
 	
 	/* Class methods */
