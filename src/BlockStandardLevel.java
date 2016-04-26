@@ -557,12 +557,12 @@ public abstract class BlockStandardLevel {
 	private boolean blocksMoving = false;
 	private boolean cascadeGridShift = true;
 	
-	// TODO: grid rework
 	protected void processGridBlocks(GridColumn[] grid) {
 		blockDropDelay -= Global.delta;
 		if (blockDropDelay > 0) { return ; }
 		blockDropDelay += blockDropDelayTimer;
 		blocksMoving = false;
+		int starBlockCounter = 0; // if 2 or more star blocks are present on the grid, they will be checked for sharing edges after all movement is completed
 		
 		int xMax = grid.length - 1;
 		int yMax = grid[0].blocks.length - 1;
@@ -579,14 +579,13 @@ public abstract class BlockStandardLevel {
 				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { } else 
 				if (y == 0) { continue; } // do not check for fall if at bottom row
 				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
-					if (!cascadeGridShift) {
-						gc.blocks[y].dropDistance += blockMoveRate; // set block as moving. this value is reset if the block cannot fall.
-					}
+					if (gc.blocks[y].type == Block.BlockType.STAR) { starBlockCounter++; }
+					// set block as moving. this value will be reset if the block cannot fall.
+					if (!cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
 					
 					if (gc.blocks[y-1] == null) { // space below is empty
-						if (cascadeGridShift) {
-							gc.blocks[y].dropDistance += blockMoveRate;
-						}
+						// set block as moving. this value will be reset if the block cannot fall.
+						if (cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
 						if (gc.blocks[y].dropDistance > blockSize[1]) {
 							gc.blocks[y].dropDistance -= blockSize[1];
 							if (y == 1) { // move into last row check
@@ -638,7 +637,9 @@ public abstract class BlockStandardLevel {
 			}
 		}
 		
-		if (blocksMoving) { return; } // check for falling blocks before horizontal movement
+		if (blocksMoving) {  // check for falling blocks before horizontal movement 
+			return; 
+		}
 		
 		// left-right grid shift after all block fall mechanics have been handled
 		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
@@ -717,10 +718,39 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		}
+		if (blocksMoving || starBlockCounter < 2) {
+			return;
+		}
+		
+		for (int x = 0; x < grid.length; x++) {
+			for (int y = 0; y < grid[0].blocks.length; y++) {
+				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
+					// TODO: add activation call for star blocks found sharing an edge
+					if (grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					} else 
+					if (grid[x-1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					} else 
+					if (grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					} else
+					if (grid[x].blocks[y-1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+						
+					}
+				}
+			}
+		}
 		
 	}
 	
+	/** Draws the grid to the screen u
+	 * 
+	 * @param grid
+	 * @author John
+	 */
 	protected void drawGridRework(GridColumn[] grid) {
+		// The old grid draw functions will not work with the new grid management algorithm, the math will not move the blocks the same
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				if (grid[i].blocks[k] == null) { continue; }
@@ -741,6 +771,9 @@ public abstract class BlockStandardLevel {
 		}
 		drawQueue();
 	}
+	
+	
+	
 	
 	/**
 	 * Draws the <code>Block</code> grid without processing any block movement.
