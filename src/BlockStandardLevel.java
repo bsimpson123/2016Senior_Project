@@ -576,6 +576,7 @@ public abstract class BlockStandardLevel {
 				if (gc.blocks[y] == null) { continue; }
 				
 				gc.blocks[y].checked = false; // reset checked flag each loop
+				gc.blocks[y].clearMark = false; // reset clear mark each loop
 				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { } else 
 				if (y == 0) { continue; } // do not check for fall if at bottom row
 				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
