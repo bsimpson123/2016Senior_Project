@@ -36,9 +36,10 @@ public class Block {
 	
 	/** Indicates whether the block has been checked for processing during a game loop.
 	 * This value should be reset to false before logic processing each game loop. */
-	public boolean checked = false;
-	public boolean clearMark = false;
-	public int dropDistance = 0;
+	protected boolean checked = false;
+	protected boolean clearMark = false;
+	protected int dropDistance = 0;
+	protected float dropDistancef = 0f;
 	 
 	
 	/* Constructors */
@@ -73,6 +74,9 @@ public class Block {
 		this.type = clone.type;
 		this.block = clone.block;
 		this.colorID = clone.colorID;
+		this.dropDistance = clone.dropDistance;
+		this.dropDistancef = clone.dropDistancef;
+		
 	}
 	
 	/* Class methods */

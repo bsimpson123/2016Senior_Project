@@ -72,6 +72,12 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
+		int rx, ry;
+		rx = Global.rand.nextInt(10) + 5;
+		ry = Global.rand.nextInt(4) + 8;
+		grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
+		blocksRemaining--;
+		wedgePos = new int[] { rx, ry };
 	}
 
 	@Override
