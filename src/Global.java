@@ -302,6 +302,12 @@ public class Global {
 		font24.drawString(0, 0, "", Color.white);
 	}
 	
+	public static void drawFont48(int xc, int yc, String text, Color color, boolean centered) {
+		if (!centered) { drawFont48(xc, yc, text, color); return; }
+		int w = font48.getWidth(text) / 2;
+		drawFont48(xc - w, yc, text, color);
+	}
+
 	public static void drawFont48(int xc, int yc, String text, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();
@@ -309,6 +315,12 @@ public class Global {
 		font48.drawString(0, 0, "", Color.white);
 	}
 
+	public static void drawNumbers24(int xc, int yc, String numbers, Color color, boolean centered) {
+		if (!centered) { drawNumbers24(xc, yc, numbers, color); return; }
+		int w = numbers24.getWidth(numbers) / 2;
+		drawNumbers24(xc - w, yc, numbers, color);
+	}
+	
 	public static void drawNumbers24(int xc, int yc, String numbers, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();
@@ -316,6 +328,12 @@ public class Global {
 		numbers24.drawString(0, -1, "", Color.white);
 	}
 	
+	public static void drawNumbers48(int xc, int yc, String numbers, Color color, boolean centered) {
+		if (!centered) { drawNumbers48(xc, yc, numbers, color); return; }
+		int w = numbers48.getWidth(numbers) / 2;
+		drawNumbers48(xc - w, yc, numbers, color);
+	}
+
 	public static void drawNumbers48(int xc, int yc, String numbers, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();

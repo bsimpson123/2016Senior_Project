@@ -1,6 +1,12 @@
+import java.util.HashMap;
+
+import org.newdawn.slick.opengl.Texture;
 
 public class ConfigScreen implements GameMode {
-
+	protected LoadState currentState = LoadState.NOT_LOADED;
+	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
+	
+	
 	@Override
 	public void initialize() {
 		// TODO Auto-generated method stub
