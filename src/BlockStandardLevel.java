@@ -550,12 +550,12 @@ public abstract class BlockStandardLevel {
 		return (blockDropActive || gridShiftActive);
 	}
 
-	private int[] wedgePos = new int[] { -1, -1 };
+	protected int[] wedgePos = new int[] { -1, -1 };
 	private final long blockDropDelayTimer = 16l; // 32 is approx. 30/sec
 	private long blockDropDelay = blockDropDelayTimer;
 	private final int blockDropRate = 8;
 	private boolean blocksMoving = false;
-	private final boolean cascadeFall = true; 
+	private final boolean cascadeGridShift = true; 
 	
 	// TODO: grid rework
 	protected void processGridBlocks(GridColumn[] grid) {
@@ -572,19 +572,18 @@ public abstract class BlockStandardLevel {
 		for (int x = 0; x <= xMax; x++) {
 			gc = grid[x];
 			for (int y = 0; y <= yMax; y++) {
-			//for (int y = yMax; y > 0; y--) {
 				if (gc.blocks[y] == null) { continue; }
 				
 				gc.blocks[y].checked = false; // reset checked flag each loop
 				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { } else 
 				if (y == 0) { continue; } // do not check for fall if at bottom row
 				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
-					if (!cascadeFall) {
+					if (!cascadeGridShift) {
 						gc.blocks[y].dropDistance += blockDropRate; // set block as moving. this value is reset if the block cannot fall.
 					}
 					
 					if (gc.blocks[y-1] == null) { // space below is empty
-						if (cascadeFall) {
+						if (cascadeGridShift) {
 							gc.blocks[y].dropDistance += blockDropRate;
 						}
 						if (gc.blocks[y].dropDistance > blockSize[1]) {
@@ -608,15 +607,54 @@ public abstract class BlockStandardLevel {
 						if (x != wedgePos[0] || y < wedgePos[1]) {
 							topblock[x] = y;
 						}
-						
 					}
-					
+				}
+			} // end for(y)
+		} // end for(x)
+		
+		// if (blocksMoving) { return; } // return if any blocks are falling at this point
+		
+		// wedge block mechanics
+		if (wedgePos[0] >= 0 && wedgePos[1] >= 0) {
+			int xc = wedgePos[0], yc = wedgePos[1];
+			GridColumn moveFrom = grid[xc];
+			GridColumn moveTo = null;
+			// if the grid shift is disabled (set to 0), the wedge will just stop blocks from falling
+			// logic assumes that the wedge is never against an edge
+			if (grid[xc].blocks[yc+1] == null || gridShiftDir == 0) { } // no block to move or grid shift disabled
+			else {
+				if (gridShiftDir == 1) { // right-shift
+					if (topblock[xc+1] <= yc) { moveTo = grid[xc+1]; }
+				} else { // left-shift
+					if (topblock[xc-1] <= yc) { moveTo = grid[xc-1]; }
 				}
 				
+				if (moveTo != null && moveTo.blocks[yc] == null && moveTo.blocks[yc+1] == null) {
+					moveTo.blocks[yc+1] = moveFrom.blocks[yc+1].clone();
+					moveFrom.blocks[yc+1] = null;
+					blocksMoving = true;
+				}
+			}
+		}
+		
+		if (blocksMoving) { return; } // second check for falling blocks
+		
+		// left-right grid shift after all block fall mechanics have been handled
+		if (gridShiftDir == 1) { // right-shift
+			for (int x = xMax - 1; x >= 0; x--) {
+				// check if empty column
+				if (grid[x].blocks[0] == null) { continue; }
 				
-			} // end for(y)
+				if (grid[x+1].columnOffset == 0) { continue; } // no room to move
+				
+			}
 			
-		} // end for(x)
+			
+		} else if (gridShiftDir == -1) { // left-shift
+			
+			
+			
+		}
 		
 	}
 	
