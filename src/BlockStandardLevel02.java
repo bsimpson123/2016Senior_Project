@@ -8,9 +8,9 @@ import org.newdawn.slick.opengl.Texture;
  * where necessary to set level difficulty. 
  * @author John
  */
-public class BlockStandardLevelTemplate extends BlockStandardLevel {
-	public BlockStandardLevelTemplate(HashMap<String,Texture> rootTexMap) {
-		
+public class BlockStandardLevel02 extends BlockStandardLevel {
+	public BlockStandardLevel02(HashMap<String,Texture> rootTexMap) {
+		level = 2;
 		// TODO: [CUSTOM] set background and user interface sprites
 		// if these sprite must be defined or the game will crash at runtime
 		background = new Sprite(
@@ -48,10 +48,8 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
-		// TODO: [CUSTOM] set energy and energyMax if different than default (100000)
 		// set energy max if not default
 		energy = energyMax = 200000;		
-	
 	}
 	
 	@Override
@@ -63,11 +61,11 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				r = Global.rand.nextInt(10000);
-				if (r > 20) { 
+				r = Global.rand.nextInt(256);
+				if (r > 16) { 
 					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 				} else {
-					b = new Block(Block.BlockType.BLOCK, 3);
+					b = new Block(Block.BlockType.BOMB, Global.rand.nextInt(3) + 2);
 				}
 				grid[i].blocks[k] = b;
 			}
@@ -76,8 +74,6 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
-		
-		
 	}
 
 	@Override
@@ -100,8 +96,12 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 				updateScore(adj);
 				addEnergy(adj);
 				break;
-			default:
-				super.processActivate();
+			case BOMB:
+				counter = activateBombBlock(cursorGridPos);
+				updateScore(counter);
+				addEnergy(counter);
+				break;
+			default: // block does not activate, do nothing
 				break;
 		}
 		

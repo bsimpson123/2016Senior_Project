@@ -1,15 +1,15 @@
-import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import org.newdawn.slick.opengl.Texture;
-/**
- * Template level for simplify level-building.
- * Copy the code here into a new BlockStandardLevel extended class and edit
- * where necessary to set level difficulty. 
- * @author John
- */
-public class BlockStandardLevelTemplate extends BlockStandardLevel {
-	public BlockStandardLevelTemplate(HashMap<String,Texture> rootTexMap) {
+
+public class BlockStandardLevelex3 extends BlockStandardLevel {
+	private boolean specialActive = false;
+	private  BufferedReader infile;
+	
+	public BlockStandardLevelex3(HashMap<String,Texture> rootTexMap) {
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 		// if these sprite must be defined or the game will crash at runtime
@@ -48,38 +48,46 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
-		// TODO: [CUSTOM] set energy and energyMax if different than default (100000)
-		// set energy max if not default
-		energy = energyMax = 200000;		
-	
+		
+		
 	}
 	
 	@Override
 	protected void buildGrid() {
-		Block b = null;
-		int r = 0;
-		Global.rand.setSeed(LocalDateTime.now().getNano());
-		for (int i = 0; i < grid.length; i++) {
-			grid[i] = new GridColumn(gridSize[1]);
-			for (int k = 0; k < grid[0].blocks.length; k++) {
-				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				r = Global.rand.nextInt(10000);
-				if (r > 20) { 
-					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-				} else {
-					b = new Block(Block.BlockType.BLOCK, 3);
+		try {
+			String parseline;
+			String[] parseCSV;
+			infile = new BufferedReader(new FileReader("media/sp6.csv"));
+			parseline = infile.readLine();
+			int x=0;
+			while (parseline!= null) {
+				parseCSV = parseline.split(",");
+				grid[x] = new GridColumn(gridSize[1]);
+				for (int i = 0; i < parseCSV.length; i++) {
+					
+					grid[x].blocks[i] = new Block(Block.BlockType.BLOCK, Integer.parseInt(parseCSV[i]));
+//change above line to account for starting at 0 or 1 in matrix  ... integer.parseInt(parseCV[i])-1);					
 				}
-				grid[i].blocks[k] = b;
+				x++;
+				parseline = infile.readLine();
 			}
+			
+			infile.close();
+			//outfile.close();
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
 		
-		
 	}
-
+	
 	@Override
 	protected Block getQueueBlock() {
 		Block b = null;
@@ -87,23 +95,5 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 
 		return b;		
-	}
-
-	@Override
-	protected void processActivate() {
-		// TODO: score base value calculation is to be done within each case statement
-		// [CUSTOM] add case statements for each type of block that can be activated in the level
-		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
-			case BLOCK:
-				counter = checkGrid(cursorGridPos);
-				int adj = (int)Math.pow(counter - 1, 2);
-				updateScore(adj);
-				addEnergy(adj);
-				break;
-			default:
-				super.processActivate();
-				break;
-		}
-		
 	}
 }

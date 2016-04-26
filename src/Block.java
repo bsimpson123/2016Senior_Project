@@ -4,12 +4,13 @@ import org.newdawn.slick.opengl.Texture;
 public class Block {
 	/* Public Variables */
 	public enum BlockType {
-		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB
+		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB, HEART
 	}
 
 	protected static Sprite blockColor[];
+	protected static Sprite bombNumber[];
 	protected static Sprite blockStar, blockStarOverlay;
-	protected static Sprite blockWedge, blockTrash, blockRock, blockBomb;
+	protected static Sprite blockWedge, blockTrash, blockRock, blockBomb, blockHeart;
 	protected static Sprite errorBlock;
 	
 	public static final int  
@@ -17,9 +18,10 @@ public class Block {
 		YELLOW = 1,
 		GREEN = 2,
 		RED = 3,
-		PURPLE = 4
+		PURPLE = 4,
+		GREY = 5
 	;
-	public static final int blockColorCount = 5;
+	public static final int blockColorCount = 6;
 	
 	/* Protected variables */
 	/* Define the draw space that a block will take up in the grid.
@@ -34,16 +36,19 @@ public class Block {
 	
 	/** Indicates whether the block has been checked for processing during a game loop.
 	 * This value should be reset to false before logic processing each game loop. */
-	public boolean checked = false;
-	public boolean clearMark = false;
-	public int dropDistance = 0;
+	protected boolean checked = false;
+	protected boolean clearMark = false;
+	protected int dropDistance = 0;
+	protected float dropDistancef = 0f;
 	 
 	
 	/* Constructors */
 	public Block(BlockType type, int colorID) {
 		this.type = type;
-		if (colorID >= blockColorCount) {
-			colorID = 0;
+		if ( (colorID >= blockColorCount || colorID < 0) && type == BlockType.BLOCK) {
+			colorID = 0; 
+		} else if ( (colorID < 2 || colorID > 9) && type == BlockType.BOMB ) {
+			colorID = 2; // default,minimum bomb radius, used if set value is out of range
 		} else {
 			this.colorID = colorID;
 		}
@@ -54,6 +59,8 @@ public class Block {
 		this.type = type;
 		if (type == BlockType.BLOCK) {
 			colorID = Global.rand.nextInt(blockColorCount);
+		} else if (type == BlockType.BOMB) {
+			colorID = 2; // default bomb radius
 		} else {
 			colorID = 0;
 		}
@@ -67,13 +74,17 @@ public class Block {
 		this.type = clone.type;
 		this.block = clone.block;
 		this.colorID = clone.colorID;
+		this.dropDistance = clone.dropDistance;
+		this.dropDistancef = clone.dropDistancef;
+		
 	}
 	
 	/* Class methods */
 	
 	public static void initializeBlocks(HashMap<String,Texture> texMap) {
-		blockColor = new Sprite[5];
+		blockColor = new Sprite[blockColorCount];
 		Texture blockTex = texMap.get("blocksheet");
+		Texture heartTex = texMap.get("heart");
 		blockColor[BLUE] = new Sprite(
 				blockTex,
 				new int[] { 212, 266 },
@@ -104,6 +115,12 @@ public class Block {
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
+		blockColor[GREY] = new Sprite (
+				blockTex,
+				new int[] { 212, 431 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
 		blockStar = new Sprite(
 				blockTex,
 				new int[] { 65, 361 },
@@ -128,6 +145,12 @@ public class Block {
 				new int[] { 32, 32 },
 				blockDrawSpace
 			);
+		blockHeart = new Sprite(
+				heartTex,
+				new int[] { 0, 0 },
+				new int[] { 32, 32 },
+				blockDrawSpace
+			);
 		blockRock = new Sprite(
 				blockTex,
 				new int[] { 272, 32 },
@@ -140,6 +163,25 @@ public class Block {
 				new int[] { 36, 36 },
 				blockDrawSpace
 			);
+		
+		bombNumber = new Sprite[10];
+		for (int i = 0; i < 10; i++) {
+			if (i < 5) {
+				bombNumber[i] = new Sprite(
+						texMap.get("bomb_numbers"),
+						new int[] { i * 12, 0 },
+						new int[] { 10, 16 },
+						new int[] { 10, 16 }
+					);
+			} else {
+				bombNumber[i] = new Sprite(
+						texMap.get("bomb_numbers"),
+						new int[] { (i - 5) * 12, 16 },
+						new int[] { 10, 16 },
+						new int[] { 10, 16 }
+					);
+			}
+		}
 	}
 	
 	private void setSprite() {
@@ -161,6 +203,9 @@ public class Block {
 				break;
 			case BOMB:
 				block = blockBomb;
+				break;
+			case HEART:
+				block = blockHeart;
 				break;
 			default:
 				break;
@@ -185,6 +230,8 @@ public class Block {
 		block.draw(xc, yc);
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc);
+		} else if (type == BlockType.BOMB) {
+			bombNumber[colorID].draw(xc + 9, yc - 5);
 		}
 	}
 
@@ -196,6 +243,9 @@ public class Block {
 		block.draw(xc, yc, size);
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc, size);
+		} else if (type == BlockType.BOMB) {
+			float factor = size[0] / (float) blockDrawSpace[0];
+			bombNumber[colorID].draw(xc + 9, yc + 7);
 		}
 	}
 	

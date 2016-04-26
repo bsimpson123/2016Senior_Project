@@ -1,15 +1,18 @@
 import java.util.Random;
-
+import java.awt.Font;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Controller;
-import org.lwjgl.input.Controllers;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.*;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureImpl;
+import org.newdawn.slick.util.ResourceLoader;
 
 /* 
  * When adding variables and functions to this class, remember to always mark them
@@ -39,11 +42,26 @@ public class Global {
 	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
 	 * This is the sensitivity of the input. */
 	public static long inputReadDelayTimer = 150l;
+	public static long actionDelay = inputReadDelayTimer;
+	public static long movementDelay = inputReadDelayTimer;
 	public static UIBox 
-		uiBlue, uiRed, uiGreen, uiYellow, uiGrey;
+		uiBlue, uiRed, uiGreen, uiYellow, uiGrey,
+		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
+		uiTransWhite, uiWhite;
+	
+	public static Color menuButtonShader = new Color(79, 187, 101);
+	
+    private static TrueTypeFont font24, font48, numbers24, numbers48;
 	
 	private static FileWriter logFile;
 	
+	public static String[][] audioList = {
+			new String[] { "button_click", "media/click3.ogg"},
+			new String[] { "explo", "media/Explosion.wav"}
+	};
+
+	public static GameSounds sounds = new GameSounds(GameSounds.soundType.SOUND,audioList);
+
 	
 	public enum GameControl {
 		RIGHT, LEFT, UP, DOWN,
@@ -56,6 +74,7 @@ public class Global {
 	private static HashMap<Integer, GameControl> gamepadMap = new HashMap<Integer, GameControl>();
 	private static int ctrlID = -1;
 	private static Controller[] ctrlList;
+	
 
 	public static Controller getController() {
 		if (ctrlID == -1) { return null; }
@@ -79,7 +98,9 @@ public class Global {
 			writeToLog(String.format("Controller detected: %s\n\tButton count: %d; Axis count: %d\n", 
 					ctrlList[i].getName(), ctrlList[i].getButtonCount(), ctrlList[i].getAxisCount()), false);
 			axis = ctrlList[i].getAxisCount();
-			if (axis == 2 || axis == 4) {
+			// Author Brock
+			if ( (axis == 2 || axis == 4 || axis == 6) && ctrlList[i].getButtonCount() >= 8 && ctrlList[i].getButtonCount() <= 16 ) {
+			
 				ctrlID = i;
 				break;
 			}
@@ -199,59 +220,64 @@ public class Global {
 	public static void globalInit() {
 		initLog();
 		buildControllers();
-		
+		initFonts();
 		
 	}
 	
+	private static void initFonts() {
+		TextureImpl.bindNone();
+        //Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
+		Font awtFont = new Font("Lucida Console", Font.BOLD, 24);
+		Font awtFontSized = awtFont.deriveFont(24f);
+		numbers24 = new TrueTypeFont(awtFontSized, false);
+		awtFontSized = awtFont.deriveFont(48f);
+		numbers48 = new TrueTypeFont(awtFontSized, false);
+        try {
+            InputStream inputStream = ResourceLoader.getResourceAsStream("media/fonts/SF Theramin Gothic.ttf");
+            
+            awtFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            awtFontSized = awtFont.deriveFont(24f); // set font size
+            font24 = new TrueTypeFont(awtFontSized, false);
+            awtFontSized = awtFont.deriveFont(48f);
+            font48 = new TrueTypeFont(awtFontSized, false);
+            
+                 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }   
+
+        
+        //font = new TrueTypeFont(awtFont, true);
+
+	}
+	
 	public static void buildStandardUIBoxes() {
-		Sprite[][] box = new Sprite[3][3];
 		int[] corner = new int[] { 16, 16 };
 		Texture tex = textureMap.get("uibox");
-		int[] point = new int[2];
+		uiBlue = buildBox(tex, new int[] { 0, 0 }, corner);
+		uiRed = buildBox(tex, new int[] { 48, 0 }, corner);
+		uiGreen = buildBox(tex, new int[] { 96, 0 }, corner);
+		uiYellow = buildBox(tex, new int[] { 144, 0 }, corner);
+		uiGrey = buildBox(tex, new int[] { 192, 0 }, corner);
+		uiBlueSel = buildBox(tex, new int[] { 0, 48 }, corner);
+		uiRedSel = buildBox(tex, new int[] { 48, 96 }, corner);
+		uiGreenSel = buildBox(tex, new int[] { 96, 96 }, corner);
+		uiYellowSel = buildBox(tex, new int[] { 144, 96 }, corner);
+		uiWhite = buildBox(tex, new int[] { 192, 96 }, corner);
+		uiTransWhite = buildBox(tex, new int[] { 192, 146 }, corner);
+	}
+	
+	private static UIBox buildBox(Texture tex, int[] offset, int[] corner) {
+		Sprite[][] boxParts = new Sprite[3][3];
+		int[] point = new int[] { 0, 0 };
 		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16;
+			point[0] = i * corner[0] + offset[0];
 			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16 ;
-				box[i][k] = new Sprite( tex, point, corner, corner);
+				point[1] = k * corner[1] + offset[1];
+				boxParts[i][k] = new Sprite( tex, point, corner, corner);
 			}
 		}
-		uiBlue = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 48;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiRed = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 96;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiGreen = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 144;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiYellow = new UIBox(box, corner);
-		box = new Sprite[3][3];
-		for (int i = 0; i < 3; i++) {
-			point[0] = i * 16 + 192;
-			for (int k = 0; k < 3; k++) {
-				point[1] = k * 16;
-				box[i][k] = new Sprite( tex, point, corner, corner);
-			}
-		}
-		uiGrey = new UIBox(box, corner);
+		return new UIBox(boxParts, corner);
 	}
 	
 	public static void globalFinalize() {
@@ -262,4 +288,43 @@ public class Global {
 		Global.textureMap.clear();
 
 	}
+	
+	public static void drawFont24(int xc, int yc, String text, Color color, boolean centered) {
+		if (!centered) { drawFont24(xc, yc, text, color); return; }
+		int w = font24.getWidth(text) / 2;
+		drawFont24(xc - w, yc, text, color);
+	}
+	
+	public static void drawFont24(int xc, int yc, String text, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		font24.drawString(xc, yc, text, color);
+		font24.drawString(0, 0, "", Color.white);
+	}
+	
+	public static void drawFont48(int xc, int yc, String text, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		font48.drawString(xc, yc, text, color);
+		font48.drawString(0, 0, "", Color.white);
+	}
+
+	public static void drawNumbers24(int xc, int yc, String numbers, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		numbers24.drawString(xc, yc, numbers, color);
+		numbers24.drawString(0, -1, "", Color.white);
+	}
+	
+	public static void drawNumbers48(int xc, int yc, String numbers, Color color) {
+		TextureImpl.bindNone();
+		Color.white.bind();
+		numbers48.drawString(xc, yc, numbers, color);
+		numbers48.drawString(0, -1, "", Color.white);
+	}
+
+	public static int getFont24DrawSize(String text) { return font24.getWidth(text); }
+	public static int getFont48DrawSize(String text) { return font48.getWidth(text); }
+	public static int getNumbers24DrawSize(String numbers) { return numbers24.getWidth(numbers); }
+	public static int getNumbers48DrawSize(String numbers) { return numbers48.getWidth(numbers); }
 }

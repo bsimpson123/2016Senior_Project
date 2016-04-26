@@ -8,8 +8,8 @@ import org.newdawn.slick.opengl.Texture;
  * where necessary to set level difficulty. 
  * @author John
  */
-public class BlockStandardLevelTemplate extends BlockStandardLevel {
-	public BlockStandardLevelTemplate(HashMap<String,Texture> rootTexMap) {
+public class BlockStandardLevel04 extends BlockStandardLevel {
+	public BlockStandardLevel04(HashMap<String,Texture> rootTexMap) {
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 		// if these sprite must be defined or the game will crash at runtime
@@ -64,11 +64,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
 				r = Global.rand.nextInt(10000);
-				if (r > 20) { 
-					b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-				} else {
-					b = new Block(Block.BlockType.BLOCK, 3);
-				}
+				b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
 				grid[i].blocks[k] = b;
 			}
 		}
@@ -82,11 +78,8 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 
 	@Override
 	protected Block getQueueBlock() {
-		Block b = null;
 		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-
-		return b;		
+		return new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
 	}
 
 	@Override
@@ -100,8 +93,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 				updateScore(adj);
 				addEnergy(adj);
 				break;
-			default:
-				super.processActivate();
+			default: // block does not activate, do nothing
 				break;
 		}
 		

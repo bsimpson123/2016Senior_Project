@@ -1,12 +1,16 @@
 import static org.lwjgl.opengl.GL11.*;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
 /**
- * This class serves as the base class for all Block Breaker Standard mode levels,
- * and defines and abstracts many of the functions that make level design simpler.
- * @author John Ojala
+ * This class serves as the base class for all Block Breaker Puzzle Mode levels,
+ * and defines and abstracts many of the functions that many level design simpler.
+ * @author Brock Simpson
  */
-public abstract class BlockStandardLevel {
+public abstract class PuzzleModeLevel {
 	protected static Sprite[] numbers = new Sprite[10]; 
 	protected static int score;
 	protected static Sprite pauseCursor;
@@ -17,8 +21,11 @@ public abstract class BlockStandardLevel {
 	
 	private static int scoreDisplay = 0;
 	private static int change = 0;
+	private static int movesChange = 0;
 	private static long scoreUpdateDelayTimer = 50l;
 	private static long scoreUpdateDelay = scoreUpdateDelayTimer;
+	private static long movesUpdateDelayTimer = 50l;
+	private static long movesUpdateDelay = movesUpdateDelayTimer;
 
 	protected Sprite levelDisplay;
 	protected Sprite background;
@@ -38,7 +45,7 @@ public abstract class BlockStandardLevel {
 	private boolean gridShiftActive = false;
 	private boolean blockDropActive = false;
 	private boolean gridMoving = false;
-	private int gridShiftDir = 1;
+	protected int gridShiftDir = 1;
 	private long shiftActionDelayTimer = 1000l;
 	private long gridShiftActionDelay = shiftActionDelayTimer;
 	// grid queue variables
@@ -59,6 +66,13 @@ public abstract class BlockStandardLevel {
 	protected int heartCursorPos = 0;
 	protected int[] blockSize;
 	protected int blocksRemaining = 0;
+	
+	protected static int totalClears = 0;
+	protected static int remainClears = totalClears;
+	private static int movesDisplay = 0;
+	protected boolean resetMoves = true;
+	protected boolean noRemainClears = false;
+	
 	private boolean gamePaused = false;
 	private long inputDelay = Global.inputReadDelayTimer * 2;
 	private long actionDelay = Global.inputReadDelayTimer * 2;
@@ -90,6 +104,27 @@ public abstract class BlockStandardLevel {
 	protected boolean clearColor;
 	protected Sprite heartCursor;
 	protected int colorCount = 0;
+	
+	/**
+	 * Game control variables
+	 */
+	protected boolean clearMoves = false;
+	protected boolean clearCertColor = false;
+	
+	
+	
+	protected boolean noMoves = false;
+	protected static int sumMoves = 0;
+	protected String[] clearsString = new String[] {
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6"
+	};
+	
 	
 	private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
@@ -148,6 +183,78 @@ public abstract class BlockStandardLevel {
 	private int[] pauseOptionSize = new int[2];
 	
 	private Block[] heartMenuBlocks = new Block[6];
+	
+	/*public PuzzleModeLevel(HashMap<String,Texture> rootTexMap) {
+		level = 1;
+		// TODO: [CUSTOM] set background and user interface sprites
+		// if these sprite must be defined or the game will crash at runtime
+		background = new Sprite(
+				rootTexMap.get("bg_space_1"),
+				new int[] { 0, 0 },
+				new int[] { 1024, 768 },
+				new int[] { Global.glEnvWidth, Global.glEnvHeight }
+			);
+		
+		userInterface = new Sprite(
+				rootTexMap.get("ui_stdmode"), // default interface texture
+				new int[] { 0, 0 },
+				new int[] { 1024, 768 },
+				new int[] { Global.glEnvWidth, Global.glEnvHeight }
+			);
+		// TODO: [CUSTOM] set the score multiplier for the level
+		// default value: 1.0f
+		levelMultiplier = 1.5f;
+		
+		// TODO: [CUSTOM] set the energy gain multiplier. default value is 1.0f
+		energyGainMultiplier = 1.0f;
+		
+		// TODO: [CUSTOM] set the block size and grid size
+		// valid block dimensions are { 16, 32, 64 }
+		// valid grid sizes (respective to block size) are { 40, 20, 10 }
+		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+		// create the grid with x-dimension as specified above
+		grid = new GridColumn[gridSize[0]];
+		queue = new Block[gridSize[0]];
+		// build the grid according the level difficulty
+		buildGrid();
+		// set the grid draw starting position derived from grid and block size
+		gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
+		// set the cursor starting position in the center of the grid
+		cursorGridPos[0] = grid.length / 2;
+		cursorGridPos[1] = grid[0].blocks.length / 2;
+		// set energy max if not default
+		energy = energyMax = 200000;	
+	}*/
+	
+	//@Override
+	/*protected void buildGrid() {
+		int r = 0;
+		Global.rand.setSeed(LocalDateTime.now().getNano());
+		for (int i = 0; i < grid.length; i++) {
+			grid[i] = new GridColumn(gridSize[1]);
+			for (int k = 0; k < grid[0].blocks.length; k++) {
+				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
+				r = Global.rand.nextInt(2);
+				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
+			}
+		}
+		// set the block count for the level
+		blocksRemaining = grid.length * grid[0].blocks.length;
+		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
+		// remember to decrease blocksRemaining for each such block added
+		//grid[4].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
+		//grid[16].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
+	}*/
+
+	//@Override
+	protected Block getQueueBlock() {
+		Block b = null;
+		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
+		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(2));
+
+		return b;		
+	}
 
 	
 /*	public void run() {
@@ -173,7 +280,8 @@ public abstract class BlockStandardLevel {
 		
 	}//*/
 
-	public final void run() {
+	
+	public void run() {
 		// decrement delay variables
 		queueManualShiftDelay -= Global.delta;
 		gridShiftActionDelay -= Global.delta;
@@ -182,8 +290,10 @@ public abstract class BlockStandardLevel {
 		/* Draw all background elements. These should always be the first items drawn to screen. */
 		background.draw(0, 0);
 		counter = 0;
+		//remainClears = totalClears;
+		drawTopLevelUI();
 		
-		if (blocksRemaining == 0) {
+		if (blocksRemaining == 0 && movesUpdateDelay == 0) {
 			levelComplete = true;
 			if (!endLevelDelayed) {
 				endLevelDelayed = true;
@@ -192,24 +302,60 @@ public abstract class BlockStandardLevel {
 				energy = 0;
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
-		} else if (energy == 0 && !gameOver) {
+		} else if (blocksRemaining != 0 && remainClears == 0 && movesUpdateDelay == 0) {
 			// game over
+			//if (movesUpdateDelay == 0) {
+				noRemainClears = true;
+				gameOver = true;
+				pauseCursorPos = 0;
+				
+				//inputDelay = Global.inputReadDelayTimer;
+			//}
+			
+			/**
+			 * @author Brock
+			 */
+		} /*else if (noMoves && movesUpdateDelay == 0){
+			// Game over is no moves are remaining
+				gameOver = true;
+				pauseCursorPos = 0;
+			
+		}*/
+		else if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0) {
+	        // game over with one block remaining
+			noMoves = true;
 			gameOver = true;
 			pauseCursorPos = 0;
+			
+		} else if (blocksRemaining != 0 && remainClears > 0) {
+			// If not out of clears but no moves left, then game over
+			for (int i = 0; i < gridSize[0]; i++) {
+				for (int j = 0; j < gridSize[1]; j++) {
+					if (grid[i].blocks[j] == null) {
+						continue;
+					} else {
+						sumMoves += checkGridMovesRemain(i, j, grid[i].blocks[j].colorID);		
+					}
+				}				
+			}
+			if ( sumMoves == 0 && movesUpdateDelay == 0) {
+				noMoves = true;
+				gameOver = true;
+				pauseCursorPos = 0;
+			}
+			sumMoves = 0;
+ 
+
 		}
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver && !levelComplete) {
-			processQueue();
+			//processQueue();
 			energy -= Global.delta;
 			if (energy < 0) { energy = 0; }
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
-			//gridMoving = drawGrid(500);
-			processGridBlocks(grid);
-			this.drawGridRework(grid);
-			gridMoving = blocksMoving;
-			
-			
+			gridMoving = drawGrid(500);
+
 			// for cursor surrounding block
 			cursor.draw(
 				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
@@ -230,8 +376,8 @@ public abstract class BlockStandardLevel {
 					updateScore(counter);
 					addEnergy(counter);
 					removeMarkedBlocks();
-					//dropBlocks();
-					//shiftGridColumns();
+					dropBlocks();
+					shiftGridColumns();
 					heartSpecialActive = false;
 					clearColor = false;
 
@@ -243,13 +389,15 @@ public abstract class BlockStandardLevel {
 					if (Global.getControlActive(Global.GameControl.CANCEL)) {
 						levelFinished = true;
 						gameOver = true;
+						remainClears = totalClears;
 					}
 				}
 			}
 		}
 		// draw the top-level UI frame, score and other elements
-		drawTopLevelUI();
-		drawEnergy();
+
+
+		//drawEnergy();
 	}
 
 	/**
@@ -264,6 +412,38 @@ public abstract class BlockStandardLevel {
 		if (grid[xy[0]].blocks[xy[1]] == null) { return 0; }
 		if (grid[xy[0]].blocks[xy[1]].type != Block.BlockType.BLOCK) { return 0; }
 		return checkGrid(xy[0], xy[1], grid[xy[0]].blocks[xy[1]].colorID);
+	}
+	
+	protected final int checkGridMovesRemain(int xc, int yc) {
+		if (grid[xc].blocks[yc] == null) { return 0; }
+		if (grid[xc].blocks[yc].type != Block.BlockType.BLOCK) { return 0; }
+		return checkGridMovesRemain(xc, yc, grid[xc].blocks[yc].colorID);
+	}
+	
+	/**
+	 * @author Brock
+	 * @param xc - x coordinate
+	 * @param yc - y coordinate
+	 * @param colorID - id for color of block
+	 * @return sum
+	 */
+	private final int checkGridMovesRemain(int xc, int yc, final int colorID) {
+		int sum = 0;
+		
+		if (xc > 0 && grid[xc-1].blocks[yc] != null && grid[xc-1].blocks[yc].colorID == colorID) {
+			sum += 1;
+		}
+		if (yc > 0 && grid[xc].blocks[yc-1] != null && grid[xc].blocks[yc-1].colorID == colorID) {
+			sum += 1;
+		}
+		if ( (xc + 1) < grid.length && grid[xc+1].blocks[yc] != null && grid[xc+1].blocks[yc].colorID == colorID) {
+			sum += 1;
+		}
+		if ( (yc + 1) < grid[0].blocks.length && grid[xc].blocks[yc+1] != null && grid[xc].blocks[yc+1].colorID == colorID) {
+			sum += 1;
+		}
+		
+		return sum;
 	}
 
 	/**
@@ -282,6 +462,7 @@ public abstract class BlockStandardLevel {
 			return 0;
 		}
 		grid[xc].blocks[yc].clearMark = true;
+		
 		sum = 1;
 		if (xc > 0) {
 			sum += checkGrid(xc - 1, yc, colorID);
@@ -365,28 +546,94 @@ public abstract class BlockStandardLevel {
 	}
 	
 	/**
+	 * @author Brock
+	 */
+	protected void drawMovesRemain() {
+		if (remainClears >= 0) {
+			movesUpdateDelay -= Global.delta;
+			//inputDelay -= Global.delta;
+			//remainClears = 6;
+			if (movesUpdateDelay <= 0 && remainClears != movesDisplay) {
+				//if (movesDisplay < remainClears) {
+				//	movesChange = (remainClears - movesDisplay) >> 2;
+				//	if (movesChange == 0) { change = 1;}
+				//	movesDisplay += movesChange;
+				//	if (movesDisplay > remainClears) {movesDisplay = remainClears; }
+				//} else {
+					movesChange = (movesDisplay - remainClears) >> 2;
+					if (movesChange == 0) { movesChange = 1; }
+				    movesDisplay -= movesChange;
+					if (movesDisplay < remainClears) { movesDisplay = remainClears; }
+					//movesDisplay = remainClears;
+				//}
+				movesUpdateDelay = movesUpdateDelayTimer;//Global.inputReadDelayTimer;//movesUpdateDelayTimer;
+			} 
+			if (resetMoves) {
+				remainClears = totalClears;
+				movesDisplay = remainClears;
+				resetMoves = false;
+			}
+				//else {
+			
+			//	inputDelay -= Global.delta;
+			//}
+		} else {
+			remainClears = totalClears;
+			movesDisplay = remainClears;
+		}
+
+
+		char[] strMoves = Integer.toString(movesDisplay).toCharArray();
+
+		//String strMoves = Integer.toString(movesDisplay).toString();
+		int offsetX = 840;//780;
+		int yPos = 450;
+		for (int i = strMoves.length - 1; i >= 0; i--) {
+			getNumber(strMoves[i]).draw(offsetX, yPos);
+			offsetX -= 24;
+			
+		}
+		/*for (int i = strMoves.length() - 1; i >= 0; i--) {
+			//getNumber(strMoves[i]).draw(offsetX, yPos);
+			offsetX -= 24;
+			Global.drawFont48(840, 450, strMoves, Color.white);
+		}*/
+		for (int i = strMoves.length; i < 2; i++) {
+			numbers[0].draw(offsetX, yPos);
+			offsetX -= 24;
+		}
+	}
+	
+	/**
 	 * @author John
 	 */
 	protected void drawTopLevelUI() {
 		Global.uiRed.draw(700, 16, 300, 56);
 		Global.uiBlue.draw(700, 72, 300, 96);
 		userInterface.draw(0,0);
+		//remainClears = 6;
 		Global.drawFont48(710, 25, levelTitle, Color.white);
 		Global.drawFont48(710, 80, "Score", Color.white);
+		Global.drawFont48(730, 400, "Clears left", Color.white);
+		Global.uiBlue.draw(800, 445, 80, 44);
+		//Global.drawFont48(710, 450, clearsString[remainClears], Color.white);
+		//numbers[remainClears].draw(710, 450);
 		int offsetX = 860;
 		int yPos = 16;
 		int[] numResize = new int[] { 30, 40 };
 		drawScore();
+		drawMovesRemain();
 		Global.uiGreen.draw(680, 500, 100, 100);
 		if (gridShiftDir == 1) {
 			shiftLR[1].draw(680, 500);
 		} else {
 			shiftLR[0].draw(680, 500);
 		}
-		drawEnergy();
+		//drawEnergy();
 
 		if (levelComplete) {
 			//drawGrid();
+			// TODO: level complete code
 			overlay.draw(0, 0);
 			//nLevel.draw(200, 200);
 			levelFinishedControls();
@@ -411,7 +658,9 @@ public abstract class BlockStandardLevel {
 			//}
 			// placeholder for level advancement
 		} else if (gamePaused) {
-// Author: Brock
+            /**
+             *  @author Brock
+             */
 			pauseControls();
 
 			overlay.draw(0, 0);
@@ -457,24 +706,63 @@ public abstract class BlockStandardLevel {
 		Color.white.bind();
 		Global.uiWhite.draw(288, 288, 452, 192);
 		
-		if (pauseCursorPos == 0) {
-			Global.drawFont24(330, 240, "Continue?", Color.white);
-			Global.drawFont24(618, 240, "Quit", Color.black);
-			Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
-			Global.drawFont24(308, 350, "your current score.",Color.black);
-		}
-		
-		if (pauseCursorPos == 1) {
-			Global.drawFont24(330, 240, "Continue?", Color.black);
-			Global.drawFont24(618, 240, "Quit", Color.white);
-			Global.drawFont24(440, 380, "Quit the level.", Color.black);
-		}
-		
-		if (Global.getControlActive(Global.GameControl.CANCEL)) {
-			this.levelFinished = true;
-			Global.actionDelay = Global.inputReadDelayTimer;
-		}
+		if (noMoves) {
+			if (pauseCursorPos == 0) {
+				Global.drawFont24(330, 240, "Restart", Color.white);
+				Global.drawFont24(618, 240, "Quit", Color.black);
+				Global.drawFont24(415, 380, "No more moves left", Color.black);
+				//Global.drawFont24(308, 350, "your current score.",Color.black);
+			}
+			
+			if (pauseCursorPos == 1) {
+				Global.drawFont24(330, 240, "Restart", Color.black);
+				Global.drawFont24(618, 240, "Quit", Color.white);
+				Global.drawFont24(440, 380, "Quit the level.", Color.black);
+			}
+			
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				this.levelFinished = true;
+				Global.actionDelay = Global.inputReadDelayTimer;
+			}
+		} else if (noRemainClears) {
+			if (pauseCursorPos == 0) {
+				Global.drawFont24(330, 240, "Restart", Color.white);
+				Global.drawFont24(618, 240, "Quit", Color.black);
+				Global.drawFont24(415, 380, "No more clears left", Color.black);
+				//Global.drawFont24(308, 350, "your current score.",Color.black);
+			}
+			
+			if (pauseCursorPos == 1) {
+				Global.drawFont24(330, 240, "Restart", Color.black);
+				Global.drawFont24(618, 240, "Quit", Color.white);
+				Global.drawFont24(440, 380, "Quit the level.", Color.black);
+			}
+			
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				this.levelFinished = true;
+				Global.actionDelay = Global.inputReadDelayTimer;
+			}
+		}/*else {
+			if (pauseCursorPos == 0) {
+				Global.drawFont24(330, 240, "Continue?", Color.white);
+				Global.drawFont24(618, 240, "Quit", Color.black);
+				//Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
+				//Global.drawFont24(308, 350, "your current score.",Color.black);
+			}
+			
+			if (pauseCursorPos == 1) {
+				Global.drawFont24(330, 240, "Continue?", Color.black);
+				Global.drawFont24(618, 240, "Quit", Color.white);
+				Global.drawFont24(440, 380, "Quit the level.", Color.black);
+			}
+			
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				this.levelFinished = true;
+				Global.actionDelay = Global.inputReadDelayTimer;
+			}
+		}*/
 	}
+	
 	
 	protected abstract void buildGrid(); 
 
@@ -549,231 +837,6 @@ public abstract class BlockStandardLevel {
 		drawQueue();
 		return (blockDropActive || gridShiftActive);
 	}
-
-	protected int[] wedgePos = new int[] { -1, -1 };
-	private final long blockDropDelayTimer = 16l; // 32 is approx. 30/sec
-	private long blockDropDelay = blockDropDelayTimer;
-	private final int blockMoveRate = 8;
-	private boolean blocksMoving = false;
-	private boolean cascadeGridShift = true;
-	
-	protected void processGridBlocks(GridColumn[] grid) {
-		blockDropDelay -= Global.delta;
-		if (blockDropDelay > 0) { return ; }
-		blockDropDelay += blockDropDelayTimer;
-		blocksMoving = false;
-		int starBlockCounter = 0; // if 2 or more star blocks are present on the grid, they will be checked for sharing edges after all movement is completed
-		
-		int xMax = grid.length - 1;
-		int yMax = grid[0].blocks.length - 1;
-		// contains the position of the topmost block per column. will be checked when attempting to move under a wedge block
-		int[] topblock = new int[grid.length];
-		for (int i = 0; i < topblock.length; i++) { topblock[i] = -1; }
-		GridColumn gc;
-		for (int x = 0; x <= xMax; x++) {
-			gc = grid[x];
-			for (int y = 0; y <= yMax; y++) {
-				if (gc.blocks[y] == null) { continue; }
-				
-				gc.blocks[y].checked = false; // reset checked flag each loop
-				//if (gc.blocks[y].type == Block.BlockType.WEDGE) { } else 
-				if (y == 0) { continue; } // do not check for fall if at bottom row
-				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
-					if (gc.blocks[y].type == Block.BlockType.STAR) { starBlockCounter++; }
-					// set block as moving. this value will be reset if the block cannot fall.
-					if (!cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
-					
-					if (gc.blocks[y-1] == null) { // space below is empty
-						// set block as moving. this value will be reset if the block cannot fall.
-						if (cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
-						if (gc.blocks[y].dropDistance > blockSize[1]) {
-							gc.blocks[y].dropDistance -= blockSize[1];
-							if (y == 1) { // move into last row check
-								gc.blocks[y].dropDistance = 0;
-							}
-							gc.blocks[y-1] = gc.blocks[y].clone();
-							gc.blocks[y] = null;
-						}
-						blocksMoving = true;
-					} else if (gc.blocks[y].dropDistance > gc.blocks[y-1].dropDistance) {
-						gc.blocks[y].dropDistance = gc.blocks[y-1].dropDistance;
-						if (gc.blocks[y].dropDistance > 0) {
-							blocksMoving = true; 
-						}
-					} else if (gc.blocks[y-1].dropDistance > 0) { // check if block below is moving
-						
-					} else {
-						gc.blocks[y].dropDistance = 0;
-					}
-					if (gc.blocks[y] != null) {
-						if (x != wedgePos[0] || y < wedgePos[1]) {
-							topblock[x] = y;
-						}
-					}
-				}
-			} // end for(y)
-		} // end for(x)
-		
-		// wedge block mechanics
-		if (wedgePos[0] >= 0 && wedgePos[1] >= 0) {
-			int xc = wedgePos[0], yc = wedgePos[1];
-			GridColumn moveFrom = grid[xc];
-			GridColumn moveTo = null;
-			// if the grid shift is disabled (set to 0), the wedge will just stop blocks from falling
-			// logic assumes that the wedge is never against an edge
-			if (grid[xc].blocks[yc+1] == null || gridShiftDir == 0) { } // no block to move or grid shift disabled
-			else {
-				if (gridShiftDir == 1) { // right-shift
-					if (topblock[xc+1] <= yc) { moveTo = grid[xc+1]; }
-				} else if (gridShiftDir == -1) { // left-shift
-					if (topblock[xc-1] <= yc) { moveTo = grid[xc-1]; }
-				}
-				
-				if (moveTo != null && moveTo.blocks[yc] == null && moveTo.blocks[yc+1] == null) {
-					moveTo.blocks[yc+1] = moveFrom.blocks[yc+1].clone();
-					moveFrom.blocks[yc+1] = null;
-					blocksMoving = true;
-				}
-			}
-		}
-		
-		if (blocksMoving) {  // check for falling blocks before horizontal movement 
-			return; 
-		}
-		
-		// left-right grid shift after all block fall mechanics have been handled
-		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
-		if (gridShiftDir == 1) { // right-shift
-			// next should always be (xc + 1)
-			for (int xc = xMax - 1, next = xMax; xc >= 0; xc--, next--) {
-				
-				// check conditions that prevent column movement
-				if (grid[xc].blocks[0] == null) { continue; }
-				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
-				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
-				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
-					grid[xc].columnOffset = 0;
-					continue; 
-				}
-				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
-					grid[xc].columnOffset = 0;
-					continue;
-				}
-				grid[xc].columnOffset += blockMoveRate;
-				blocksMoving = true;
-				if (grid[xc].columnOffset >= blockSize[0]) {
-					grid[xc].columnOffset -= blockSize[0];
-					if (next == wedgePos[0]) { // moving into the column with wedge block
-						for (int k = 0; k < wedgePos[1]; k++) {
-							grid[next].blocks[k] = grid[xc].blocks[k];
-							grid[xc].blocks[k] = null;
-						}
-						
-					} else if (xc == wedgePos[0]) { // moving out of column with wedge block
-						for (int k = 0; k < wedgePos[1]; k++) {
-							grid[next].blocks[k] = grid[xc].blocks[k];
-							grid[xc].blocks[k] = null;
-						}
-					} else {
-						grid[next] = grid[xc];
-						grid[xc] = emptyset.clone();
-					}
-				}
-			}
-		} else if (gridShiftDir == -1) { // left-shift
-			// next should always be (xc - 1)
-			for (int xc = 1, next = 0; xc <= xMax; xc++, next++) {
-				
-				// check conditions that prevent column movement
-				if (grid[xc].blocks[0] == null) { continue; }
-				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
-				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
-				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
-					grid[xc].columnOffset = 0;
-					continue; 
-				}
-				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
-					grid[xc].columnOffset = 0;
-					continue;
-				}
-				grid[xc].columnOffset -= blockMoveRate;
-				blocksMoving = true;
-				if (grid[xc].columnOffset <= -blockSize[0]) {
-					grid[xc].columnOffset += blockSize[0];
-					if (next == wedgePos[0]) { // moving into the column with wedge block
-						for (int k = 0; k < wedgePos[1]; k++) {
-							grid[next].blocks[k] = grid[xc].blocks[k];
-							grid[xc].blocks[k] = null;
-						}
-						
-					} else if (xc == wedgePos[0]) { // moving out of column with wedge block
-						for (int k = 0; k < wedgePos[1]; k++) {
-							grid[next].blocks[k] = grid[xc].blocks[k];
-							grid[xc].blocks[k] = null;
-						}
-					} else {
-						grid[next] = grid[xc];
-						grid[xc] = emptyset.clone();
-					}
-				}
-			}
-		}
-		if (blocksMoving || starBlockCounter < 2) {
-			return;
-		}
-		
-		for (int x = 0; x < grid.length; x++) {
-			for (int y = 0; y < grid[0].blocks.length; y++) {
-				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
-					// TODO: add activation call for star blocks found sharing an edge
-					if (grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
-					} else 
-					if (grid[x-1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
-					} else 
-					if (grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
-					} else
-					if (grid[x].blocks[y-1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
-					}
-				}
-			}
-		}
-		
-	}
-	
-	/** Draws the grid to the screen u
-	 * 
-	 * @param grid
-	 * @author John
-	 */
-	protected void drawGridRework(GridColumn[] grid) {
-		// The old grid draw functions will not work with the new grid management algorithm, the math will not move the blocks the same
-		for (int i = 0; i < grid.length; i++) {
-			for (int k = 0; k < grid[0].blocks.length; k++) {
-				if (grid[i].blocks[k] == null) { continue; }
-				if (grid[i].blocks[k].type == Block.BlockType.WEDGE) { // wedge blocks are not drawn with grid column offset adjustment
-					grid[i].blocks[k].draw(
-							gridBasePos[0] + blockSize[0] * i,
-							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
-							blockSize
-						);
-				} else {
-					grid[i].blocks[k].draw(
-							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
-							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
-							blockSize
-						);
-				}
-			}
-		}
-		drawQueue();
-	}
-	
-	
-	
 	
 	/**
 	 * Draws the <code>Block</code> grid without processing any block movement.
@@ -854,19 +917,28 @@ public abstract class BlockStandardLevel {
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				
 				switch (pauseCursorPos) {
 					case 0:
 						gameOver = false;
-						energy = energyMax;
-						score = score/2;
-						inputDelay = 10 * Global.inputReadDelayTimer;	
+						//energy = energyMax;
+						//score = score/2;
+						remainClears = totalClears;
+						noMoves = false;
+						noRemainClears = false;
+						//resetMoves = true;
+						buildGrid();
+						score = 0;
+						inputDelay = 4 * Global.inputReadDelayTimer;	
 						break;
 					case 1:
 						gameOver = true;
 						levelFinished = true;
-						inputDelay = 10 * Global.inputReadDelayTimer;	
+						inputDelay = 4 * Global.inputReadDelayTimer;
+						remainClears = totalClears;
 						break;
 				}
+				//inputDelay = Global.inputReadDelayTimer * 2;
 			}
 		} else if (inputDelay > 0) {
 			inputDelay -= Global.delta;
@@ -925,28 +997,29 @@ public abstract class BlockStandardLevel {
 			if ( queueManualShiftDelay <= 0) {
 				if (Global.getControlActive(Global.GameControl.LEFT)) {
 					// shift queue left
-					shiftQueue(-1);
+					//shiftQueue(-1);
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
 					// shift queue right
-					shiftQueue(1);
+					//shiftQueue(1);
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				} else if (Global.getControlActive(Global.GameControl.DOWN)) {
 					// drop (add to grid) queue
-					int overflow = addToGrid();
-					updateScore( overflow * -10 );
+					//int overflow = addToGrid();
+					//updateScore( overflow * -10 );
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				}
 			}
 		} else {
-			queueHold = false;
+			//queueHold = false;
 			// cursor control
-			if (Global.getControlActive(Global.GameControl.SPECIAL1) && gridShiftActionDelay <= 0) {
+			/*if (Global.getControlActive(Global.GameControl.SPECIAL1) && gridShiftActionDelay <= 0) {
 				gridShiftActionDelay = shiftActionDelayTimer;
 				gridShiftActive = true;
 				gridShiftDir *= -1;
-				//shiftGridColumns();
-			}
+				shiftGridColumns();
+				
+			}*/
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorGridPos[1]++;
 				if (cursorGridPos[1] >= grid[0].blocks.length) {
@@ -981,8 +1054,9 @@ public abstract class BlockStandardLevel {
 					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
 						// decrease the blocksRemaining counter after blocks are cleared
 						removeMarkedBlocks();
-						//dropBlocks(); // TODO: these functions are handled by the new grid management algorithm
-						//shiftGridColumns();
+						dropBlocks();
+						shiftGridColumns();
+						remainClears -= 1;
 						// action delay is only increased if an action was performed and the grid was changed
 						// actionDelay = Global.inputReadDelayTimer;
 					}
@@ -1003,6 +1077,7 @@ public abstract class BlockStandardLevel {
 				if (grid[xc].blocks[yc] != null && grid[xc].blocks[yc].clearMark) {
 					grid[xc].blocks[yc] = null;
 					blocksRemaining--;
+					//remainClears--;
 				}
 			}
 		}
@@ -1016,7 +1091,7 @@ public abstract class BlockStandardLevel {
 	 * Used to calculate the distance blocks will be offset. 
 	 * @author John
 	 */
-	private void dropBlocks() {
+	protected void dropBlocks() {
 		int dropDist = 0;
 		int slotDist = 0;
 		for (int i = 0; i < grid.length; i++) {
@@ -1039,7 +1114,7 @@ public abstract class BlockStandardLevel {
 	/**
 	 * @author John
 	 */
-	private void shiftGridColumns() {
+	protected void shiftGridColumns() {
 		GridColumn emptyset = new GridColumn(grid[0].blocks.length);
 		int colDist = 0, shiftDist = 0;
 		if (gridShiftDir == 1) {
@@ -1075,6 +1150,7 @@ public abstract class BlockStandardLevel {
 				}
 			}
 		}
+		
 		return ;
 	}
 	
@@ -1100,16 +1176,16 @@ public abstract class BlockStandardLevel {
 				queue[x] = null;
 			}
 		}
-		/*if (overflow < queueCount) {
+		if (overflow < queueCount) {
 			gridMoving = true;
-		} //*/
-		//dropBlocks();
-		//shiftGridColumns();
+		}
+		dropBlocks();
+		shiftGridColumns();
 		queueCount = 0;
 		return overflow;
 	}
 	
-	protected abstract Block getQueueBlock();
+	//protected abstract Block getQueueBlock();
 	
 	protected void processActivate() {
 		// TODO: score base value calculation is to be done within each case statement
@@ -1119,6 +1195,7 @@ public abstract class BlockStandardLevel {
 				int adj = (int)Math.pow(counter - 1, 2);
 				updateScore(adj);
 				addEnergy(adj);
+				//updateMoves(1);
 				break;
 			case BOMB:
 				counter = activateBombBlock(cursorGridPos);
@@ -1290,6 +1367,10 @@ public abstract class BlockStandardLevel {
 	 */
 	protected void updateScore(int baseAdjustment) {
 		score += (int)Math.floor(baseAdjustment * levelMultiplier);
+	}
+	
+	protected void updateMoves(int baseAdjustment) {
+		remainClears -= baseAdjustment;
 	}
 	
 	protected void addEnergy(int baseAdjustment) {
