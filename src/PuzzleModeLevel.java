@@ -10,7 +10,7 @@ import org.newdawn.slick.Color;
  * and defines and abstracts many of the functions that many level design simpler.
  * @author Brock Simpson
  */
-public class PuzzleModeLevel {
+public abstract class PuzzleModeLevel {
 	protected static Sprite[] numbers = new Sprite[10]; 
 	protected static int score;
 	protected static Sprite pauseCursor;
@@ -21,8 +21,11 @@ public class PuzzleModeLevel {
 	
 	private static int scoreDisplay = 0;
 	private static int change = 0;
+	private static int movesChange = 0;
 	private static long scoreUpdateDelayTimer = 50l;
 	private static long scoreUpdateDelay = scoreUpdateDelayTimer;
+	private static long movesUpdateDelayTimer = 50l;
+	private static long movesUpdateDelay = movesUpdateDelayTimer;
 
 	protected Sprite levelDisplay;
 	protected Sprite background;
@@ -42,7 +45,7 @@ public class PuzzleModeLevel {
 	private boolean gridShiftActive = false;
 	private boolean blockDropActive = false;
 	private boolean gridMoving = false;
-	private int gridShiftDir = 1;
+	protected int gridShiftDir = 1;
 	private long shiftActionDelayTimer = 1000l;
 	private long gridShiftActionDelay = shiftActionDelayTimer;
 	// grid queue variables
@@ -63,6 +66,13 @@ public class PuzzleModeLevel {
 	protected int heartCursorPos = 0;
 	protected int[] blockSize;
 	protected int blocksRemaining = 0;
+	
+	protected static int totalClears = 0;
+	protected static int remainClears = totalClears;
+	private static int movesDisplay = 0;
+	protected boolean resetMoves = true;
+	protected boolean noRemainClears = false;
+	
 	private boolean gamePaused = false;
 	private long inputDelay = Global.inputReadDelayTimer * 2;
 	private long actionDelay = Global.inputReadDelayTimer * 2;
@@ -94,6 +104,27 @@ public class PuzzleModeLevel {
 	protected boolean clearColor;
 	protected Sprite heartCursor;
 	protected int colorCount = 0;
+	
+	/**
+	 * Game control variables
+	 */
+	protected boolean clearMoves = false;
+	protected boolean clearCertColor = false;
+	
+	
+	
+	protected boolean noMoves = false;
+	protected static int sumMoves = 0;
+	protected String[] clearsString = new String[] {
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6"
+	};
+	
 	
 	private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
@@ -153,7 +184,7 @@ public class PuzzleModeLevel {
 	
 	private Block[] heartMenuBlocks = new Block[6];
 	
-	public PuzzleModeLevel(HashMap<String,Texture> rootTexMap) {
+	/*public PuzzleModeLevel(HashMap<String,Texture> rootTexMap) {
 		level = 1;
 		// TODO: [CUSTOM] set background and user interface sprites
 		// if these sprite must be defined or the game will crash at runtime
@@ -194,10 +225,10 @@ public class PuzzleModeLevel {
 		cursorGridPos[1] = grid[0].blocks.length / 2;
 		// set energy max if not default
 		energy = energyMax = 200000;	
-	}
+	}*/
 	
 	//@Override
-	protected void buildGrid() {
+	/*protected void buildGrid() {
 		int r = 0;
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
@@ -212,9 +243,9 @@ public class PuzzleModeLevel {
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added
-		grid[4].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
-		grid[16].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
-	}
+		//grid[4].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
+		//grid[16].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
+	}*/
 
 	//@Override
 	protected Block getQueueBlock() {
@@ -249,7 +280,8 @@ public class PuzzleModeLevel {
 		
 	}//*/
 
-	public final void run() {
+	
+	public void run() {
 		// decrement delay variables
 		queueManualShiftDelay -= Global.delta;
 		gridShiftActionDelay -= Global.delta;
@@ -258,8 +290,10 @@ public class PuzzleModeLevel {
 		/* Draw all background elements. These should always be the first items drawn to screen. */
 		background.draw(0, 0);
 		counter = 0;
+		//remainClears = totalClears;
+		drawTopLevelUI();
 		
-		if (blocksRemaining == 0) {
+		if (blocksRemaining == 0 && movesUpdateDelay == 0) {
 			levelComplete = true;
 			if (!endLevelDelayed) {
 				endLevelDelayed = true;
@@ -268,14 +302,54 @@ public class PuzzleModeLevel {
 				energy = 0;
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
-		} else if (energy == 0) {
+		} else if (blocksRemaining != 0 && remainClears == 0 && movesUpdateDelay == 0) {
 			// game over
+			//if (movesUpdateDelay == 0) {
+				noRemainClears = true;
+				gameOver = true;
+				pauseCursorPos = 0;
+				
+				//inputDelay = Global.inputReadDelayTimer;
+			//}
+			
+			/**
+			 * @author Brock
+			 */
+		} /*else if (noMoves && movesUpdateDelay == 0){
+			// Game over is no moves are remaining
+				gameOver = true;
+				pauseCursorPos = 0;
+			
+		}*/
+		else if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0) {
+	        // game over with one block remaining
+			noMoves = true;
 			gameOver = true;
 			pauseCursorPos = 0;
+			
+		} else if (blocksRemaining != 0 && remainClears > 0) {
+			// If not out of clears but no moves left, then game over
+			for (int i = 0; i < gridSize[0]; i++) {
+				for (int j = 0; j < gridSize[1]; j++) {
+					if (grid[i].blocks[j] == null) {
+						continue;
+					} else {
+						sumMoves += checkGridMovesRemain(i, j, grid[i].blocks[j].colorID);		
+					}
+				}				
+			}
+			if ( sumMoves == 0 && movesUpdateDelay == 0) {
+				noMoves = true;
+				gameOver = true;
+				pauseCursorPos = 0;
+			}
+			sumMoves = 0;
+ 
+
 		}
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver && !levelComplete) {
-			processQueue();
+			//processQueue();
 			energy -= Global.delta;
 			if (energy < 0) { energy = 0; }
 			if (energy > energyMax) { energy = energyMax; }
@@ -315,13 +389,15 @@ public class PuzzleModeLevel {
 					if (Global.getControlActive(Global.GameControl.CANCEL)) {
 						levelFinished = true;
 						gameOver = true;
+						remainClears = totalClears;
 					}
 				}
 			}
 		}
 		// draw the top-level UI frame, score and other elements
-		drawTopLevelUI();
-		drawEnergy();
+
+
+		//drawEnergy();
 	}
 
 	/**
@@ -336,6 +412,38 @@ public class PuzzleModeLevel {
 		if (grid[xy[0]].blocks[xy[1]] == null) { return 0; }
 		if (grid[xy[0]].blocks[xy[1]].type != Block.BlockType.BLOCK) { return 0; }
 		return checkGrid(xy[0], xy[1], grid[xy[0]].blocks[xy[1]].colorID);
+	}
+	
+	protected final int checkGridMovesRemain(int xc, int yc) {
+		if (grid[xc].blocks[yc] == null) { return 0; }
+		if (grid[xc].blocks[yc].type != Block.BlockType.BLOCK) { return 0; }
+		return checkGridMovesRemain(xc, yc, grid[xc].blocks[yc].colorID);
+	}
+	
+	/**
+	 * @author Brock
+	 * @param xc - x coordinate
+	 * @param yc - y coordinate
+	 * @param colorID - id for color of block
+	 * @return sum
+	 */
+	private final int checkGridMovesRemain(int xc, int yc, final int colorID) {
+		int sum = 0;
+		
+		if (xc > 0 && grid[xc-1].blocks[yc] != null && grid[xc-1].blocks[yc].colorID == colorID) {
+			sum += 1;
+		}
+		if (yc > 0 && grid[xc].blocks[yc-1] != null && grid[xc].blocks[yc-1].colorID == colorID) {
+			sum += 1;
+		}
+		if ( (xc + 1) < grid.length && grid[xc+1].blocks[yc] != null && grid[xc+1].blocks[yc].colorID == colorID) {
+			sum += 1;
+		}
+		if ( (yc + 1) < grid[0].blocks.length && grid[xc].blocks[yc+1] != null && grid[xc].blocks[yc+1].colorID == colorID) {
+			sum += 1;
+		}
+		
+		return sum;
 	}
 
 	/**
@@ -354,6 +462,7 @@ public class PuzzleModeLevel {
 			return 0;
 		}
 		grid[xc].blocks[yc].clearMark = true;
+		
 		sum = 1;
 		if (xc > 0) {
 			sum += checkGrid(xc - 1, yc, colorID);
@@ -437,25 +546,90 @@ public class PuzzleModeLevel {
 	}
 	
 	/**
+	 * @author Brock
+	 */
+	protected void drawMovesRemain() {
+		if (remainClears >= 0) {
+			movesUpdateDelay -= Global.delta;
+			//inputDelay -= Global.delta;
+			//remainClears = 6;
+			if (movesUpdateDelay <= 0 && remainClears != movesDisplay) {
+				//if (movesDisplay < remainClears) {
+				//	movesChange = (remainClears - movesDisplay) >> 2;
+				//	if (movesChange == 0) { change = 1;}
+				//	movesDisplay += movesChange;
+				//	if (movesDisplay > remainClears) {movesDisplay = remainClears; }
+				//} else {
+					movesChange = (movesDisplay - remainClears) >> 2;
+					if (movesChange == 0) { movesChange = 1; }
+				    movesDisplay -= movesChange;
+					if (movesDisplay < remainClears) { movesDisplay = remainClears; }
+					//movesDisplay = remainClears;
+				//}
+				movesUpdateDelay = movesUpdateDelayTimer;//Global.inputReadDelayTimer;//movesUpdateDelayTimer;
+			} 
+			if (resetMoves) {
+				remainClears = totalClears;
+				movesDisplay = remainClears;
+				resetMoves = false;
+			}
+				//else {
+			
+			//	inputDelay -= Global.delta;
+			//}
+		} else {
+			remainClears = totalClears;
+			movesDisplay = remainClears;
+		}
+
+
+		char[] strMoves = Integer.toString(movesDisplay).toCharArray();
+
+		//String strMoves = Integer.toString(movesDisplay).toString();
+		int offsetX = 840;//780;
+		int yPos = 450;
+		for (int i = strMoves.length - 1; i >= 0; i--) {
+			getNumber(strMoves[i]).draw(offsetX, yPos);
+			offsetX -= 24;
+			
+		}
+		/*for (int i = strMoves.length() - 1; i >= 0; i--) {
+			//getNumber(strMoves[i]).draw(offsetX, yPos);
+			offsetX -= 24;
+			Global.drawFont48(840, 450, strMoves, Color.white);
+		}*/
+		for (int i = strMoves.length; i < 2; i++) {
+			numbers[0].draw(offsetX, yPos);
+			offsetX -= 24;
+		}
+	}
+	
+	/**
 	 * @author John
 	 */
 	protected void drawTopLevelUI() {
 		Global.uiRed.draw(700, 16, 300, 56);
 		Global.uiBlue.draw(700, 72, 300, 96);
 		userInterface.draw(0,0);
+		//remainClears = 6;
 		Global.drawFont48(710, 25, levelTitle, Color.white);
 		Global.drawFont48(710, 80, "Score", Color.white);
+		Global.drawFont48(730, 400, "Clears left", Color.white);
+		Global.uiBlue.draw(800, 445, 80, 44);
+		//Global.drawFont48(710, 450, clearsString[remainClears], Color.white);
+		//numbers[remainClears].draw(710, 450);
 		int offsetX = 860;
 		int yPos = 16;
 		int[] numResize = new int[] { 30, 40 };
 		drawScore();
+		drawMovesRemain();
 		Global.uiGreen.draw(680, 500, 100, 100);
 		if (gridShiftDir == 1) {
 			shiftLR[1].draw(680, 500);
 		} else {
 			shiftLR[0].draw(680, 500);
 		}
-		drawEnergy();
+		//drawEnergy();
 
 		if (levelComplete) {
 			//drawGrid();
@@ -484,7 +658,9 @@ public class PuzzleModeLevel {
 			//}
 			// placeholder for level advancement
 		} else if (gamePaused) {
-// Author: Brock
+            /**
+             *  @author Brock
+             */
 			pauseControls();
 
 			overlay.draw(0, 0);
@@ -530,26 +706,65 @@ public class PuzzleModeLevel {
 		Color.white.bind();
 		Global.uiWhite.draw(288, 288, 452, 192);
 		
-		if (pauseCursorPos == 0) {
-			Global.drawFont24(330, 240, "Continue?", Color.white);
-			Global.drawFont24(618, 240, "Quit", Color.black);
-			Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
-			Global.drawFont24(308, 350, "your current score.",Color.black);
-		}
-		
-		if (pauseCursorPos == 1) {
-			Global.drawFont24(330, 240, "Continue?", Color.black);
-			Global.drawFont24(618, 240, "Quit", Color.white);
-			Global.drawFont24(440, 380, "Quit the level.", Color.black);
-		}
-		
-		if (Global.getControlActive(Global.GameControl.CANCEL)) {
-			this.levelFinished = true;
-			Global.actionDelay = Global.inputReadDelayTimer;
-		}
+		if (noMoves) {
+			if (pauseCursorPos == 0) {
+				Global.drawFont24(330, 240, "Restart", Color.white);
+				Global.drawFont24(618, 240, "Quit", Color.black);
+				Global.drawFont24(415, 380, "No more moves left", Color.black);
+				//Global.drawFont24(308, 350, "your current score.",Color.black);
+			}
+			
+			if (pauseCursorPos == 1) {
+				Global.drawFont24(330, 240, "Restart", Color.black);
+				Global.drawFont24(618, 240, "Quit", Color.white);
+				Global.drawFont24(440, 380, "Quit the level.", Color.black);
+			}
+			
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				this.levelFinished = true;
+				Global.actionDelay = Global.inputReadDelayTimer;
+			}
+		} else if (noRemainClears) {
+			if (pauseCursorPos == 0) {
+				Global.drawFont24(330, 240, "Restart", Color.white);
+				Global.drawFont24(618, 240, "Quit", Color.black);
+				Global.drawFont24(415, 380, "No more clears left", Color.black);
+				//Global.drawFont24(308, 350, "your current score.",Color.black);
+			}
+			
+			if (pauseCursorPos == 1) {
+				Global.drawFont24(330, 240, "Restart", Color.black);
+				Global.drawFont24(618, 240, "Quit", Color.white);
+				Global.drawFont24(440, 380, "Quit the level.", Color.black);
+			}
+			
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				this.levelFinished = true;
+				Global.actionDelay = Global.inputReadDelayTimer;
+			}
+		}/*else {
+			if (pauseCursorPos == 0) {
+				Global.drawFont24(330, 240, "Continue?", Color.white);
+				Global.drawFont24(618, 240, "Quit", Color.black);
+				//Global.drawFont24(304, 320, "Continue from this level with half of", Color.black);
+				//Global.drawFont24(308, 350, "your current score.",Color.black);
+			}
+			
+			if (pauseCursorPos == 1) {
+				Global.drawFont24(330, 240, "Continue?", Color.black);
+				Global.drawFont24(618, 240, "Quit", Color.white);
+				Global.drawFont24(440, 380, "Quit the level.", Color.black);
+			}
+			
+			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+				this.levelFinished = true;
+				Global.actionDelay = Global.inputReadDelayTimer;
+			}
+		}*/
 	}
 	
-	//protected abstract void buildGrid(); 
+	
+	protected abstract void buildGrid(); 
 
 	/**
 	 * Draw the contents of the <code>Block</code> grid to the screen and
@@ -702,19 +917,28 @@ public class PuzzleModeLevel {
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
+				
 				switch (pauseCursorPos) {
 					case 0:
 						gameOver = false;
-						energy = energyMax;
-						score = score/2;
-						inputDelay = 10 * Global.inputReadDelayTimer;	
+						//energy = energyMax;
+						//score = score/2;
+						remainClears = totalClears;
+						noMoves = false;
+						noRemainClears = false;
+						//resetMoves = true;
+						buildGrid();
+						score = 0;
+						inputDelay = 4 * Global.inputReadDelayTimer;	
 						break;
 					case 1:
 						gameOver = true;
 						levelFinished = true;
-						inputDelay = 10 * Global.inputReadDelayTimer;	
+						inputDelay = 4 * Global.inputReadDelayTimer;
+						remainClears = totalClears;
 						break;
 				}
+				//inputDelay = Global.inputReadDelayTimer * 2;
 			}
 		} else if (inputDelay > 0) {
 			inputDelay -= Global.delta;
@@ -773,28 +997,29 @@ public class PuzzleModeLevel {
 			if ( queueManualShiftDelay <= 0) {
 				if (Global.getControlActive(Global.GameControl.LEFT)) {
 					// shift queue left
-					shiftQueue(-1);
+					//shiftQueue(-1);
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
 					// shift queue right
-					shiftQueue(1);
+					//shiftQueue(1);
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				} else if (Global.getControlActive(Global.GameControl.DOWN)) {
 					// drop (add to grid) queue
-					int overflow = addToGrid();
-					updateScore( overflow * -10 );
+					//int overflow = addToGrid();
+					//updateScore( overflow * -10 );
 					queueManualShiftDelay = queueManualShiftDelayTimer;
 				}
 			}
 		} else {
-			queueHold = false;
+			//queueHold = false;
 			// cursor control
-			if (Global.getControlActive(Global.GameControl.SPECIAL1) && gridShiftActionDelay <= 0) {
+			/*if (Global.getControlActive(Global.GameControl.SPECIAL1) && gridShiftActionDelay <= 0) {
 				gridShiftActionDelay = shiftActionDelayTimer;
 				gridShiftActive = true;
 				gridShiftDir *= -1;
 				shiftGridColumns();
-			}
+				
+			}*/
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorGridPos[1]++;
 				if (cursorGridPos[1] >= grid[0].blocks.length) {
@@ -831,6 +1056,7 @@ public class PuzzleModeLevel {
 						removeMarkedBlocks();
 						dropBlocks();
 						shiftGridColumns();
+						remainClears -= 1;
 						// action delay is only increased if an action was performed and the grid was changed
 						// actionDelay = Global.inputReadDelayTimer;
 					}
@@ -851,6 +1077,7 @@ public class PuzzleModeLevel {
 				if (grid[xc].blocks[yc] != null && grid[xc].blocks[yc].clearMark) {
 					grid[xc].blocks[yc] = null;
 					blocksRemaining--;
+					//remainClears--;
 				}
 			}
 		}
@@ -923,6 +1150,7 @@ public class PuzzleModeLevel {
 				}
 			}
 		}
+		
 		return ;
 	}
 	
@@ -967,6 +1195,7 @@ public class PuzzleModeLevel {
 				int adj = (int)Math.pow(counter - 1, 2);
 				updateScore(adj);
 				addEnergy(adj);
+				//updateMoves(1);
 				break;
 			case BOMB:
 				counter = activateBombBlock(cursorGridPos);
@@ -1138,6 +1367,10 @@ public class PuzzleModeLevel {
 	 */
 	protected void updateScore(int baseAdjustment) {
 		score += (int)Math.floor(baseAdjustment * levelMultiplier);
+	}
+	
+	protected void updateMoves(int baseAdjustment) {
+		remainClears -= baseAdjustment;
 	}
 	
 	protected void addEnergy(int baseAdjustment) {
