@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Stack;
@@ -10,9 +13,11 @@ import org.newdawn.slick.opengl.Texture;
  * @author John
  */
 public class BlockStandardLevelEx extends BlockStandardLevel {
-	private Block[] list = new Block[11];
+	private Block[] list = new Block[12];
 	private Stack<GridColumn[]> undo = new Stack<GridColumn[]>();
 	private boolean fillToggle = false;
+	private int[] fillPoint1 = null;
+	private int[] fillPoint2 = null;
 	
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
 		// set the score multiplier for the level when 
@@ -57,15 +62,21 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		list[8] = new Block(Block.BlockType.TRASH);
 		list[9] = new Block(Block.BlockType.HEART);
 		list[10] = new Block(Block.BlockType.BOMB);
+		list[11] = new Block(Block.BlockType.ROCK);
 	}
 	
 	
 	@Override
 	protected void checkCommonControls() {
 		char c;
+		int key;
 		int x = this.cursorGridPos[0], y = this.cursorGridPos[1]; // done to improve code readability
 		while (Keyboard.next()) {
-			c = Character.toUpperCase( Keyboard.getEventCharacter() );
+			c = Keyboard.getEventCharacter();
+			System.out.println(c);
+			c = Character.toUpperCase( c );
+			//key = Keyboard.getEventKey();
+			
 			switch (c) {
 				case '1':
 				case '2':
@@ -79,7 +90,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					undo.push(grid.clone());
 					if (grid[x].blocks[y].type == Block.BlockType.BLOCK && fillToggle) {
 						// only BLOCK types are affected by the fill toggle
-						int t = checkGrid(cursorGridPos);
+						checkGrid(cursorGridPos);
 						for (int j = 0; j < grid.length; j++) {
 							for (int k = 0; k < grid[0].blocks.length; k++) {
 								if (grid[j].blocks[k].clearMark) {
@@ -108,7 +119,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 						grid[x].blocks[y] = list[6].clone();
 					}
 					break;
-				case 'E':
+				case 'N':
 					if (grid[x].blocks[y].type != Block.BlockType.STAR) {
 						undo.push(grid.clone());
 						grid[x].blocks[y] = list[7].clone();
@@ -120,7 +131,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 						grid[x].blocks[y] = list[8].clone();
 					}
 					break;
-				case 'R': 
+				case 'H': 
 					if (grid[x].blocks[y].type != Block.BlockType.HEART) {
 						undo.push(grid.clone());
 						grid[x].blocks[y] = list[9].clone();
@@ -132,26 +143,103 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 						grid[x].blocks[y] = list[10].clone();
 					}
 					break;
+				case 'R':
+					if (grid[x].blocks[y].type != Block.BlockType.ROCK) {
+						undo.push(grid.clone());
+						grid[x].blocks[y] = list[11].clone();
+					}
+					break;
 				case 'F':
 					fillToggle = !fillToggle;
 					break;
 				case 'S':
 					// TODO: write grid to file
+					writeToFile();
 					break;
 				case 'L':
 					// TODO: load grid from file
+					loadFromFile();
 					break;
 				case 'Z':
 					grid = undo.pop();
 					break;
-					
+				case 'P':
+					if (fillPoint1 == null) {
+						fillPoint1 = cursorGridPos.clone();
+					} else if (fillPoint2 == null){
+						fillPoint2 = cursorGridPos.clone();
+						fillToggle = true;
+					} else {
+						fillPoint1 = fillPoint2;
+						fillPoint2 = cursorGridPos.clone();
+					}
+					break;
+				case 'C': // clear sets
+					fillPoint1 = null;
+					fillPoint2 = null;
+					fillToggle = false;
+				default:
+					break;
 			}
 		}
+		if (undo.size() > 15) { // limit undo history to 15 entries
+			undo.remove(0);
+		}
+		
 	}
 	
-	
 	@Override
-	protected void buildGrid() {
+	protected void drawCursor() {
+		cursor.draw(
+				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
+				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
+				blockSize
+			);
+		
+		if (fillPoint1 != null) {
+			// TODO: draw points tinted with color
+		}
+		
+	}
+
+	
+	private void fill(Block copyBlock) {
+		undo.push(grid.clone());
+		if (fillPoint1 == null || fillPoint2 == null) {
+			// use fill point defined area
+			int t;
+			if (fillPoint1[0] < fillPoint2[0]) {
+				t = fillPoint1[0];
+				fillPoint1[0] = fillPoint2[0];
+				fillPoint2[0] = t;
+			}
+			if (fillPoint1[1] < fillPoint2[1]) {
+				t = fillPoint1[1];
+				fillPoint1[1] = fillPoint2[14];
+				fillPoint2[1] = t;
+			}
+			for (int x = fillPoint1[0]; x <= fillPoint2[0]; x++) {
+				for (int y = fillPoint1[1]; y <= fillPoint2[1]; y++) {
+					grid[x].blocks[y] = copyBlock.clone();
+				}
+			}
+		} else {
+			// use matching block defined areas
+			checkGrid(cursorGridPos);
+			for (int j = 0; j < grid.length; j++) {
+				for (int k = 0; k < grid[0].blocks.length; k++) {
+					if (grid[j].blocks[k].clearMark) {
+						grid[j].blocks[k] = copyBlock.clone();
+					}
+				}
+			}
+		}
+		fillToggle = false;
+		fillPoint1 = null;
+		fillPoint2 = null;
+	}
+	
+	@Override	protected void buildGrid() {
 		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
@@ -166,6 +254,53 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		// TODO Auto-generated method stub
 		return null;		
 	}
+	
+	private void writeToFile() {
+		String[] conv = new String[grid.length];
+		String sub;
+		for (int x = 0; x < grid.length; x++) {
+			sub = "";
+			for (int y = 0; y < grid[0].blocks.length; y++) {
+				switch(grid[x].blocks[y].type) {
+					case BLOCK:
+						
+						break;
+					case WEDGE:
+						
+						break;
+					case STAR:
+						
+						break;
+					case TRASH:
+						
+						break;
+					case HEART:
+						
+						break;
+					case BOMB:
+						
+						break;
+				}
+			}
+			
+		}
+		try {
+			BufferedWriter outFile = new BufferedWriter(new FileWriter("out.csv"));
+			
+			outFile.write("1a");
+			outFile.newLine();
+			
+			
+			outFile.close();
+		} catch (IOException ioe) {
+			Global.writeToLog(String.format("Error writing to custom map file.\n%s", ioe.getMessage()));
+		}
+	}
+	
+	private void loadFromFile() {
+		
+	}
+	
 }
 
 

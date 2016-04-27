@@ -305,6 +305,8 @@ public class BlockBreakStandard implements GameMode {
 		if (playLevel != null) {
 			if (!playLevel.levelFinished) {
 				playLevel.run();
+			} else if (playLevel.level == 0) { 
+				playLevel = null;
 			} else {
 				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
@@ -474,8 +476,13 @@ public class BlockBreakStandard implements GameMode {
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0: // normal mode
-						loadLevel(1);
-						BlockStandardLevel.score = 0;
+						if (Global.getControlActive(Global.GameControl.LEFT)) {
+							playLevel = new BlockStandardLevelEx(localTexMap);
+							playLevel.levelTitle = "Build Mode";
+						} else {
+							loadLevel(1);
+							BlockStandardLevel.score = 0;
+						}
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode

@@ -211,13 +211,7 @@ public abstract class BlockStandardLevel {
 			this.drawGrid(grid);
 			gridMoving = blocksMoving;
 			
-			
-			// for cursor surrounding block
-			cursor.draw(
-				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
-				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
-				blockSize
-			);
+			drawCursor();
 			
 			// check if heart special control is active and handle accordingly
 			if (heartSpecialActive) {
@@ -242,16 +236,25 @@ public abstract class BlockStandardLevel {
 				if (inputDelay <= 0l) {
 					checkCommonControls();
 					// DEBUG: back out of the game to the main menu. not to be included in finished levels
-					if (Global.getControlActive(Global.GameControl.CANCEL)) {
+					/*if (Global.getControlActive(Global.GameControl.CANCEL)) {
 						levelFinished = true;
 						gameOver = true;
-					}
+					}//*/
 				}
 			}
 		}
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
 		drawEnergy();
+	}
+	
+	protected void drawCursor() {
+		cursor.draw(
+				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
+				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
+				blockSize
+			);
+		
 	}
 
 	/**
