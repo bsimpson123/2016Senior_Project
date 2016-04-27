@@ -1,7 +1,8 @@
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Random;
+import java.util.Stack;
 
+import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.opengl.Texture;
 
 /**
@@ -9,10 +10,11 @@ import org.newdawn.slick.opengl.Texture;
  * @author John
  */
 public class BlockStandardLevelEx extends BlockStandardLevel {
-	private Random rand;
-
+	private Block[] list = new Block[11];
+	private Stack<GridColumn[]> undo = new Stack<GridColumn[]>();
+	private boolean fillToggle = false;
+	
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
-		rand = Global.rand;
 		// set the score multiplier for the level when 
 		levelMultiplier = 1.5f;
 		// Set environment textures and variables
@@ -42,81 +44,127 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		cursorGridPos[1] = grid[0].blocks.length / 2;
 		// TODO: [CUSTOM] set energy and energyMax if different than default (100000)
 		// set energy max if not default
-		energy = energyMax = 200000;		
+		energy = energyMax = 200000;
+		queueDisabled = true;
+		list[0] = new Block(Block.BlockType.BLOCK, Block.BLUE);
+		list[1] = new Block(Block.BlockType.BLOCK, Block.YELLOW);
+		list[2] = new Block(Block.BlockType.BLOCK, Block.GREEN);
+		list[3] = new Block(Block.BlockType.BLOCK, Block.RED);
+		list[4] = new Block(Block.BlockType.BLOCK, Block.PURPLE);
+		list[5] = new Block(Block.BlockType.BLOCK, Block.GREY);
+		list[6] = new Block(Block.BlockType.WEDGE);
+		list[7] = new Block(Block.BlockType.STAR);
+		list[8] = new Block(Block.BlockType.TRASH);
+		list[9] = new Block(Block.BlockType.HEART);
+		list[10] = new Block(Block.BlockType.BOMB);
 	}
+	
+	
+	@Override
+	protected void checkCommonControls() {
+		char c;
+		int x = this.cursorGridPos[0], y = this.cursorGridPos[1]; // done to improve code readability
+		while (Keyboard.next()) {
+			c = Character.toUpperCase( Keyboard.getEventCharacter() );
+			switch (c) {
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+					if (grid[x].blocks[y].type != Block.BlockType.BLOCK || grid[x].blocks[y].type != Block.BlockType.BOMB) {
+						break;
+					}
+					int v = Character.getNumericValue(c) - 1; // get the matching colorID value for the provided number
+					undo.push(grid.clone());
+					if (grid[x].blocks[y].type == Block.BlockType.BLOCK && fillToggle) {
+						// only BLOCK types are affected by the fill toggle
+						int t = checkGrid(cursorGridPos);
+						for (int j = 0; j < grid.length; j++) {
+							for (int k = 0; k < grid[0].blocks.length; k++) {
+								if (grid[j].blocks[k].clearMark) {
+									grid[j].blocks[k].colorID = v;
+								}
+							}
+						}
+						fillToggle = false;
+					} else {
+						if (grid[x].blocks[y].type == Block.BlockType.BOMB && v < 2) {
+							v = 2;
+						}
+						grid[x].blocks[y].colorID = v;
+						fillToggle = false;
+					}
+					break;
+				case 'Q': // set as block type at default color (blue)
+					if (grid[x].blocks[y].type != Block.BlockType.BLOCK) {
+						undo.push(grid.clone());
+						grid[x].blocks[y] = list[0].clone();
+					}
+					break;
+				case 'W':
+					if (grid[x].blocks[y].type != Block.BlockType.WEDGE) {
+						undo.push(grid.clone());
+						grid[x].blocks[y] = list[6].clone();
+					}
+					break;
+				case 'E':
+					if (grid[x].blocks[y].type != Block.BlockType.STAR) {
+						undo.push(grid.clone());
+						grid[x].blocks[y] = list[7].clone();
+					}
+					break;
+				case 'T':
+					if (grid[x].blocks[y].type != Block.BlockType.TRASH) {
+						undo.push(grid.clone());
+						grid[x].blocks[y] = list[8].clone();
+					}
+					break;
+				case 'R': 
+					if (grid[x].blocks[y].type != Block.BlockType.HEART) {
+						undo.push(grid.clone());
+						grid[x].blocks[y] = list[9].clone();
+					}
+					break;
+				case 'Y':
+					if (grid[x].blocks[y].type != Block.BlockType.BOMB) {
+						undo.push(grid.clone());
+						grid[x].blocks[y] = list[10].clone();
+					}
+					break;
+				case 'F':
+					fillToggle = !fillToggle;
+					break;
+				case 'S':
+					// TODO: write grid to file
+					break;
+				case 'L':
+					// TODO: load grid from file
+					break;
+				case 'Z':
+					grid = undo.pop();
+					break;
+					
+			}
+		}
+	}
+	
 	
 	@Override
 	protected void buildGrid() {
-		Block b = null;
-		int r = 0;
-		Global.rand.setSeed(LocalDateTime.now().getNano());
 		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
-				r = Global.rand.nextInt(10000);
-				if (r > 20) { 
-					b = new Block(Block.BlockType.BLOCK, rand.nextInt(6));
-				} else {
-					b = new Block(Block.BlockType.BOMB);
-				}
-				grid[i].blocks[k] = b; //*/
-				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, (++count) % 2);
+				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Block.BLUE); //*/
 			}
 		}
-		// TASK: set the block count for the level
 		this.blocksRemaining = grid.length * grid[0].blocks.length;
-		r = Global.rand.nextInt(12) + 4;
-		grid[r].blocks[0] = new Block(Block.BlockType.ROCK);
-		blocksRemaining--; //*/
-		grid[r].blocks[1] = new Block(Block.BlockType.BOMB);
-		//grid[0].blocks[0] = grid[1].blocks[0].clone();
 	}
 	
 	@Override
 	protected Block getQueueBlock() {
 		// TODO Auto-generated method stub
-		if (Global.rand.nextInt(100000) == 1) {
-			return new Block(Block.BlockType.BOMB);
-		}
-		Block b = null;
-		b = new Block(Block.BlockType.BLOCK, rand.nextInt(6));
-		return b;		
-	}
-
-	@Override
-	protected void processActivate() {
-		// TODO: score base value calculation is to be done within each case statement
-		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
-			case BLOCK:
-				counter = checkGrid(cursorGridPos);
-				int adj = (int)Math.pow(counter - 1, 2);
-				updateScore(adj);
-				addEnergy(adj);
-				break;
-			case STAR:
-				if (cursorGridPos[1] > 0) { break; }
-				int lRange = cursorGridPos[0] == 0 ? 0 : cursorGridPos[0] - 1;
-				int uRange = cursorGridPos[0] == grid.length - 1 ? grid.length : cursorGridPos[0] + 2;
-				for (int i = lRange; i < uRange; i++) {
-					for (int k = 0; k < 2; k++) {
-						if (grid[i].blocks[k] != null) {
-							grid[i].blocks[k].clearMark = true;
-							counter++;
-						}
-					}
-				}
-				grid[cursorGridPos[0]].blocks[cursorGridPos[1]].clearMark = true;
-				updateScore(counter * 5);
-				addEnergy(counter * 5);
-				break;
-			case BOMB:
-				counter = activateBombBlock(cursorGridPos);
-				updateScore(counter);
-				addEnergy(counter);
-				break;
-			default: // selected block does not activate; do nothing
-				break;
-		}
+		return null;		
 	}
 }
 

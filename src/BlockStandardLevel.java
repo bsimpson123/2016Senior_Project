@@ -1,6 +1,7 @@
 import static org.lwjgl.opengl.GL11.*;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
+
 /**
  * This class serves as the base class for all Block Breaker Standard mode levels,
  * and defines and abstracts many of the functions that make level design simpler.
@@ -53,6 +54,7 @@ public abstract class BlockStandardLevel {
 	private final long queueManualShiftDelayTimer = 250l;
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
+	protected boolean queueDisabled = false;
 	
 	private boolean heartSpecialActive = false;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
@@ -206,7 +208,7 @@ public abstract class BlockStandardLevel {
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			//gridMoving = drawGrid(500);
 			processGridBlocks(grid);
-			this.drawGridRework(grid);
+			this.drawGrid(grid);
 			gridMoving = blocksMoving;
 			
 			
@@ -275,12 +277,11 @@ public abstract class BlockStandardLevel {
 			return 0;
 		}
 		grid[xc].blocks[yc].checked = true;
-		if (grid[xc].blocks[yc].colorID != colorID) {
-			return 0;
-		}
-		if (grid[xc].blocks[yc].type != Block.BlockType.BLOCK) {
-			return 0;
-		}
+		
+		if (grid[xc].blocks[yc].dropDistance != 0) { return 0; }
+		if (grid[xc].blocks[yc].colorID != colorID) { return 0; }
+		if (grid[xc].blocks[yc].type != Block.BlockType.BLOCK) { return 0; }
+		
 		grid[xc].blocks[yc].clearMark = true;
 		sum = 1;
 		if (xc > 0) {
@@ -435,7 +436,7 @@ public abstract class BlockStandardLevel {
 				}
 			}			
 		} else if (gameOver) {
-			drawGrid();
+			drawGrid(grid);
 			showGameOver();
 		}
 	}
@@ -486,7 +487,7 @@ public abstract class BlockStandardLevel {
 	 * if no blocks are currently falling 
 	 * @author John
 	 */
-	protected final boolean drawGrid(int shiftRate) {
+	protected final boolean drawGridDepreciated(int shiftRate) {
 		gridShiftActionDelay -= Global.delta;
 		queueManualShiftDelay -= Global.delta;
 		int[] gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 }; // distance from the left top for the bottom-left of the grid display
@@ -745,12 +746,12 @@ public abstract class BlockStandardLevel {
 		
 	}
 	
-	/** Draws the grid to the screen u
-	 * 
+	/** Draws the grid to the screen. Calculates block offsets used by the updated
+	 *  grid management algorithm.
 	 * @param grid
 	 * @author John
 	 */
-	protected void drawGridRework(GridColumn[] grid) {
+	protected void drawGrid(GridColumn[] grid) {
 		// The old grid draw functions will not work with the new grid management algorithm, the math will not move the blocks the same
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
@@ -773,14 +774,11 @@ public abstract class BlockStandardLevel {
 		drawQueue();
 	}
 	
-	
-	
-	
 	/**
 	 * Draws the <code>Block</code> grid without processing any block movement.
 	 * @author John
 	 */
-	protected final void drawGrid() {
+	protected final void drawGridDepreciated() {
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				if (grid[i].blocks[k] != null) {
@@ -975,14 +973,15 @@ public abstract class BlockStandardLevel {
 				inputDelay = Global.inputReadDelayTimer;
 			}
 			if (actionDelay <= 0) {
-				if (!gridMoving && Global.getControlActive(Global.GameControl.SELECT) &&
+				if ((!gridMoving || !Global.waitForGridMovement) &&
+						Global.getControlActive(Global.GameControl.SELECT) &&
 						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
 					counter = 0;
 					processActivate();
 					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
 						// decrease the blocksRemaining counter after blocks are cleared
 						removeMarkedBlocks();
-						//dropBlocks(); // TODO: these functions are handled by the new grid management algorithm
+						//dropBlocks(); // NOTE: these functions are handled by the new grid management algorithm
 						//shiftGridColumns();
 						// action delay is only increased if an action was performed and the grid was changed
 						// actionDelay = Global.inputReadDelayTimer;
@@ -1182,6 +1181,7 @@ public abstract class BlockStandardLevel {
 	 * @author John
 	 */
 	protected void processQueue() {
+		if (queueDisabled) { return; }
 		if (levelComplete) { return; }
 		if (heartSpecialActive) { return; }
 		queueStepDelay -= Global.delta;
