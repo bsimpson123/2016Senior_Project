@@ -244,7 +244,7 @@ public class Block implements Cloneable {
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc, size);
 		} else if (type == BlockType.BOMB) {
-			float factor = size[0] / (float) blockDrawSpace[0];
+			//float factor = size[0] / (float) blockDrawSpace[0];
 			bombNumber[colorID].draw(xc + 9, yc + 7);
 		}
 	}

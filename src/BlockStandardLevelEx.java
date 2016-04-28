@@ -1,7 +1,3 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -51,9 +47,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
-		// TODO: [CUSTOM] set energy and energyMax if different than default (100000)
-		// set energy max if not default
-		energy = energyMax = 200000;
 		// disable the queue. it will not be processed or displayed. no blocks will be added
 		queueDisabled = true;
 		list[0] = new Block(Block.BlockType.BLOCK, Block.BLUE);
@@ -258,8 +251,22 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		userInterface.draw(0,0);
 		Global.drawFont48(710, 25, levelTitle, Color.white);
 
-		list[0].draw(700, 72);
-		Global.drawNumbers24(716, 78, "1", Color.white);
+/*		list[0].draw(700, 80);
+		Global.drawNumbers24(716, 86, "1", Color.white, true);
+		
+		list[1].draw(740, 80);
+		Global.drawNumbers24(756, 86, "2", Color.white, true); //*/
+		
+		for (int i = 0; i < 6; i++) {
+			list[i].draw(700 + i * 40, 80);
+			Global.drawNumbers24(716 + i * 40, 86, String.format("%d", i + 1), Color.black, true);
+		}
+		list[6].draw(700, 120);
+		Global.drawFont24(716, 156, "W", Color.white, true);
+		
+		list[10].draw(740, 120, blockSize);
+		Global.drawFont24(756, 156, "B", Color.white, true);
+		
 		
 	}
 	
@@ -274,7 +281,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 			);
 		
 		if (fillPoint1 != null) {
-			// TODO: draw points tinted with color
 			Color.cyan.bind();
 			cursor.draw(
 					gridBasePos[0] + blockSize[0] * fillPoint1[0], 
