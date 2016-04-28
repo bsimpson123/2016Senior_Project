@@ -234,30 +234,8 @@ public class Game {
 		Global.globalInit();
 		// TODO: add all game variables to be loaded/initialized at the start of the program
 		// Setup default game controls.
-		Global.setKeyMap(Global.GameControl.UP, Keyboard.KEY_UP);
-		Global.setKeyMap(Global.GameControl.DOWN, Keyboard.KEY_DOWN);
-		Global.setKeyMap(Global.GameControl.LEFT, Keyboard.KEY_LEFT);
-		Global.setKeyMap(Global.GameControl.RIGHT, Keyboard.KEY_RIGHT);
-		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_X);
-		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_RETURN);
-		Global.setKeyMap(Global.GameControl.SELECT, Keyboard.KEY_SPACE);
-		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_W);
-		Global.setKeyMap(Global.GameControl.CANCEL, Keyboard.KEY_ESCAPE);
-		Global.setKeyMap(Global.GameControl.PAUSE, Keyboard.KEY_F);
-		Global.setKeyMap(Global.GameControl.SPECIAL1, Keyboard.KEY_A);
-		Global.setKeyMap(Global.GameControl.SPECIAL2, Keyboard.KEY_D);
-		
-		// gamepad controls
-		Controller gamepad = Global.getController();
-		if (gamepad != null) {
-			// add gamepad controls here;
-			Global.setGamePadMap(Global.GameControl.SELECT, 1);
-			Global.setGamePadMap(Global.GameControl.CANCEL, 3);
-			Global.setGamePadMap(Global.GameControl.SPECIAL1, 2);
-			Global.setGamePadMap(Global.GameControl.SPECIAL2, 0);
-			Global.setGamePadMap(Global.GameControl.PAUSE, 9);
-			
-		}
+		Configuration.setupDefaultValues();
+
 		// Load all used textures into memory so the game will not be slowed down by loading textures later
 		Texture tex;
 		String type; // holds file type extension

@@ -21,6 +21,14 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		 */
 		gridShiftDir = -1;
 		
+		/**
+		 * set score for medal 1, 2, and 3
+		 * 
+		 */
+		scoreMedal1 = 5000;
+		scoreMedal2 = 10000;
+		scoreMedal3 = 21000;
+		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime
 				background = new Sprite(
@@ -74,10 +82,25 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				//r = 2;//Global.rand.nextInt(2);
-				if (i % 2 == 0) {
+				//r = 1;//Global.rand.nextInt(2);
+				
+				/*if (((i + k) % 2 == 0)) {
+					r = 4;
+				}*/
+					
+				/*if (i % 2 == 0) {
 					r = 1;
 				} else if (k % 2 == 0){
+					r = 2;
+				} else if (i / 2 != 1 && k / 2 != 1){
+					r = 2;
+				} else {
+					r = 3;
+				}*/
+				
+				if (i % 2 == 0) {
+					r = 1;
+				} else if (k % 2 == 0) {
 					r = 2;
 				} else {
 					r = 3;
@@ -86,8 +109,15 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
 			}
 		}
-		//grid[0].blocks[0] = new Block(Block.BlockType.BLOCK, 1);
+		
+		grid[grid.length / 2].blocks[grid[0].blocks.length / 2] = new Block(Block.BlockType.BLOCK, 1);
+		//grid[0].blocks[0] = new Block(Block.BlockType.BLOCK, 2);
 		//grid[0].blocks[1] = new Block(Block.BlockType.BLOCK, 3);
+		//grid[0].blocks[2] = new Block(Block.BlockType.BLOCK, 2);
+		//grid[0].blocks[3] = new Block(Block.BlockType.BLOCK, 4);
+		//grid[0].blocks[4] = new Block(Block.BlockType.BLOCK, 2);
+		//grid[0].blocks[5] = new Block(Block.BlockType.BLOCK, 3);
+		//grid[0].blocks[6] = new Block(Block.BlockType.BLOCK, 2);
 		//grid[0].blocks[2] = new Block(Block.BlockType.BLOCK, 1);
 		//grid[0].blocks[3] = new Block(Block.BlockType.BLOCK, 3);
 		

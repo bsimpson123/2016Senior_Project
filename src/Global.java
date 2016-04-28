@@ -39,15 +39,24 @@ public class Global {
 	public static int winHeight = glEnvHeight;
 	/** The pixel width of the game window, defaults to the same size as the OpenGL environment. */
 	public static int winWidth = glEnvWidth;
-	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
-	 * This is the sensitivity of the input. */
-	public static long inputReadDelayTimer = 150l;
-	public static long actionDelay = inputReadDelayTimer;
-	public static long movementDelay = inputReadDelayTimer;
 	public static UIBox 
 		uiBlue, uiRed, uiGreen, uiYellow, uiGrey,
 		uiBlueSel, uiRedSel, uiGreenSel, uiYellowSel,
 		uiTransWhite, uiWhite;
+	
+	// Configurable variables (preset with default values)
+	/** The minimum time (milliseconds) to wait after receiving input before processing further input.
+	 * This is the sensitivity of the input. */
+	public static long inputReadDelayTimer = 150l;
+	public static boolean useBlockCascading = true;
+	public static boolean waitForGridMovement = true;
+	
+	
+	// End configurable variables
+	
+	public static long actionDelay = inputReadDelayTimer;
+	public static long movementDelay = inputReadDelayTimer;
+
 	
 	public static Color menuButtonShader = new Color(79, 187, 101);
 	
@@ -182,7 +191,7 @@ public class Global {
 	
 	public static void initLog() {
 		LocalDateTime time = LocalDateTime.now();
-		String filename = String.format("%1$tF %1$tH%1$tI.log", time);
+		String filename = String.format("%1$tF %1$tH%1$tS.log", time);
 		try {
 			logFile = new FileWriter(filename);
 		} catch (IOException e) {
@@ -302,11 +311,23 @@ public class Global {
 		font24.drawString(0, 0, "", Color.white);
 	}
 	
+	public static void drawFont48(int xc, int yc, String text, Color color, boolean centered) {
+		if (!centered) { drawFont48(xc, yc, text, color); return; }
+		int w = font48.getWidth(text) / 2;
+		drawFont48(xc - w, yc, text, color);
+	}
+
 	public static void drawFont48(int xc, int yc, String text, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();
 		font48.drawString(xc, yc, text, color);
 		font48.drawString(0, 0, "", Color.white);
+	}
+
+	public static void drawNumbers24(int xc, int yc, String text, Color color, boolean centered) {
+		if (!centered) { drawNumbers24(xc, yc, text, color); return; }
+		int w = numbers24.getWidth(text) / 2;
+		drawNumbers24(xc - w, yc, text, color);
 	}
 
 	public static void drawNumbers24(int xc, int yc, String numbers, Color color) {
@@ -316,6 +337,12 @@ public class Global {
 		numbers24.drawString(0, -1, "", Color.white);
 	}
 	
+	public static void drawNumbers48(int xc, int yc, String text, Color color, boolean centered) {
+		if (!centered) { drawNumbers48(xc, yc, text, color); return; }
+		int w = numbers48.getWidth(text) / 2;
+		drawNumbers48(xc - w, yc, text, color);
+	}
+
 	public static void drawNumbers48(int xc, int yc, String numbers, Color color) {
 		TextureImpl.bindNone();
 		Color.white.bind();

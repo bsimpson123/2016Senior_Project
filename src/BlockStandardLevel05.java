@@ -56,6 +56,8 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 	
 	@Override
 	protected void buildGrid() {
+		grid = GridColumn.loadFromFile("media/sp2.csv");
+		/*
 		try {
 			String parseline;
 			String[] parseCSV;
@@ -80,7 +82,7 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} //*/
 
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;

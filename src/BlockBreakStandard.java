@@ -283,10 +283,11 @@ public class BlockBreakStandard implements GameMode {
 			);
 		
 		hsBack = localTexMap.get("bigsky");
-		// Update mode state when asset loading is completed
-		currentState = LoadState.LOADING_DONE;
 		
 		loadPrefs();
+
+		// Update mode state when asset loading is completed
+		currentState = LoadState.LOADING_DONE;
 		return;
 	}
 
@@ -304,6 +305,8 @@ public class BlockBreakStandard implements GameMode {
 		if (playLevel != null) {
 			if (!playLevel.levelFinished) {
 				playLevel.run();
+			} else if (playLevel.level == 0) { 
+				playLevel = null;
 			} else {
 				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
@@ -396,7 +399,11 @@ public class BlockBreakStandard implements GameMode {
 				Global.uiTransWhite.draw(180, 180 + i * 70, 190, 48);
 				Color.white.bind();
 				if (cursorPos == i) {
-					Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.white);
+					if (i == 0 && Global.getControlActive(Global.GameControl.LEFT)) {
+						Global.drawFont24(275, 195, "Grid Builder", Color.white, true);
+					} else {
+						Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.white);
+					}
 				} else {
 					Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.black);
 				}
@@ -473,8 +480,13 @@ public class BlockBreakStandard implements GameMode {
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0: // normal mode
-						loadLevel(1);
-						BlockStandardLevel.score = 0;
+						if (Global.getControlActive(Global.GameControl.LEFT)) {
+							playLevel = new BlockStandardLevelEx(localTexMap);
+							playLevel.levelTitle = "Build Mode";
+						} else {
+							loadLevel(1);
+							BlockStandardLevel.score = 0;
+						}
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode

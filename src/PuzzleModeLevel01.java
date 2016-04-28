@@ -14,6 +14,21 @@ public class PuzzleModeLevel01 extends PuzzleModeLevel{
 		 */
 		totalClears = 3;
 		
+		/**
+		 * 1 = shift right
+		 * -1 = shift left
+		 */
+		gridShiftDir = -1;
+		
+		/**
+		 * set score for medal 1, 2, and 3
+		 * 
+		 */
+		scoreMedal1 = 5000;
+		scoreMedal2 = 152000;
+		scoreMedal3 = 152000;
+		
+		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime
 				background = new Sprite(

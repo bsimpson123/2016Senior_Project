@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import org.newdawn.slick.opengl.Texture;
 
-public class Block {
+public class Block implements Cloneable {
 	/* Public Variables */
 	public enum BlockType {
 		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB, HEART
@@ -231,7 +231,7 @@ public class Block {
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc);
 		} else if (type == BlockType.BOMB) {
-			bombNumber[colorID].draw(xc + 9, yc - 5);
+			bombNumber[colorID].draw(xc + 9, yc + 7);
 		}
 	}
 
@@ -244,7 +244,7 @@ public class Block {
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc, size);
 		} else if (type == BlockType.BOMB) {
-			float factor = size[0] / (float) blockDrawSpace[0];
+			//float factor = size[0] / (float) blockDrawSpace[0];
 			bombNumber[colorID].draw(xc + 9, yc + 7);
 		}
 	}
