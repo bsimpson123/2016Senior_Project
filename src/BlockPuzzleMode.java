@@ -58,9 +58,10 @@ public class BlockPuzzleMode implements GameMode {
 		new String[] { "white_ui_controls" , "media/sheet_white2x.png" },
 		new String[] { "new_test", "media/image1.png"},
 		new String[] { "bigsky", "media/bigsky_cedf10.png" },
+		new String[] { "Gold_Star", "media/star_gold.png"},
 		//new String[] { "Gold_Star", "media/tileYellow_09.png"},
-		new String[] { "Gold_Star", "media/flat_medal8.png"},
-		new String[] { "Silver_Star", "media/tileGrey_09.png"}
+		new String[] { "Silver_Star", "media/tileGrey_09.png"},
+		//new String[] { "Gold_Star", "media/flat_medal8.png"}
 	};
 	
 	private Sprite GameSelector_background;
@@ -90,7 +91,8 @@ public class BlockPuzzleMode implements GameMode {
 	private int[] menuOptionOffset = new int[4];
 	
 	//private boolean selectPractice = false;
-	protected Sprite Yellow_star;
+	protected static Sprite Yellow_star;
+	protected static Sprite Yellow_star_small;
 	protected Sprite Silver_star;
 	
 	private Sprite pracBox;
@@ -155,17 +157,24 @@ public class BlockPuzzleMode implements GameMode {
 				new int[] {1024,768},
 				new int[] {1024,768}
 			);
-		/*Yellow_star = new Sprite(
-				localTexMap.get("Gold_Star"),
-				new int[] {0,0},
-				new int[] {129,120},
-				new int[] {55,45}
-			);*/
 		Yellow_star = new Sprite(
 				localTexMap.get("Gold_Star"),
 				new int[] {0,0},
+				new int[] {31,30},
+				new int[] {41,40}
+			);
+		/*Yellow_star = new Sprite(
+				localTexMap.get("Gold_Star"),
+				new int[] {0,0},
 				new int[] {41,74},
-				new int[] {41,74}
+				new int[] {60, 94}
+				//new int[] {41,74}
+			);*/
+		Yellow_star_small = new Sprite(
+				localTexMap.get("Silver_Star"),
+				new int[] {0,0},
+				new int[] {129,120},
+				new int[] {129,120}
 			);
 		Silver_star = new Sprite(
 				localTexMap.get("Silver_Star"),
@@ -372,7 +381,7 @@ public class BlockPuzzleMode implements GameMode {
 			}
 		} else if (showHighScore) {
 			showHighScores();
-			if (newHighScore) {
+			/*if (newHighScore) {
 				// TODO: get high score user data
 				if (!preClearComplete) {
 					int c = Keyboard.getNumKeyboardEvents();
@@ -421,7 +430,8 @@ public class BlockPuzzleMode implements GameMode {
 				Global.uiBlueSel.draw(276, 360, 472, 48);
 				Global.drawFont24(282, 386, hsNameEntry + '_', Color.black);
 				
-			} else if (movementInputDelay <= 0 && Global.getControlActive(Global.GameControl.CANCEL)) {
+			} */
+			if (movementInputDelay <= 0 && Global.getControlActive(Global.GameControl.CANCEL)) {
 				movementInputDelay = 2 * Global.inputReadDelayTimer;
 				showHighScore = false;
 			} else {
@@ -578,7 +588,7 @@ public class BlockPuzzleMode implements GameMode {
 
 	private static final int pracOffset = 375;
 	private static final int pracSelectDrop = 248;
-	private static int medalOffset = 30;
+	protected static int medalOffset = 45;
 	
 	private void drawPracticeSelect() {
 		String num = Integer.toString(pracLevel);
@@ -586,7 +596,11 @@ public class BlockPuzzleMode implements GameMode {
 		Color numCol = pracLevel > this.maxUnlocked ? Color.gray : Color.white;
 		
 		pracArrows[0].draw(pracOffset, 248);
-		pracBox.draw(pracOffset + 40, 250);
+		//pracBox.draw(pracOffset + 40, 250);
+		Global.menuButtonShader.bind();
+		Global.uiTransWhite.draw(pracOffset + 40, 250, 49, 45);
+		Color.white.bind();
+		//Global.uiGreen.draw(pracOffset + 40, 250, 49, 45);
 		//PuzzleModeLevel.numbers[pracLevel].draw(525, 255);
 		Global.drawNumbers24(pracOffset + 65 - numOffset, pracSelectDrop + 12, num, numCol);
 		pracArrows[1].draw(pracOffset + 80, 248);
@@ -611,6 +625,7 @@ public class BlockPuzzleMode implements GameMode {
 	private Texture hsBack;
 	private int[] hsBackShift = new int[] { 1, 0 };
 	private float[] hsBackDraw = new float[] { 1024 / 4096f, 768 / 1024f };
+	private int starMargin = 50;
 
 	private void showHighScores() {
 		int drawWidth = 1024 - 2 * hsMargin;
@@ -658,17 +673,26 @@ public class BlockPuzzleMode implements GameMode {
 		Global.drawFont48(512 - 98, 25, "High Score", Color.white);
 		HighScoreRecord hsr;
 		int scoreOff = 0;
-		for (int i = 0; i < limit; i++) {
-			hsr = hsRecords.get(i);
+		
+		for (int i = 1; i < medals.length; i++) {
+			//hsr = hsRecords.get(i);
 			//hsr = ((ArrayList<HighScoreRecord>) hsLevelArray[i]).get(i);
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
-			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, hsr.getName(), textColor);
-			scoreOff = Global.getNumbers24DrawSize(hsr.getScoreAsString()); 
+			
+			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "Level " + i, Color.white);
+			for (int j = 1; j <= medals[i]; j++) {
+				Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+				//medalOffset -= 5;
+			}
+			//Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
+			//resetColor.bind();
+			//Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, hsr.getName(), textColor);
+			//scoreOff = Global.getNumbers24DrawSize(hsr.getScoreAsString()); 
 			//Global.drawNumbers24(hsMargin + 560, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
-			Global.drawNumbers24(hsMargin + 740 - scoreOff, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
-			Global.drawNumbers24(hsMargin + 770, firstDrop + i * interval + 15, hsr.getDate(), textColor);
+			//Global.drawNumbers24(hsMargin + 740 - scoreOff, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
+			//Global.drawNumbers24(hsMargin + 770, firstDrop + i * interval + 15, hsr.getDate(), textColor);
 			//Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 15, hsr.getLevel(), textColor);
 		}
 		Color.white.bind();
@@ -694,39 +718,40 @@ public class BlockPuzzleMode implements GameMode {
 			prefFile = new BufferedReader(new FileReader("puzzle.pref"));
 			line = prefFile.readLine();
 			while (line != null) {
-				//for (int i = 1; i < 3; i++) {
-				if (line.compareToIgnoreCase("[HighScore]") == 0) {
-					try {
-						line = prefFile.readLine();
-						while (line != null) {
-							hsr = HighScoreRecord.getNewEmptyRecord();
-							hsr.readRecord(line);
-							hsRecords.add(hsr);
+				for (int i = 1; i < medals.length; i++) {
+					if (line.compareToIgnoreCase("[HighScore" + i +"]") == 0) {
+						try {
 							line = prefFile.readLine();
+							while (line != null) {
+								//hsr = HighScoreRecord.getNewEmptyRecord();
+								//hsr.readRecord(line);
+								//hsRecords.add(hsr);
+								medals[i] = Integer.parseInt(line);
+								line = prefFile.readLine();
+							}
+						} catch (NumberFormatException nfe) {
+							continue;
 						}
-					} catch (DataFormatException dfe) {
-						continue;
-					}
-				} else if (line.compareToIgnoreCase("[TopLevel]") == 0) {
-					line = prefFile.readLine();
-					try {
-						maxUnlocked = Integer.parseInt(line);
-					} catch (NumberFormatException nfe) {
-						maxUnlocked = 1;
+					} else if (line.compareToIgnoreCase("[TopLevel]") == 0) {
+						line = prefFile.readLine();
+						try {
+							maxUnlocked = Integer.parseInt(line);
+						} catch (NumberFormatException nfe) {
+							maxUnlocked = 1;
+						}
 					}
 				}
-				//}
 				line = prefFile.readLine();
 			}
 			prefFile.close();
 		} catch (IOException err) {
 			
-		} finally {
+		} /*finally {
 			Collections.sort(hsRecords);
 			while (hsRecords.size() > 10) {
 				hsRecords.remove(10);
 			}
-		}
+		}*/
 		
 	}
 	
@@ -740,16 +765,17 @@ public class BlockPuzzleMode implements GameMode {
 			prefFile.newLine();
 			prefFile.write(Integer.toString(maxUnlocked));
 			prefFile.newLine();
-			//for (int i = 1; i < 3; i++) {
-				prefFile.write("[HighScore]");
+			for (int i = 1; i < medals.length; i++) {
+				prefFile.write("[HighScore" + i +"]");
 				//if (maxUnlocked == playLevel.level) {
 					prefFile.newLine();
-					for(HighScoreRecord hsr : hsRecords) {
-						prefFile.write(hsr.toString());
+					///for(HighScoreRecord hsr : hsRecords) {
+					//	prefFile.write(hsr.toString());
+						prefFile.write(Integer.toString(medals[i]).toString());
 						prefFile.newLine();
-					}
+					//}
 				//}
-			//}
+			}
 			prefFile.close();
 		} catch (IOException e) {
 			Global.writeToLog("Error opening Standard mode preferences file for writing.", true);
