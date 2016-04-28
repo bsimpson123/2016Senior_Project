@@ -231,7 +231,7 @@ public class Block implements Cloneable {
 		if (type == BlockType.STAR) {
 			blockStarOverlay.draw(xc, yc);
 		} else if (type == BlockType.BOMB) {
-			bombNumber[colorID].draw(xc + 9, yc - 5);
+			bombNumber[colorID].draw(xc + 9, yc + 7);
 		}
 	}
 

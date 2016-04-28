@@ -399,7 +399,11 @@ public class BlockBreakStandard implements GameMode {
 				Global.uiTransWhite.draw(180, 180 + i * 70, 190, 48);
 				Color.white.bind();
 				if (cursorPos == i) {
-					Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.white);
+					if (i == 0 && Global.getControlActive(Global.GameControl.LEFT)) {
+						Global.drawFont24(275, 195, "Grid Builder", Color.white, true);
+					} else {
+						Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.white);
+					}
 				} else {
 					Global.drawFont24(275 - menuOptionOffset[i], 195 + i * 70, menuOptions[i], Color.black);
 				}

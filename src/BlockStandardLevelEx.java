@@ -68,6 +68,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	protected void checkCommonControls() {
 		moveDelay -= Global.delta;
 		keyDelay -= Global.delta;
+		fileDelay -= Global.delta;
 		int key;
 		if (moveDelay < 0) {  
 			if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
@@ -134,7 +135,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				case Keyboard.KEY_R: // Rock
 					if (grid[x].blocks[y].type != Block.BlockType.ROCK) {
 						if (keyDelay > 0) { break; } 
-						undo.push(grid.clone());
+						undo.push(GridColumn.copyGrid(grid));
 						updateGrid( list[11].clone() );
 						keyDelay = Global.inputReadDelayTimer;
 					}
@@ -142,7 +143,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				case Keyboard.KEY_W: // Wedge
 					if (grid[x].blocks[y].type != Block.BlockType.WEDGE) {
 						if (keyDelay > 0) { break; } 
-						undo.push(grid.clone());
+						undo.push(GridColumn.copyGrid(grid));
 						grid[x].blocks[y] = list[6].clone();
 						keyDelay = Global.inputReadDelayTimer;
 					}
@@ -165,7 +166,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 				case Keyboard.KEY_B:
 					if (grid[x].blocks[y].type != Block.BlockType.BOMB) {
 						if (keyDelay > 0) { break; } 
-						undo.push(grid.clone());
+						undo.push(GridColumn.copyGrid(grid));
 						//grid[x].blocks[y] = list[10].clone();
 						updateGrid(list[10].clone());
 						keyDelay = Global.inputReadDelayTimer;
@@ -175,7 +176,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					if (keyDelay > 0) { break; } 
 					if (grid[x].blocks[y].type != Block.BlockType.BOMB) { break; }
 					if (grid[x].blocks[y].colorID == 9) { break; } // upper limit for Bomb size
-					undo.push(grid.clone());
+					undo.push(GridColumn.copyGrid(grid));
 					grid[x].blocks[y].colorID++;
 					keyDelay = Global.inputReadDelayTimer;
 					break;
@@ -183,7 +184,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					if (keyDelay > 0) { break; } 
 					if (grid[x].blocks[y].type != Block.BlockType.BOMB) { break; }
 					if (grid[x].blocks[y].colorID  == 2) { break; } // upper limit for Bomb size
-					undo.push(grid.clone());
+					undo.push(GridColumn.copyGrid(grid));
 					grid[x].blocks[y].colorID--;
 					keyDelay = Global.inputReadDelayTimer;
 					break;
@@ -199,7 +200,11 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					break;
 				case Keyboard.KEY_L:
 					if (fileDelay > 0) { break; } 
-					grid = GridColumn.loadFromFile("");
+					GridColumn[] newGrid = GridColumn.loadFromFile("inport.dat");
+					if (newGrid != null) {  // ensure data loaded properly before switching grids 
+						undo.push(GridColumn.copyGrid(grid));
+						grid = newGrid; 
+					}
 					fileDelay = fileDelayTimer;
 					break;
 				case Keyboard.KEY_Z:
@@ -207,7 +212,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					if (fileDelay > 0) { break; } 
 					if (undo.empty()) { break; } 
 					grid = undo.pop();
-					keyDelay = Global.inputReadDelayTimer;
+					keyDelay = Global.inputReadDelayTimer * 3;
 					break;
 				case Keyboard.KEY_P:
 					if (keyDelay > 0) { break; } 
@@ -238,11 +243,13 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					break;
 			}
 		}
-		if (undo.size() > 15) { // limit undo history to 15 entries
+		if (undo.size() > 30) { // limit undo history to 15 entries
 			undo.remove(0);
 		}
 		
 	}
+	
+	private final String[] cmds = new String[] { "[W]", "[N]", "[T]", "[H]", "[B]", "[R]" };
 	
 	@Override
 	protected void drawTopLevelUI() {
@@ -256,18 +263,40 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		
 		list[1].draw(740, 80);
 		Global.drawNumbers24(756, 86, "2", Color.white, true); //*/
-		
+		int xsp = 40, ysp = 40; // x and y spacing between blocks
+		int xst = 700, yst = 80; // x and y starting positions
 		for (int i = 0; i < 6; i++) {
-			list[i].draw(700 + i * 40, 80);
-			Global.drawNumbers24(716 + i * 40, 86, String.format("%d", i + 1), Color.black, true);
+			list[i].draw(xst + i * xsp, yst);
+			Global.drawNumbers24(xst + 16 + i * 40, yst + 6, String.format("%d", i + 1), Color.black, true);
 		}
-		list[6].draw(700, 120);
-		Global.drawFont24(716, 156, "W", Color.white, true);
+		yst += ysp;
+		for (int i = 0, k = 6; k < list.length; i++, k++) {
+			list[k].draw(xst + i * xsp, yst);
+			Global.drawFont24(xst + 16 + i * xsp, yst + 36, cmds[i], Color.white, true);
+		}
+		yst += ysp + 40;
+		Global.drawFont24(xst, yst, "[F]Fill", Color.white);
+		if (fillToggle) { // show Fill status
+			Global.drawFont24(xst + 60, yst, "ON", Color.yellow);
+		} else {
+			Global.drawFont24(xst + 60, yst, "OFF", Color.white);
+		}
 		
-		list[10].draw(740, 120, blockSize);
-		Global.drawFont24(756, 156, "B", Color.white, true);
-		
-		
+		Global.drawFont24(xst + 110, yst, "[P]Set Fill Points", Color.white);
+		yst += ysp;
+		Global.drawFont24(xst, yst, "[C]Clear Fills  [U]Undo", Color.white);
+		yst += ysp;
+		Global.drawFont24(xst, yst, "[+/-]Adjust Bomb Radius", Color.white);
+		yst += ysp;
+		if (fileDelay > 0) {
+			Global.drawFont24(xst, yst, "[S]Save to file", Color.red);
+			Global.drawFont24(xst, yst + ysp, "[L]Load from import.dat", Color.red);
+		} else {
+			Global.drawFont24(xst, yst, "[S]Save to file", Color.white);
+			Global.drawFont24(xst, yst + ysp, "[L]Load from import.dat", Color.white);
+		}
+		yst += ysp * 2;
+		Global.drawFont24(xst, yst, String.format("Position: [ %d %d ]", cursorGridPos[0], cursorGridPos[1]), Color.white);
 	}
 	
 	@Override
@@ -302,7 +331,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 
 	
 	private void updateGrid(Block copyBlock) {
-		undo.push(grid.clone());
+		undo.push(GridColumn.copyGrid(grid));
 		if (!fillToggle) {
 			grid[cursorGridPos[0]].blocks[cursorGridPos[1]] = copyBlock.clone();
 			return;
