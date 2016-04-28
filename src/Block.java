@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import org.newdawn.slick.opengl.Texture;
 
-public class Block {
+public class Block implements Cloneable {
 	/* Public Variables */
 	public enum BlockType {
 		BLOCK, WEDGE, STAR, TRASH, ROCK, BOMB, HEART

@@ -245,7 +245,6 @@ public abstract class BlockStandardLevel {
 		}
 		// draw the top-level UI frame, score and other elements
 		drawTopLevelUI();
-		drawEnergy();
 	}
 	
 	protected void drawCursor() {
@@ -1317,9 +1316,12 @@ public abstract class BlockStandardLevel {
 			yMax = pos[1] + radius;
 		int[] xEdge = new int[] { xMin, xMax }; // edge values before range checks
 		int[] yEdge = new int[] { yMin, yMax };
+
 		int cornerRadius = radius / 3;
 		if (cornerRadius <= 0) { cornerRadius = 1; }
 		int count = 0;
+		int dist;
+		int flex = radius / 2;
 		if (xMin < 0) { xMin = 0; }
 		if (xMax >= gridSize[0]) { xMax = gridSize[0] - 1; }
 		if (yMin < 0) { yMin = 0; }
@@ -1329,11 +1331,13 @@ public abstract class BlockStandardLevel {
 		count++;
 		for (int i = xMin; i <= xMax; i++) {
 			for (int k = yMin; k <= yMax; k++) {
-				if (i < (xEdge[0] + cornerRadius) || i > (xEdge[1] - cornerRadius)) {
+				/*if (i < (xEdge[0] + cornerRadius) || i > (xEdge[1] - cornerRadius)) {
 					if (k < (yEdge[0] + cornerRadius) || k > (yEdge[1] - cornerRadius)) {
 						continue; // skip corner checks
 					}
-				}
+				}//*/
+				dist = Math.abs(i - pos[0]) + Math.abs(k - pos[1]) - flex;
+				if (dist > radius) { continue; }
 				if (grid[i].blocks[k] != null && !grid[i].blocks[k].clearMark) {
 					if (grid[i].blocks[k].type == Block.BlockType.BOMB) {
 						count += activateBombBlock( new int[] { i, k } );

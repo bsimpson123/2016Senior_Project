@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class GridColumn {
+public class GridColumn implements Cloneable {
 	protected Block[] blocks;
 	protected int columnOffset = 0;
 	
@@ -17,7 +17,11 @@ public class GridColumn {
 	
 	public GridColumn clone() {
 		GridColumn gc = new GridColumn();
-		gc.blocks = this.blocks.clone();
+		//gc.blocks = this.blocks.clone();
+		gc.blocks = new Block[this.blocks.length];
+		for (int i = 0; i < gc.blocks.length; i++) {
+			gc.blocks[i] = this.blocks[i].clone();
+		}
 		return gc;
 	}
 	
