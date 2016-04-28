@@ -191,7 +191,7 @@ public class Global {
 	
 	public static void initLog() {
 		LocalDateTime time = LocalDateTime.now();
-		String filename = String.format("%1$tF %1$tH%1$tI.log", time);
+		String filename = String.format("%1$tF %1$tH%1$tS.log", time);
 		try {
 			logFile = new FileWriter(filename);
 		} catch (IOException e) {

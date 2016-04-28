@@ -7,6 +7,7 @@ import java.util.Stack;
 
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.Color;
 
 /**
  * Example level to demonstrate the flow and references need to build a level
@@ -18,6 +19,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	private boolean fillToggle = false;
 	private int[] fillPoint1 = null;
 	private int[] fillPoint2 = null;
+	private long moveDelay = 0;
 	
 	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
 		// set the score multiplier for the level when 
@@ -68,102 +70,97 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	
 	@Override
 	protected void checkCommonControls() {
+		moveDelay -= Global.delta;
 		char c;
 		int key;
 		int x = this.cursorGridPos[0], y = this.cursorGridPos[1]; // done to improve code readability
 		while (Keyboard.next()) {
 			c = Keyboard.getEventCharacter();
-			System.out.println(c);
-			c = Character.toUpperCase( c );
-			//key = Keyboard.getEventKey();
-			
-			switch (c) {
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-					if (grid[x].blocks[y].type != Block.BlockType.BLOCK || grid[x].blocks[y].type != Block.BlockType.BOMB) {
-						break;
-					}
-					int v = Character.getNumericValue(c) - 1; // get the matching colorID value for the provided number
-					undo.push(grid.clone());
-					if (grid[x].blocks[y].type == Block.BlockType.BLOCK && fillToggle) {
-						// only BLOCK types are affected by the fill toggle
-						checkGrid(cursorGridPos);
-						for (int j = 0; j < grid.length; j++) {
-							for (int k = 0; k < grid[0].blocks.length; k++) {
-								if (grid[j].blocks[k].clearMark) {
-									grid[j].blocks[k].colorID = v;
-								}
-							}
-						}
-						fillToggle = false;
-					} else {
-						if (grid[x].blocks[y].type == Block.BlockType.BOMB && v < 2) {
-							v = 2;
-						}
-						grid[x].blocks[y].colorID = v;
-						fillToggle = false;
-					}
+			key = Keyboard.getEventKey();
+			if (moveDelay > 0) { continue; } 
+			switch (key) {
+				case Keyboard.KEY_1:
+					updateGrid(list[0]);
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'Q': // set as block type at default color (blue)
-					if (grid[x].blocks[y].type != Block.BlockType.BLOCK) {
+				case Keyboard.KEY_2:
+					updateGrid(list[1]);
+					moveDelay = Global.inputReadDelayTimer;
+					break;
+				case Keyboard.KEY_3:
+					updateGrid(list[2]);
+					moveDelay = Global.inputReadDelayTimer;
+					break;
+				case Keyboard.KEY_4:
+					updateGrid(list[3]);
+					moveDelay = Global.inputReadDelayTimer;
+					break;
+				case Keyboard.KEY_5:
+					updateGrid(list[4]);
+					moveDelay = Global.inputReadDelayTimer;
+					break;
+				case Keyboard.KEY_6:
+					updateGrid(list[5]);
+					moveDelay = Global.inputReadDelayTimer;
+					break;
+				case Keyboard.KEY_R: // Rock
+					if (grid[x].blocks[y].type != Block.BlockType.ROCK) {
 						undo.push(grid.clone());
-						grid[x].blocks[y] = list[0].clone();
+						updateGrid( list[11].clone() );
 					}
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'W':
+				case Keyboard.KEY_W: // Wedge
 					if (grid[x].blocks[y].type != Block.BlockType.WEDGE) {
 						undo.push(grid.clone());
 						grid[x].blocks[y] = list[6].clone();
 					}
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'N':
-					if (grid[x].blocks[y].type != Block.BlockType.STAR) {
-						undo.push(grid.clone());
-						grid[x].blocks[y] = list[7].clone();
-					}
+				case Keyboard.KEY_N: // Star
+					updateGrid(list[y]);
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'T':
-					if (grid[x].blocks[y].type != Block.BlockType.TRASH) {
-						undo.push(grid.clone());
-						grid[x].blocks[y] = list[8].clone();
-					}
+				case Keyboard.KEY_T: // Trash
+					updateGrid(list[8]);
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'H': 
-					if (grid[x].blocks[y].type != Block.BlockType.HEART) {
-						undo.push(grid.clone());
-						grid[x].blocks[y] = list[9].clone();
-					}
+				case Keyboard.KEY_H: // Heart
+					updateGrid(list[9].clone());
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'Y':
+				case Keyboard.KEY_B:
 					if (grid[x].blocks[y].type != Block.BlockType.BOMB) {
 						undo.push(grid.clone());
-						grid[x].blocks[y] = list[10].clone();
+						//grid[x].blocks[y] = list[10].clone();
+						updateGrid(list[10].clone());
 					}
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'R':
-					if (grid[x].blocks[y].type != Block.BlockType.ROCK) {
-						undo.push(grid.clone());
-						grid[x].blocks[y] = list[11].clone();
-					}
+				case Keyboard.KEY_EQUALS: // + Bomb range
+					
 					break;
-				case 'F':
+				case Keyboard.KEY_MINUS: // - Bomb range
+					
+					break;
+				case Keyboard.KEY_F:
 					fillToggle = !fillToggle;
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'S':
+				case Keyboard.KEY_S:
 					// TODO: write grid to file
-					writeToFile();
+					GridColumn.writeToFile(grid);
 					break;
-				case 'L':
+				case Keyboard.KEY_L:
 					// TODO: load grid from file
-					loadFromFile();
+					grid = GridColumn.loadFromFile("");
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'Z':
+				case Keyboard.KEY_Z:
 					grid = undo.pop();
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'P':
+				case Keyboard.KEY_P:
 					if (fillPoint1 == null) {
 						fillPoint1 = cursorGridPos.clone();
 					} else if (fillPoint2 == null){
@@ -173,14 +170,52 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 						fillPoint1 = fillPoint2;
 						fillPoint2 = cursorGridPos.clone();
 					}
+					moveDelay = Global.inputReadDelayTimer;
 					break;
-				case 'C': // clear sets
+				case Keyboard.KEY_C: // clear sets
 					fillPoint1 = null;
 					fillPoint2 = null;
 					fillToggle = false;
+					moveDelay = Global.inputReadDelayTimer;
+					break;
+				case Keyboard.KEY_UP:
+				case Keyboard.KEY_DOWN:
+				case Keyboard.KEY_LEFT:
+				case Keyboard.KEY_RIGHT:
+					if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+						cursorGridPos[1]++;
+						if (cursorGridPos[1] >= grid[0].blocks.length) {
+							cursorGridPos[1] = grid[0].blocks.length - 1;
+						}
+					} else
+					if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+						if (cursorGridPos[1] > 0) {
+							cursorGridPos[1]--;
+						}
+					} 
+					if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+						if (cursorGridPos[0] > 0) {
+							cursorGridPos[0]--;
+						}
+					} else
+					if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+						cursorGridPos[0]++;
+						if (cursorGridPos[0] >= grid.length) {
+							cursorGridPos[0] = grid.length - 1;
+						}
+					}
+					moveDelay = Global.inputReadDelayTimer;
+					break;
+				case Keyboard.KEY_ESCAPE:
+					if (gameOver) {
+						levelFinished = true;
+					}
+					this.gameOver = true;
+					break;
 				default:
 					break;
 			}
+			
 		}
 		if (undo.size() > 15) { // limit undo history to 15 entries
 			undo.remove(0);
@@ -189,7 +224,21 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	}
 	
 	@Override
+	protected void drawTopLevelUI() {
+		Global.uiRed.draw(700, 16, 300, 56);
+		Global.uiBlue.draw(700, 72, 300, 96);
+		userInterface.draw(0,0);
+		Global.drawFont48(710, 25, levelTitle, Color.white);
+		int offsetX = 860;
+		int yPos = 16;
+		int[] numResize = new int[] { 30, 40 };
+		Global.uiGreen.draw(680, 500, 100, 100);
+	}
+	
+	@Override
 	protected void drawCursor() {
+		energy = energyMax; // prevent energy from decreasing
+		
 		cursor.draw(
 				gridBasePos[0] + blockSize[0] * cursorGridPos[0],
 				gridBasePos[1] - blockSize[1] * cursorGridPos[1],
@@ -198,14 +247,34 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 		
 		if (fillPoint1 != null) {
 			// TODO: draw points tinted with color
+			Color.cyan.bind();
+			cursor.draw(
+					gridBasePos[0] + blockSize[0] * fillPoint1[0], 
+					gridBasePos[1] - blockSize[1] * fillPoint1[1],
+					blockSize
+				);
+			Color.white.bind();
 		}
-		
+		if (fillPoint2 != null) {
+			Color.magenta.bind();
+			cursor.draw(
+					gridBasePos[0] + blockSize[0] * fillPoint2[0], 
+					gridBasePos[1] - blockSize[1] * fillPoint2[1],
+					blockSize
+				);
+			Color.white.bind();
+		}
 	}
 
 	
-	private void fill(Block copyBlock) {
+	private void updateGrid(Block copyBlock) {
 		undo.push(grid.clone());
-		if (fillPoint1 == null || fillPoint2 == null) {
+		if (!fillToggle) {
+			grid[cursorGridPos[0]].blocks[cursorGridPos[1]] = copyBlock.clone();
+			return;
+		}
+		
+		if (fillPoint1 != null && fillPoint2 != null) {
 			// use fill point defined area
 			int t;
 			if (fillPoint1[0] < fillPoint2[0]) {
@@ -215,7 +284,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 			}
 			if (fillPoint1[1] < fillPoint2[1]) {
 				t = fillPoint1[1];
-				fillPoint1[1] = fillPoint2[14];
+				fillPoint1[1] = fillPoint2[1];
 				fillPoint2[1] = t;
 			}
 			for (int x = fillPoint1[0]; x <= fillPoint2[0]; x++) {
@@ -253,52 +322,6 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	protected Block getQueueBlock() {
 		// TODO Auto-generated method stub
 		return null;		
-	}
-	
-	private void writeToFile() {
-		String[] conv = new String[grid.length];
-		String sub;
-		for (int x = 0; x < grid.length; x++) {
-			sub = "";
-			for (int y = 0; y < grid[0].blocks.length; y++) {
-				switch(grid[x].blocks[y].type) {
-					case BLOCK:
-						
-						break;
-					case WEDGE:
-						
-						break;
-					case STAR:
-						
-						break;
-					case TRASH:
-						
-						break;
-					case HEART:
-						
-						break;
-					case BOMB:
-						
-						break;
-				}
-			}
-			
-		}
-		try {
-			BufferedWriter outFile = new BufferedWriter(new FileWriter("out.csv"));
-			
-			outFile.write("1a");
-			outFile.newLine();
-			
-			
-			outFile.close();
-		} catch (IOException ioe) {
-			Global.writeToLog(String.format("Error writing to custom map file.\n%s", ioe.getMessage()));
-		}
-	}
-	
-	private void loadFromFile() {
-		
 	}
 	
 }
