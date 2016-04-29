@@ -87,16 +87,16 @@ public class Game {
 	
 	/** All texture objects that will be used */
 	private final String[][] texLoadList = {
-			new String[] { "menubar", "media/mbar.png" },
-			new String[] { "menucursor", "media/menu_selector.png" },
+			//new String[] { "menubar", "media/mbar.png" },
+			//new String[] { "menucursor", "media/menu_selector.png" },
 			new String[] { "blocksheet", "media/puzzleAssets_sheet.png" },
-			new String[] { "menubartext", "media/mbartext.png" },
+			//new String[] { "menubartext", "media/mbartext.png" },
 			new String[] { "blue_ui", "media/blueSheet.png" }, 
 			new String[] { "green_ui", "media/greenSheet.png" },
 			new String[] { "red_ui", "media/redSheet.png" },
 			new String[] { "yellow_ui", "media/yellowSheet.png" },
 			new String[] { "grey_ui", "media/greySheet.png" },
-			new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
+			//new String[] { "yellowtiles", "media/spritesheet_tilesYellow.png" },
 			//new String[] { "main_menu_background","media/main_menu_background.png"},
 			new String[] { "main_menu_background", "media/title_68e14f.png" },
 			new String[] { "uibox", "media/UI_Boxes.png" },
@@ -104,18 +104,13 @@ public class Game {
 			new String[] { "Text", "media/Mode_Text.png"},
 			new String[] { "overlay", "media/blackoverlay.png" }, 
 			new String[] { "bomb_numbers", "media/numbers_small.png" },
-			new String[] { "pause_text", "media/pause_text.png"},
+			//new String[] { "pause_text", "media/pause_text.png"},
 			new String[] { "heart", "media/tileRed_36_small.png"},
 			new String[] { "white_ui_controls", "media/sheet_white2x.png"}
 	};
 	
 	/* Menu display and control variables */
 	private int cursorPos = 0;
-	private Sprite[] selector = new Sprite[2];
-	private Sprite optionFrameTop;
-	private Sprite optionFrameMid;
-	private Sprite optionFrameBottom;
-	private Sprite optionBox;
 	private Sprite menu_background;
 	private Sprite title;
 	

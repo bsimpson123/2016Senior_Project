@@ -117,31 +117,6 @@ public abstract class BlockStandardLevel {
 	
 	//private Sprite[] pauseText = new Sprite[2];
 	
-	private Sprite pause_RE_sel = new Sprite(
-			Global.textureMap.get("pause_text"),
-			new int[] { 180, 0 },
-			new int[] { 180, 26 },
-			new int[] { 180, 38 }
-		);
-	private Sprite pause_RE_unsel = new Sprite(
-			Global.textureMap.get("pause_text"),
-			new int[] { 0, 0 },
-			new int[] { 180, 26 },
-			new int[] { 180, 38 }
-		);
-	private Sprite pause_EX_sel = new Sprite(
-			Global.textureMap.get("pause_text"),
-			new int[] { 180, 26 },
-			new int[] { 180, 26 },
-			new int[] { 180, 38 }
-		);
-	private Sprite pause_EX_unsel = new Sprite(
-			Global.textureMap.get("pause_text"),
-			new int[] { 0, 26 },
-			new int[] { 180, 26 },
-			new int[] { 180, 38 }
-		);
-	
 	private final String[] pauseOptions = new String[] {
 			"Resume",
 			"Quit"
@@ -488,6 +463,7 @@ public abstract class BlockStandardLevel {
 	 * @return true if blocks are currently falling within the grid, false
 	 * if no blocks are currently falling 
 	 * @author John
+	 * @deprecated
 	 */
 	protected final boolean drawGridDepreciated(int shiftRate) {
 		gridShiftActionDelay -= Global.delta;
@@ -558,7 +534,7 @@ public abstract class BlockStandardLevel {
 	private long blockDropDelay = blockDropDelayTimer;
 	private final int blockMoveRate = 8;
 	private boolean blocksMoving = false;
-	private boolean cascadeGridShift = true;
+	//private boolean Global.useBlockCascading = true;
 	
 	protected void processGridBlocks(GridColumn[] grid) {
 		blockDropDelay -= Global.delta;
@@ -585,11 +561,11 @@ public abstract class BlockStandardLevel {
 				if (gc.blocks[y].type != Block.BlockType.WEDGE) {
 					if (gc.blocks[y].type == Block.BlockType.STAR) { starBlockCounter++; }
 					// set block as moving. this value will be reset if the block cannot fall.
-					if (!cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
+					if (!Global.useBlockCascading) { gc.blocks[y].dropDistance += blockMoveRate; }
 					
 					if (gc.blocks[y-1] == null) { // space below is empty
 						// set block as moving. this value will be reset if the block cannot fall.
-						if (cascadeGridShift) { gc.blocks[y].dropDistance += blockMoveRate; }
+						if (Global.useBlockCascading) { gc.blocks[y].dropDistance += blockMoveRate; }
 						if (gc.blocks[y].dropDistance > blockSize[1]) {
 							gc.blocks[y].dropDistance -= blockSize[1];
 							if (y == 1) { // move into last row check
@@ -653,8 +629,11 @@ public abstract class BlockStandardLevel {
 				
 				// check conditions that prevent column movement
 				if (grid[xc].blocks[0] == null) { continue; }
-				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
-				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
+				if (Global.useBlockCascading && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
+				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 
+					grid[xc].columnOffset = 0;
+					continue; 
+				} 
 				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
 					grid[xc].columnOffset = 0;
 					continue; 
@@ -690,7 +669,7 @@ public abstract class BlockStandardLevel {
 				
 				// check conditions that prevent column movement
 				if (grid[xc].blocks[0] == null) { continue; }
-				if (cascadeGridShift && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
+				if (Global.useBlockCascading && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
 				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
 				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
 					grid[xc].columnOffset = 0;
@@ -1017,6 +996,7 @@ public abstract class BlockStandardLevel {
 	 * @param blockDimensions the height of blocks used in the level. 
 	 * Used to calculate the distance blocks will be offset. 
 	 * @author John
+	 * @deprecated
 	 */
 	private void dropBlocks() {
 		int dropDist = 0;
@@ -1040,6 +1020,7 @@ public abstract class BlockStandardLevel {
 	
 	/**
 	 * @author John
+	 * @deprecated
 	 */
 	private void shiftGridColumns() {
 		GridColumn emptyset = new GridColumn(grid[0].blocks.length);

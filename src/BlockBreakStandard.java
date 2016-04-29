@@ -50,21 +50,7 @@ public class BlockBreakStandard implements GameMode {
 	};
 	
 	private Sprite GameSelector_background;
-	private Sprite[] selector = new Sprite[2];
-	private Sprite optionBox;
-	private Sprite play_unselect;
-	private Sprite prac_unselect;
-	private Sprite gamemode_unselect;
-	private Sprite back_unselect;
-	
-	private Sprite play_select;
-	private Sprite prac_select;
-	private Sprite gamemode_select;
-	private Sprite back_select;
-	
-	private Sprite label_unselect[];
-	private Sprite label_select[];
-	private Sprite button_select[];
+	//private Sprite[] selector = new Sprite[2];
 	private Sprite ex_screen;
 	private final String[] menuOptions = new String[] {
 		"Play",
@@ -135,77 +121,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] {1024,768},
 				new int[] {1024,768}
 			);
-		optionBox = new Sprite(
-				Global.textureMap.get("green_ui"),
-				new int[] { 0, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
 		
-		selector[0] = new Sprite( // left-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 39, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
-		selector[1] = new Sprite( // right-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 0, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
-		
-		play_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 0 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		play_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 0 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		
-		prac_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 30 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		prac_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 30 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		
-		gamemode_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 60 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		gamemode_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 60 },
-				new int[] { 190, 27 },
-				new int[] { 190, 48 }
-			);
-		
-		back_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 90 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		back_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 90 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
 		ex_screen = new Sprite (
 				localTexMap.get("ex_game_screen"),
 				new int[] { 0,0 },
@@ -485,8 +401,8 @@ public class BlockBreakStandard implements GameMode {
 							playLevel.levelTitle = "Build Mode";
 						} else {
 							loadLevel(1);
-							BlockStandardLevel.score = 0;
 						}
+						BlockStandardLevel.score = 0;
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode

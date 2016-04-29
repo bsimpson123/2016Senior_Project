@@ -16,6 +16,7 @@ public class Configuration implements GameMode {
 	private final int titleOffset;
 	private final Color shader = Global.menuButtonShader;
 	private final Color reset = Color.white;
+	private final Sprite background;
 	
 	private final String[] menus = new String[] {
 		"Input Sensitivity",
@@ -33,6 +34,12 @@ public class Configuration implements GameMode {
 		new String[] { "Fullscreen", "Window" }, // fullscreen
 		new String[] { "Keyboard", "Gamepad" }, // input configuration
 		new String[] { "Accept", "Cancel" } // save or discard changes
+	};
+	
+	private final int[][] spacing = new int[][] {
+		new int[] { 24, 478, 751 }, // left edge 
+		new int[] { 430, 249, 249 }, // width
+		new int[] { 239, 603, 876 } // center
 	};
 	
 	private int select = 0;
@@ -60,7 +67,12 @@ public class Configuration implements GameMode {
 			0, // input config
 			0 // accept/cancel
 		};
-		
+		background = new Sprite(
+				Global.textureMap.get("main_menu_background"),
+				new int[] {0,0},
+				new int[] {1024,768},
+				new int[] {1024,768}
+			);
 		
 	}
 		
@@ -87,6 +99,7 @@ public class Configuration implements GameMode {
 	public void run() {
 		currentState = LoadState.READY;
 		// TODO Auto-generated method stub
+		background.draw(0, 0);
 		Global.drawFont48(512 - titleOffset, 80, title, Color.gray);
 		
 		for (int i = 0, xs = 20, ys = 200; i < menus.length; i++, ys += 80) {
