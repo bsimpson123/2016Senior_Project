@@ -54,7 +54,7 @@ public class Game {
 	 */
 	private final int MainMenu = 0,
 		GameModeSelection = 1,
-		BlockMatchStandard = 2
+		ConfigurationScreen = 2
 		;
 	
 	/** The current game mode within the main logic loop. */
@@ -445,7 +445,8 @@ public class Game {
 						activeGameMode = GameModeSelection;
 						break;
 					case 1: // Config
-						
+						game = new Configuration();
+						activeGameMode = ConfigurationScreen;
 						break;
 					case 2: // Credits
 						
