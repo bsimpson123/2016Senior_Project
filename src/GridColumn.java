@@ -17,11 +17,12 @@ public class GridColumn implements Cloneable {
 	
 	public GridColumn clone() {
 		GridColumn gc = new GridColumn();
-		//gc.blocks = this.blocks.clone();
+		gc.blocks = this.blocks.clone();
+		/*
 		gc.blocks = new Block[this.blocks.length];
 		for (int i = 0; i < gc.blocks.length; i++) {
 			gc.blocks[i] = this.blocks[i].clone();
-		}
+		} //*/
 		return gc;
 	}
 	

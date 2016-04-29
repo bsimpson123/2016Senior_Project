@@ -37,12 +37,13 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 		// valid block dimensions are { 16, 32, 64 }
 		// valid grid sizes (respective to block size) are { 40, 20, 10 }
 		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
-		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+		//gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
 		// create the grid with x-dimension as specified above
-		grid = new GridColumn[gridSize[0]];
+		//grid = new GridColumn[gridSize[0]];
 		queue = new Block[gridSize[0]];
 		// build the grid according the level difficulty
 		buildGrid();
+		gridSize = new int[] { grid.length, grid[0].blocks.length };
 		// set the grid draw starting position derived from grid and block size
 		gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
 		// set the cursor starting position in the center of the grid
@@ -54,6 +55,8 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 	
 	@Override
 	protected void buildGrid() {
+		grid = GridColumn.loadFromFile("media/sp6.csv");
+		/*
 		try {
 			String parseline;
 			String[] parseCSV;
@@ -79,7 +82,7 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} //*/
 
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
