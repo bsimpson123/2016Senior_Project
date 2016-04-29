@@ -7,15 +7,26 @@ import java.util.HashMap;
 
 import org.lwjgl.input.Controller;
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public class Configuration implements GameMode {
-	protected LoadState currentState = LoadState.NOT_LOADED;
-	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
+	private LoadState currentState = LoadState.NOT_LOADED;
+	
+	private final String title = "Configuration";
+	private final int titleOffset;
+	
+	private final String[] options = new String[] {
+		"Input Sensitivity",
+		"Block Cascading",
+		"Wait For Block Fall",
+		"Fullscreen",
+		""
+		};
 	
 	
 	public Configuration() {
-		
+		titleOffset = Global.getFont48DrawSize(title) / 2;
 	}
 		
 	@Override
@@ -41,16 +52,23 @@ public class Configuration implements GameMode {
 	public void run() {
 		currentState = LoadState.READY;
 		// TODO Auto-generated method stub
-
+		Global.drawFont48(512 - titleOffset, 80, title, Color.gray);
 		
 		
 		
 	}
 
+	
+	private void processInput() {
+		
+	}
+	
 	@Override
 	public void cleanup() {
-		// TODO Auto-generated method stub
+		// TODO clean up resources and save changes
 
+		saveSettings();
+		currentState = LoadState.FINALIZED;
 	}
 	
 	

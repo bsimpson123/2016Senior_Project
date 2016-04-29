@@ -516,7 +516,8 @@ public class BlockBreakStandard implements GameMode {
 	private void loadLevel(int levelID) {
 		switch (levelID) {
 			case 1:
-				playLevel = new BlockStandardLevelex3(localTexMap);//BlockStandardLevel01(localTexMap);
+				//playLevel = new BlockStandardLevelex3(localTexMap);//BlockStandardLevel01(localTexMap);
+				playLevel = new BlockStandardLevel01(localTexMap);
 				break;
 			case 2:
 				playLevel = new BlockStandardLevel02(localTexMap);
