@@ -461,22 +461,12 @@ public class Game {
 			// Draw the frame that will contain the option boxes
 			menu_background.draw(0,0);
 			title.draw(0, 50);
-			//optionFrameTop.draw(400, 350);
-			//optionFrameMid.draw(400, 370);
-			//optionFrameBottom.draw(400, 670);
 			
 			// Draw the option boxes
-			//optionBox.draw(430, 380);
-			//optionBox.draw(430, 450);
-			//optionBox.draw(430, 520);
 			Global.menuButtonShader.bind();
 			for (int i = 0; i < 4; i++) {
 				Global.uiTransWhite.draw(430, 380 + i * 70, 190, 48);
 			}
-			Color.white.bind();
-			//selector[0].draw(410, 387 + cursorPos * 70);
-			//selector[1].draw(600, 387 + cursorPos * 70);
-			//Global.uiYellowSel.draw(430, cursorPos * 70 + 380, 190, 48);
 			Color.white.bind();
 			//Global.drawStringDefaultFont(430, 380, "Standard Mode", Color.black);
 			if (cursorPos == 0) {
