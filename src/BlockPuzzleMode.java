@@ -44,6 +44,8 @@ public class BlockPuzzleMode implements GameMode {
 	private boolean pageBack = false;
 	/** The current game mode within the main logic loop. */
 
+	protected static Sprite ex_screen;
+	
 	protected String[][] texLoadList = new String[][] {
 		new String[] { "ui_base", "media/UIpackSheet_transparent.png" },
 		new String[] { "ui_stdmode", "media/StandardMode_UI.png" },
@@ -62,6 +64,7 @@ public class BlockPuzzleMode implements GameMode {
 		//new String[] { "Gold_Star", "media/tileYellow_09.png"},
 		new String[] { "Silver_Star", "media/tileGrey_09.png"},
 		//new String[] { "Gold_Star", "media/flat_medal8.png"}
+		new String[] { "ex_game_screen", "media/game_screen.png"}
 	};
 	
 	private Sprite GameSelector_background;
@@ -84,7 +87,7 @@ public class BlockPuzzleMode implements GameMode {
 	
 	private final String[] menuOptions = new String[] {
 		"Play",
-		"Practice",
+		"Level Select",
 		"High Score",
 		"Back"
 	};
@@ -107,6 +110,7 @@ public class BlockPuzzleMode implements GameMode {
 	private boolean preClearComplete = false;
 	private int level = 1;
 	protected int[] medals = PuzzleModeLevel.medals;
+	
 	
 	public BlockPuzzleMode() {
 		
@@ -176,6 +180,12 @@ public class BlockPuzzleMode implements GameMode {
 				new int[] {129,120},
 				new int[] {129,120}
 			);
+		ex_screen = new Sprite (
+				localTexMap.get("ex_game_screen"),
+				new int[] { 0,0 },
+				new int[] { 1425, 768 },
+				new int[] { 1425, 600 }
+				);
 		Silver_star = new Sprite(
 				localTexMap.get("Silver_Star"),
 				new int[] {0,0},
@@ -185,6 +195,7 @@ public class BlockPuzzleMode implements GameMode {
 		for (int i = 0; i < medals.length; i++) {
 			medals[i] = 0;
 		}
+
 		/*optionBox = new Sprite(
 				Global.textureMap.get("green_ui"),
 				new int[] { 0, 0 },
@@ -345,13 +356,14 @@ public class BlockPuzzleMode implements GameMode {
 	public LoadState getState() {
 		return currentState;
 	}
-
+	
 	@Override
 	public void run() {
 		currentState = LoadState.READY;
 		//movementInputDelay = Global.inputReadDelayTimer;
+		//Yellow_star.draw(medalOffset * j + 500, 250);
+		//medalOffset -= 5;
 
-		
 		if (playLevel != null) {
 			if (!playLevel.levelFinished) {
 				playLevel.run();
@@ -362,13 +374,13 @@ public class BlockPuzzleMode implements GameMode {
 					movementInputDelay = Global.inputReadDelayTimer;
 					if (!playLevel.practice) {
 						for (int i = 9; i >= 0; i--) {
-							if (hsRecords.get(i).getScore() < PuzzleModeLevel.score) {
+							/*if (hsRecords.get(i).getScore() < PuzzleModeLevel.score) {
 								newHighScore = true;
 								showHighScore = true;
 								hsNameEntry = "";
 								preClearComplete = false;
 								break;
-							}
+							}*/
 						}
 					}
 					lastLevel = playLevel.level;
@@ -442,6 +454,7 @@ public class BlockPuzzleMode implements GameMode {
 // @author Brock
 			GameSelector_background.draw(0, 0);
 			moveCursorMain();
+			
 			for (int i = 0; i < menuOptions.length; i++) {
 				//optionBox.draw(180, 180 + i * 70);
 				Global.menuButtonShader.bind();
@@ -533,7 +546,7 @@ public class BlockPuzzleMode implements GameMode {
 					case 1: // practice mode
 						if (pracLevel > maxUnlocked) { break; }
 						loadLevel(pracLevel);
-						playLevel.practice = true;
+						//playLevel.practice = true;
 						movementInputDelay = Global.inputReadDelayTimer;
 						PuzzleModeLevel.score = 0;
 						//selectPractice = true;
@@ -590,7 +603,7 @@ public class BlockPuzzleMode implements GameMode {
 	private static final int pracSelectDrop = 248;
 	protected static int medalOffset = 45;
 	
-	private void drawPracticeSelect() {
+	/*private void drawPracticeSelect() {
 		String num = Integer.toString(pracLevel);
 		int numOffset = Global.getNumbers24DrawSize(num) / 2;
 		Color numCol = pracLevel > this.maxUnlocked ? Color.gray : Color.white;
@@ -614,8 +627,37 @@ public class BlockPuzzleMode implements GameMode {
 			}
 		}
 		//}
-	}
-	
+	}*/
+	private void drawPracticeSelect() {
+		String num = Integer.toString(pracLevel);
+		int numOffset = Global.getNumbers24DrawSize(num) / 2;
+		Color numCol = pracLevel > this.maxUnlocked ? Color.gray : Color.white;
+		
+		pracArrows[0].draw(pracOffset, 410);
+		//pracBox.draw(pracOffset + 40, 250);
+		Global.menuButtonShader.bind();
+		//Global.uiTransWhite.draw(pracOffset + 40, 180, 565, 450);
+		Global.uiTransWhite.draw(pracOffset + 40, 180, 565, 525);
+		Color.white.bind();
+		ex_screen.draw(pracOffset + 65, 243);
+		//Global.uiGreen.draw(pracOffset + 40, 250, 49, 45);
+		//PuzzleModeLevel.numbers[pracLevel].draw(525, 255);
+		Global.drawFont48(pracOffset + 65, pracSelectDrop - 50, "Level ", numCol);
+		Global.drawNumbers48(pracOffset + 190, pracSelectDrop - 55, num, numCol);
+		//Global.drawNumbers24(pracOffset + 165, pracSelectDrop - 50, num, numCol);
+		pracArrows[1].draw(pracOffset + 595, 410);
+		//for (int i = 0; i < medals.length; i++) {
+		if (pracLevel <= PuzzleModeLevel.nLevels) {
+			if (medals[pracLevel] > 0) {
+				for (int j = 1; j <= medals[pracLevel]; j++) {
+					Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+					//Yellow_star.draw(medalOffset * j + 700, 652);
+					//medalOffset -= 5;
+				}
+			}
+		}
+		//}
+	}	
 	// TODO: move high score vars to top after finished implementation
 	private boolean showHighScore = false;
 	private final int hsBarSpace = 10;

@@ -11,9 +11,9 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		level = 1;
 		
 		/**
-		 * totalMoves is the total number of clears the user is given for the level.
+		 * totalClears is the total number of clears the user is given for the level.
 		 */
-		totalClears = 31;
+		totalClears = 30;
 		
 		/**
 		 * 1 = shift right
@@ -25,9 +25,11 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		 * set score for medal 1, 2, and 3
 		 * 
 		 */
-		scoreMedal1 = 5000;
-		scoreMedal2 = 10000;
+		scoreMedal1 = 8000;
+		scoreMedal2 = 15000;
 		scoreMedal3 = 21000;
+		
+		useScore = true;
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime
@@ -96,6 +98,12 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 					r = 2;
 				} else {
 					r = 3;
+				}*/
+				
+				/*if (i % 2 == 0 && k % 2 == 0) {
+					r = 1;
+				} else {
+					r = 2;
 				}*/
 				
 				if (i % 2 == 0) {

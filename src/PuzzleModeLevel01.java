@@ -10,7 +10,7 @@ public class PuzzleModeLevel01 extends PuzzleModeLevel{
 		level = 2;
 		
 		/**
-		 * Change totalMoves for number of moves to clear the grid.
+		 * Change totalClears for number of moves to clear the grid.
 		 */
 		totalClears = 3;
 		
