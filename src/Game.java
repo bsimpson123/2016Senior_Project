@@ -37,8 +37,8 @@ public class Game {
 	private long lastFpsTime;
 	/** The recorded fps. */
 	private int fps;
-	/** indicated whether that game should be running in full-screen mode. Default is false. */
-	private boolean fullscreen = false;
+	///** indicated whether that game should be running in full-screen mode. Default is false. */
+	//private boolean Global.fullscreen = false;
 	/** Mouse movement left(-) or right(+) */
 	private int mouseX = 0;
 	/** Mouse movement up(-) or down(+) */
@@ -180,7 +180,7 @@ public class Game {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Unable to enter fullscreen, continuing in windowed mode.");
+			System.out.println("Unable to enter Global.fullscreen, continuing in windowed mode.");
 		}
 		return false;
 	}
@@ -192,7 +192,7 @@ public class Game {
 		try {
 			setDisplayMode();
 			Display.setTitle(WINDOW_TITLE);
-			Display.setFullscreen(fullscreen);
+			Display.setFullscreen(Global.fullscreen);
 			Display.create();
 			glViewport(0, 0, Global.glEnvWidth, Global.glEnvHeight);
 			// Initialize GL matrices
@@ -262,44 +262,6 @@ public class Game {
 		
 		Global.buildStandardUIBoxes();
 		// TODO: Load all Sprite objects for menu navigation
-		optionFrameTop = new Sprite(
-				Global.textureMap.get("blue_ui"),
-				new int[] { 0, 49 },
-				new int[] { 190, 20 },
-				new int[] { 250, 20 }
-			);
-		optionFrameMid = new Sprite(
-				Global.textureMap.get("blue_ui"),
-				new int[] { 0, 59 },
-				new int[] { 190, 20 },
-				new int[] { 250, 300 }
-			);
-		optionFrameBottom = new Sprite(
-				Global.textureMap.get("blue_ui"),
-				new int[] { 0, 69 },
-				new int[] { 190, -20 },
-				new int[] { 250, 20 }
-			);
-		
-		optionBox = new Sprite(
-				Global.textureMap.get("green_ui"),
-				new int[] { 0, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		
-		selector[0] = new Sprite( // left-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 39, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
-		selector[1] = new Sprite( // right-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 0, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
 		menu_background = new Sprite(
 				Global.textureMap.get("main_menu_background"),
 				new int[] {0,0},
@@ -547,7 +509,7 @@ public class Game {
 	}
 	
 	public Game(boolean runFullscreen) {
-		fullscreen = runFullscreen;
+		Global.fullscreen = runFullscreen;
 		initGL(); // setup OpenGL
 		initComponents(); // setup game variables
 	}
