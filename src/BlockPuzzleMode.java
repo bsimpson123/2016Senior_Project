@@ -64,7 +64,8 @@ public class BlockPuzzleMode implements GameMode {
 		//new String[] { "Gold_Star", "media/tileYellow_09.png"},
 		new String[] { "Silver_Star", "media/tileGrey_09.png"},
 		//new String[] { "Gold_Star", "media/flat_medal8.png"}
-		new String[] { "ex_game_screen", "media/game_screen.png"}
+		new String[] { "ex_game_screen", "media/game_screen.png"},
+		new String[] { "Chall_Star", "media/star_bronze.png"}
 	};
 	
 	private Sprite GameSelector_background;
@@ -88,7 +89,7 @@ public class BlockPuzzleMode implements GameMode {
 	private final String[] menuOptions = new String[] {
 		"Play",
 		"Level Select",
-		"High Score",
+		"Achievements",
 		"Back"
 	};
 	private int[] menuOptionOffset = new int[4];
@@ -97,6 +98,7 @@ public class BlockPuzzleMode implements GameMode {
 	protected static Sprite Yellow_star;
 	protected static Sprite Yellow_star_small;
 	protected Sprite Silver_star;
+	protected static Sprite Challenge_star;
 	
 	private Sprite pracBox;
 	private Sprite[] pracArrows = new Sprite[2];
@@ -167,6 +169,13 @@ public class BlockPuzzleMode implements GameMode {
 				new int[] {31,30},
 				new int[] {41,40}
 			);
+		Challenge_star = new Sprite(
+				localTexMap.get("Chall_Star"),
+				new int[] {0,0},
+				new int[] {31,30},
+				new int[] {41,40}
+			);	
+
 		/*Yellow_star = new Sprite(
 				localTexMap.get("Gold_Star"),
 				new int[] {0,0},
@@ -724,9 +733,23 @@ public class BlockPuzzleMode implements GameMode {
 			resetColor.bind();
 			
 			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "Level " + i, Color.white);
-			for (int j = 1; j <= medals[i]; j++) {
-				Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
-				//medalOffset -= 5;
+			if (medals[i] == 4) {
+				if (i <= 3) {
+					for (int j = 1; j <= medals[i]; j++) {
+
+						if (j == 4) {
+							Challenge_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+						} else {
+							Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+						}
+						//medalOffset -= 5;
+					}
+				} 
+			} else {
+				for (int j = 1; j <= medals[i]; j++) {
+					Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+					//medalOffset -= 5;
+				}
 			}
 			//Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			//resetColor.bind();

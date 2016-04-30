@@ -28,6 +28,12 @@ public class PuzzleModeLevel01 extends PuzzleModeLevel{
 		scoreMedal2 = 152000;
 		scoreMedal3 = 152000;
 		
+		/**
+		 *  boolean values for scoring system
+		 */
+		useScore = true;
+		useTime = false;
+		
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime

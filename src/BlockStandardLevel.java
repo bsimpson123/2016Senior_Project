@@ -1256,6 +1256,7 @@ public abstract class BlockStandardLevel {
 	 * @author Mario
 	 */
 	protected void drawEnergy() {
+		float percent;
 		emptyEnergy.draw(20, 740);
 		energyBar.bind();
 		if (energy > energyDisplay) {
@@ -1266,7 +1267,11 @@ public abstract class BlockStandardLevel {
 			energyDisplay = energy;
 		}
 		
-		float percent = (float) energyDisplay/(float) energyMax;
+		if (energy == 0) {
+			percent = 0;
+		} else {
+			percent = (float) energyDisplay/(float) energyMax;
+		}
 		glPushMatrix();
 		glTranslatef(20,740,0); // x y z
 		glBegin(GL_QUADS);
