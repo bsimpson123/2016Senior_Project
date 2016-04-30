@@ -659,7 +659,11 @@ public class BlockPuzzleMode implements GameMode {
 		if (pracLevel <= PuzzleModeLevel.nLevels) {
 			if (medals[pracLevel] > 0) {
 				for (int j = 1; j <= medals[pracLevel]; j++) {
-					Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+					if (j == 4) {
+						Challenge_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+					} else {
+						Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+					}
 					//Yellow_star.draw(medalOffset * j + 700, 652);
 					//medalOffset -= 5;
 				}

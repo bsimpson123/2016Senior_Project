@@ -327,6 +327,37 @@ public abstract class PuzzleModeLevel {
 		 * funtion for ending conditions
 		 */
 		
+		if (blocksRemaining > 0 && remainClears > 0 && movesUpdateDelay == 0) {
+			// If not out of clears but no moves left, then game over
+			int xMax = grid.length - 1;
+			int yMax = grid[0].blocks.length - 1;
+			sumMoves = 0;
+			for (int i = 0; i < xMax; i++) {
+				for (int j = 0; j < yMax; j++) {
+					if (grid[i].blocks[j] == null) {
+						continue;
+					} else {
+						sumMoves += checkGridMovesRemain(i, j, grid[i].blocks[j].colorID);		
+					}
+				}				
+			}
+			//sumMoves = 0;
+			if ( sumMoves == 0 ) {
+				noMoves = true;
+				gameOver = true;
+				pauseCursorPos = 0;
+			}
+
+			sumMoves = 0;
+ 
+
+		} 
+		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0 && !blocksMoving) {
+	        // game over with one block remaining
+			noMoves = true;
+			gameOver = true;
+			pauseCursorPos = 0;
+		}
 		endingConditions();
 		/*if (blocksRemaining == 0 && (remainClears >= 0)&& movesUpdateDelay == 0) {
 			levelComplete = true;
@@ -509,84 +540,56 @@ public abstract class PuzzleModeLevel {
 	 */
 	protected void endingConditions() {
 		if (standCond) {
-			if (blocksRemaining == 0 && (remainClears > 0)&& movesUpdateDelay == 0) {
-				levelComplete = true;
-				if (!endLevelDelayed) {
-					
-					endLevelDelayed = true;
-					pauseCursorPos = 0;
-					score += remainClears >> 6;
-					
-
-					
-					scoringSystem();
-					if (levelMedal >= medals[level]) {
-						medals[level] = levelMedal;
+			if (movesUpdateDelay == 0) {
+				if (blocksRemaining == 0 && remainClears > 0 ) {
+					levelComplete = true;
+					if (!endLevelDelayed) {
+						
+						endLevelDelayed = true;
+						pauseCursorPos = 0;
+						score += remainClears >> 6;
+						
+	
+						
+						scoringSystem();
+						if (levelMedal >= medals[level]) {
+							medals[level] = levelMedal;
+						}
+						//medals[level] = (levelMedal >= medals[level]) ? levelMedal : oldMedal;
+	
+						//energy = 0;
+						pauseCursorPos = 0;
+						inputDelay = Global.inputReadDelayTimer * 2;
 					}
-					//medals[level] = (levelMedal >= medals[level]) ? levelMedal : oldMedal;
-
-					//energy = 0;
 					pauseCursorPos = 0;
-					inputDelay = Global.inputReadDelayTimer * 2;
-				}
-				pauseCursorPos = 0;
-			} else if (blocksRemaining > 0 && remainClears == 0 && movesUpdateDelay == 0) {
-				// game over
-				//if (blockDropDelay == 0) {
-					noRemainClears = true;
-					gameOver = true;
-					pauseCursorPos = 0;
+				} 
+				if (blocksRemaining > 0 && remainClears == 0) {
+					// game over
+					//if (blockDropDelay == 0) {
+						noRemainClears = true;
+						gameOver = true;
+						pauseCursorPos = 0;
+						
+						//inputDelay = Global.inputReadDelayTimer;
+					//}
 					
-					//inputDelay = Global.inputReadDelayTimer;
-				//}
-				
-				/**
-				 * @author Brock
-				 */
-			} /*else if (noMoves && movesUpdateDelay == 0 && !blocksMoving){
-				// Game over is no moves are remaining
-					noMoves = true;
-					gameOver = true;
-					pauseCursorPos = 0;
-				
-			}*/
-			
+					/**
+					 * @author Brock
+					 */
+				} /*else if (noMoves && movesUpdateDelay == 0 && !blocksMoving){
+					// Game over is no moves are remaining
+						noMoves = true;
+						gameOver = true;
+						pauseCursorPos = 0;
+					
+				}*/
+			}
 		} else if (specCond) {
 
 			
 		}
 		
-		if (blocksRemaining > 0 && remainClears > 0 && movesUpdateDelay == 0) {
-			// If not out of clears but no moves left, then game over
-			int xMax = grid.length - 1;
-			int yMax = grid[0].blocks.length - 1;
-			sumMoves = 0;
-			for (int i = 0; i < xMax; i++) {
-				for (int j = 0; j < yMax; j++) {
-					if (grid[i].blocks[j] == null) {
-						continue;
-					} else {
-						sumMoves += checkGridMovesRemain(i, j, grid[i].blocks[j].colorID);		
-					}
-				}				
-			}
-			//sumMoves = 0;
-			if ( sumMoves == 0 ) {
-				noMoves = true;
-				gameOver = true;
-				pauseCursorPos = 0;
-			}
 
-			sumMoves = 0;
- 
-
-		} 
-		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0 && !blocksMoving) {
-	        // game over with one block remaining
-			noMoves = true;
-			gameOver = true;
-			pauseCursorPos = 0;
-		}
 	}
 	
 	/**
@@ -774,6 +777,11 @@ public abstract class PuzzleModeLevel {
 			movesUpdateDelay -= Global.delta;
 			//inputDelay -= Global.delta;
 			//remainClears = 6;
+			if (resetMoves) {
+				remainClears = totalClears;
+				movesDisplay = remainClears;
+				resetMoves = false;
+			}
 			if (movesUpdateDelay <= 0 && remainClears != movesDisplay) {
 				//if (movesDisplay < remainClears) {
 				//	movesChange = (remainClears - movesDisplay) >> 2;
@@ -788,14 +796,12 @@ public abstract class PuzzleModeLevel {
 					//movesDisplay = remainClears;
 				//}
 				movesUpdateDelay = movesUpdateDelayTimer * 2;//Global.inputReadDelayTimer;//movesUpdateDelayTimer;
-			}// else {
+			} else if (movesUpdateDelay > 0) {
+				movesUpdateDelay -= Global.delta;
+			}
 			//	movesUpdateDelay -= Global.delta;
 			//}
-			if (resetMoves) {
-				remainClears = totalClears;
-				movesDisplay = remainClears;
-				resetMoves = false;
-			}
+
 				//else {
 			//movesUpdateDelay -= Global.delta;
 			//	inputDelay -= Global.delta;
