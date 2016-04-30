@@ -9,7 +9,7 @@ import org.newdawn.slick.Color;
  * Example level to demonstrate the flow and references need to build a level
  * @author John
  */
-public class BlockStandardLevelEx extends BlockStandardLevel {
+public class BlockStandardLevelBuilder extends BlockStandardLevel {
 	private Block[] list = new Block[12];
 	private Stack<GridColumn[]> undo = new Stack<GridColumn[]>();
 	private boolean fillToggle = false;
@@ -20,7 +20,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	private final long fileDelayTimer = 5000l;
 	private long fileDelay = 0;
 	
-	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
+	public BlockStandardLevelBuilder(HashMap<String,Texture> rootTex) {
 		// set the score multiplier for the level when 
 		levelMultiplier = 1.5f;
 		// Set environment textures and variables
