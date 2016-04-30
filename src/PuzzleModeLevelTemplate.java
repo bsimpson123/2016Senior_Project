@@ -13,7 +13,7 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		/**
 		 * totalClears is the total number of clears the user is given for the level.
 		 */
-		totalClears = 30;
+		totalClears = 31;
 		
 		/**
 		 * 1 = shift right
@@ -29,7 +29,11 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		scoreMedal2 = 15000;
 		scoreMedal3 = 21000;
 		
+		/**
+		 * boolean values for scoring system
+		 */
 		useScore = true;
+		useTime = true;
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime
@@ -69,7 +73,7 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 				cursorGridPos[0] = grid.length / 2;
 				cursorGridPos[1] = grid[0].blocks.length / 2;
 				// set energy max if not default
-				energy = energyMax = 200000;	
+				energy = energyMax = 20000;	
 		
 		
 	}
@@ -84,7 +88,7 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				//r = 1;//Global.rand.nextInt(2);
+				r = 2;//Global.rand.nextInt(2);
 				
 				/*if (((i + k) % 2 == 0)) {
 					r = 4;
@@ -118,7 +122,7 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 			}
 		}
 		
-		grid[grid.length / 2].blocks[grid[0].blocks.length / 2] = new Block(Block.BlockType.BLOCK, 1);
+		//grid[grid.length / 2].blocks[grid[0].blocks.length / 2] = new Block(Block.BlockType.BLOCK, 1);
 		//grid[0].blocks[0] = new Block(Block.BlockType.BLOCK, 2);
 		//grid[0].blocks[1] = new Block(Block.BlockType.BLOCK, 3);
 		//grid[0].blocks[2] = new Block(Block.BlockType.BLOCK, 2);

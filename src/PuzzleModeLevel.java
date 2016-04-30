@@ -113,6 +113,8 @@ public abstract class PuzzleModeLevel {
 	
 	protected static int nLevels = 2;
 	protected static int[] medals = new int[nLevels + 1];
+	protected int levelMedal = 0;
+	protected int oldMedal = 0;
 	
 	protected boolean noMoves = false;
 	protected static int sumMoves = 0;
@@ -126,6 +128,8 @@ public abstract class PuzzleModeLevel {
 		"6"
 	};
 	
+	protected static boolean standCond = true;
+	protected static boolean specCond = false;
 	
 	private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
@@ -316,9 +320,46 @@ public abstract class PuzzleModeLevel {
 		background.draw(0, 0);
 		counter = 0;
 		//remainClears = totalClears;
-		drawTopLevelUI();
+		//drawTopLevelUI();
 		
-		if (blocksRemaining == 0 && (remainClears >= 0)&& movesUpdateDelay == 0) {
+		//oldMedal = medals[level];
+		/**
+		 * funtion for ending conditions
+		 */
+		
+		if (blocksRemaining > 0 && remainClears > 0 && movesUpdateDelay == 0) {
+			// If not out of clears but no moves left, then game over
+			int xMax = grid.length - 1;
+			int yMax = grid[0].blocks.length - 1;
+			sumMoves = 0;
+			for (int i = 0; i < xMax; i++) {
+				for (int j = 0; j < yMax; j++) {
+					if (grid[i].blocks[j] == null) {
+						continue;
+					} else {
+						sumMoves += checkGridMovesRemain(i, j, grid[i].blocks[j].colorID);		
+					}
+				}				
+			}
+			//sumMoves = 0;
+			if ( sumMoves == 0 ) {
+				noMoves = true;
+				gameOver = true;
+				pauseCursorPos = 0;
+			}
+
+			sumMoves = 0;
+ 
+
+		} 
+		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0 && !blocksMoving) {
+	        // game over with one block remaining
+			noMoves = true;
+			gameOver = true;
+			pauseCursorPos = 0;
+		}
+		endingConditions();
+		/*if (blocksRemaining == 0 && (remainClears >= 0)&& movesUpdateDelay == 0) {
 			levelComplete = true;
 			if (!endLevelDelayed) {
 				endLevelDelayed = true;
@@ -342,16 +383,13 @@ public abstract class PuzzleModeLevel {
 				//inputDelay = Global.inputReadDelayTimer;
 			//}
 			
-			/**
-			 * @author Brock
-			 */
-		} /*else if (noMoves && movesUpdateDelay == 0 && !blocksMoving){
+		} //else if (noMoves && movesUpdateDelay == 0 && !blocksMoving){
 			// Game over is no moves are remaining
-				noMoves = true;
-				gameOver = true;
-				pauseCursorPos = 0;
+			//	noMoves = true;
+			//	gameOver = true;
+			//	pauseCursorPos = 0;
 			
-		}*/
+		//}
 		else if (blocksRemaining > 0 && remainClears > 0 && !blocksMoving && movesUpdateDelay == 0) {
 			// If not out of clears but no moves left, then game over
 			int xMax = grid.length - 1;
@@ -381,7 +419,7 @@ public abstract class PuzzleModeLevel {
 			noMoves = true;
 			gameOver = true;
 			pauseCursorPos = 0;
-		}
+		}*/
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver && !levelComplete) {
 			//processQueue();
@@ -432,8 +470,10 @@ public abstract class PuzzleModeLevel {
 			}
 		}
 		// draw the top-level UI frame, score and other elements
-
-
+		drawTopLevelUI();
+		//if (useTime) {
+		//	drawEnergy();
+		//}
 		//drawEnergy();
 	}
 
@@ -458,20 +498,29 @@ public abstract class PuzzleModeLevel {
 	}
 	
 	/**
+	 * @author Brock
 	 * Function for the scoring system
 	 */
 	protected void scoringSystem() {
 		if (useScore) {
-			if (score <= scoreMedal1 && medals[level] < 3) {
-				medals[level] = 1;
-			} else if (score > scoreMedal1 && score <= scoreMedal2 && medals[level] < 3) {
-				medals[level] = 2;
+			if (score <= scoreMedal1) {
+				//medals[level] = 1;
+				levelMedal = 1;
+			} else if (score > scoreMedal1 && score <= scoreMedal2) {
+				//medals[level] = 2;
+				levelMedal = 2;
 			} else if (score > scoreMedal2) {
-				medals[level] = 3;
+				//medals[level] = 3;
+				levelMedal = 3;
 			}
-		} else if (useTime) {
 			
-		} else if (useScore && useTime) {
+		}
+		if (useTime) {
+			if (energy > 0 && levelMedal == 3) {
+				//medals[level] = 4;
+				levelMedal = 4;
+			}
+		}/* else if (useScore && useTime) {
 			if (score <= scoreMedal1 && medals[level] < 3) {
 				medals[level] = 1;
 			} else if (score > scoreMedal1 && score <= scoreMedal2 && medals[level] < 3) {
@@ -479,7 +528,116 @@ public abstract class PuzzleModeLevel {
 			} else if (score > scoreMedal2) {
 				medals[level] = 3;
 			}
+			if (energy > 0) {
+				medals[level] = 4;
+			}
+		}*/
+
+	}
+	
+	/**
+	 * @author Brock
+	 */
+	protected void endingConditions() {
+		if (standCond) {
+			if (movesUpdateDelay == 0) {
+				if (blocksRemaining == 0 && remainClears > 0 ) {
+					levelComplete = true;
+					if (!endLevelDelayed) {
+						
+						endLevelDelayed = true;
+						pauseCursorPos = 0;
+						score += remainClears >> 6;
+						
+	
+						
+						scoringSystem();
+						if (levelMedal >= medals[level]) {
+							medals[level] = levelMedal;
+						}
+						//medals[level] = (levelMedal >= medals[level]) ? levelMedal : oldMedal;
+	
+						//energy = 0;
+						pauseCursorPos = 0;
+						inputDelay = Global.inputReadDelayTimer * 2;
+					}
+					pauseCursorPos = 0;
+				} 
+				if (blocksRemaining > 0 && remainClears == 0) {
+					// game over
+					//if (blockDropDelay == 0) {
+						noRemainClears = true;
+						gameOver = true;
+						pauseCursorPos = 0;
+						
+						//inputDelay = Global.inputReadDelayTimer;
+					//}
+					
+					/**
+					 * @author Brock
+					 */
+				} /*else if (noMoves && movesUpdateDelay == 0 && !blocksMoving){
+					// Game over is no moves are remaining
+						noMoves = true;
+						gameOver = true;
+						pauseCursorPos = 0;
+					
+				}*/
+			}
+		} else if (specCond) {
+
+			
 		}
+		
+
+	}
+	
+	/**
+	 * fuction to reset all variables that need to be reset
+	 */
+	protected void resetVariables() {
+		/*if (gameOver) {
+			gameOver = false;
+			//energy = energyMax;
+			//score = score/2;
+			remainClears = totalClears;
+			noMoves = false;
+			noRemainClears = false;
+			//resetMoves = true;
+			buildGrid();
+			score = 0;
+			energy = energyMax;
+			inputDelay = 4 * Global.inputReadDelayTimer;
+		} else if (gamePaused) {
+			gameOver = false;
+			remainClears = totalClears;
+			noMoves = false;
+			noRemainClears = false;
+			buildGrid();
+			score = 0;
+			gamePaused = false;
+			energy = energyMax;
+			inputDelay = Global.inputReadDelayTimer;
+		} else if (levelComplete) {*/
+			gameOver = false;
+			levelFinished = false;
+			levelComplete = false;
+			gamePaused = false;
+			endLevelDelayed = false;
+			levelMedal = 0;
+			//energy = energyMax;
+			//score = score/2;
+			remainClears = totalClears;
+			noMoves = false;
+			noRemainClears = false;
+			buildGrid();
+			score = 0;
+			cursorGridPos[0] = grid.length / 2;
+			cursorGridPos[1] = grid[0].blocks.length / 2;
+			pauseCursorPos = 0;
+			energy = energyMax;
+			inputDelay = 3 * Global.inputReadDelayTimer;	
+		//}
 	}
 	/**
 	 * @author Brock
@@ -493,15 +651,19 @@ public abstract class PuzzleModeLevel {
 		
 		if (xc > 0 && grid[xc-1].blocks[yc] != null && grid[xc-1].blocks[yc].colorID == colorID) {
 			sum ++;
-		} else if (yc > 0 && grid[xc].blocks[yc-1] != null && grid[xc].blocks[yc-1].colorID == colorID) {
-			sum ++;
-		} else if ( (xc + 1) < grid.length && grid[xc+1].blocks[yc] != null && grid[xc+1].blocks[yc].colorID == colorID) {
-			sum ++;
-		} else if ( (yc + 1) < grid[0].blocks.length && grid[xc].blocks[yc+1] != null && grid[xc].blocks[yc+1].colorID == colorID) {
-			sum ++;
-		} else {
-			sum = 0;
 		}
+		if (yc > 0 && grid[xc].blocks[yc-1] != null && grid[xc].blocks[yc-1].colorID == colorID) {
+			sum ++;
+		}
+		if ( (xc + 1) < grid.length && grid[xc+1].blocks[yc] != null && grid[xc+1].blocks[yc].colorID == colorID) {
+			sum ++;
+		}
+		if ( (yc + 1) < grid[0].blocks.length && grid[xc].blocks[yc+1] != null && grid[xc].blocks[yc+1].colorID == colorID) {
+			sum ++;
+		}
+		/*else {
+			sum = 0;
+		}*/
 		return sum;
 	}
 
@@ -615,6 +777,11 @@ public abstract class PuzzleModeLevel {
 			movesUpdateDelay -= Global.delta;
 			//inputDelay -= Global.delta;
 			//remainClears = 6;
+			if (resetMoves) {
+				remainClears = totalClears;
+				movesDisplay = remainClears;
+				resetMoves = false;
+			}
 			if (movesUpdateDelay <= 0 && remainClears != movesDisplay) {
 				//if (movesDisplay < remainClears) {
 				//	movesChange = (remainClears - movesDisplay) >> 2;
@@ -629,14 +796,12 @@ public abstract class PuzzleModeLevel {
 					//movesDisplay = remainClears;
 				//}
 				movesUpdateDelay = movesUpdateDelayTimer * 2;//Global.inputReadDelayTimer;//movesUpdateDelayTimer;
-			}// else {
+			} else if (movesUpdateDelay > 0) {
+				movesUpdateDelay -= Global.delta;
+			}
 			//	movesUpdateDelay -= Global.delta;
 			//}
-			if (resetMoves) {
-				remainClears = totalClears;
-				movesDisplay = remainClears;
-				resetMoves = false;
-			}
+
 				//else {
 			//movesUpdateDelay -= Global.delta;
 			//	inputDelay -= Global.delta;
@@ -693,7 +858,9 @@ public abstract class PuzzleModeLevel {
 		} else {
 			shiftLR[0].draw(680, 500);
 		}
-		//drawEnergy();
+		if (useTime) {
+			drawEnergy();
+		}
 
 		if (levelComplete) {
 			//drawGrid();
@@ -725,6 +892,7 @@ public abstract class PuzzleModeLevel {
 			}
 			//Color.lightGray.bind();
 			Color.white.bind();
+			//Color.transparent.bind();
 			//Global.uiWhite.draw(180, 200, 512, 384);
 			Global.uiWhite.draw(180, 280, 512, 250);
 			
@@ -740,7 +908,12 @@ public abstract class PuzzleModeLevel {
 				//Global.uiWhite.draw(288, 288, 452, 170);
 	
 				if (pauseCursorPos == i) {
+					//Color.transparent.bind();
+					//Color..bind();
+					//Global.uiTransWhite.draw(212, 305 + i * 70, 190, 48);
+					//Global.uiGreen.draw(212, 305 + i * 70, 190, 48);
 					Global.drawFont24(305 - levelCompleteOptionSize[i], 319 + i * 70, levelCompleteOptions[i], Color.white);
+					Color.white.bind();
 				} else {
 					Global.drawFont24(305 - levelCompleteOptionSize[i], 319 + i * 70, levelCompleteOptions[i], Color.black);
 				}
@@ -768,15 +941,24 @@ public abstract class PuzzleModeLevel {
 			Color.lightGray.bind();
 			Global.uiWhite.draw(420, 303, 252, 192);
 			
-			if (Global.getControlActive(Global.GameControl.CANCEL)) {
+			/*if (Global.getControlActive(Global.GameControl.CANCEL)) {
 				this.levelFinished = true;
 				Global.actionDelay = Global.inputReadDelayTimer;
-			}
+			}*/
 			Color.white.bind();
-			for (int j = 1; j <= medals[level]; j++) {
-				BlockPuzzleMode.Yellow_star.draw(BlockPuzzleMode.medalOffset * j + 425, 415);
-				//medalOffset -= 5;
-			}
+			//for (int j = 1; j <= medals[level]; j++) {
+			if (levelMedal > 0) {
+				for (int j = 1; j <= levelMedal; j++) {
+					if (j == 4) {
+						BlockPuzzleMode.Challenge_star.draw(BlockPuzzleMode.medalOffset * j + 425, 415);
+					} else {
+						BlockPuzzleMode.Yellow_star.draw(BlockPuzzleMode.medalOffset * j + 425, 415);
+					}
+					//medalOffset -= 5;
+				}
+			} //else {
+				
+			//}
 			//if (actionDelay < 0 && Global.getControlActive(Global.GameControl.SELECT)) {
 			//	levelFinished = true;
 			//}
@@ -824,6 +1006,9 @@ public abstract class PuzzleModeLevel {
 	private int goTextSize;
 	private int goTextPracSize;
 
+	/**
+	 * @author Brock
+	 */
 	private void showGameOver() {
 		gameOverControls();
 		for (int i = 0; i < gameOverOptions.length; i++) {
@@ -833,7 +1018,13 @@ public abstract class PuzzleModeLevel {
 		Color.white.bind();
 		//Global.uiWhite.draw(180, 200, 512, 384);
 		Global.uiWhite.draw(180, 280, 512, 250);
+
+		//Color.white.bind();
+		//Global.uiWhite.draw(288, 288, 452, 192);
+		//Global.uiWhite.draw(288, 288, 452, 170);
 		
+		Color.lightGray.bind();
+		Global.uiWhite.draw(420, 303, 252, 192);
 		for (int i = 0; i < gameOverOptions.length; i++) {
 			//Color.blue.bind();
 			//Global.uiWhite.draw(288, 224, 192, 48); // left button
@@ -841,15 +1032,67 @@ public abstract class PuzzleModeLevel {
 			//Global.uiWhite.draw(425, 480, 192, 48); // bottom button
 			Global.menuButtonShader.bind();
 			Global.uiTransWhite.draw(212, 340 + i * 70, 190, 48);
-			//Color.white.bind();
-			//Global.uiWhite.draw(288, 288, 452, 192);
-			//Global.uiWhite.draw(288, 288, 452, 170);
+			
+			Color.white.bind();
+			
+			Global.drawFont24(490, 365, "GAME OVER", Color.black);
+			//Global.drawFont24(500, 389, "Try Again", Color.black);
+			//if (noMoves) {
+				if (pauseCursorPos == i) {
+					Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.white);
+					if (noMoves) {
+						Color.white.bind();
+						switch (pauseCursorPos) {
+							case 0:
+								Global.drawFont24(442, 389, "No Remaining Moves!", Color.black);
+								Global.drawFont24(500, 422, "Try Again?", Color.black);
+								break;
+							case 1:
+								Global.drawFont24(500, 389, "Quit?", Color.black);
+								break;
+						}
+					} else if (noRemainClears) {
+						Color.white.bind();
+						switch (pauseCursorPos) {
+							case 0:
+								Global.drawFont24(442, 389, "No Remaining Clears!", Color.black);
+								Global.drawFont24(500, 422, "Try Again?", Color.black);
+								break;
+							case 1:
+								Global.drawFont24(530, 389, "Quit?", Color.black);
+								break;
+						}
+					}
+				} else {
+					Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.black);
+				}
+				
+			/*} else if (noRemainClears) {
+				if (pauseCursorPos == i) {
+					Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.white);
+					switch (pauseCursorPos) {
+						case 0:
+							Global.drawFont24(500, 389, "No remaining clears!", Color.black);
+							break;
+						case 1:
+							Global.drawFont24(500, 389, "Try Again?", Color.black);
+							break;
+						default:
+								break;
+					}
+				} else {
+					Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.black);
+				}
+				
+			} *//*else {
+				if (pauseCursorPos == i) {
+					Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.white);
+				} else {
+					Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.black);
+				}
+			}*/
 
-			if (pauseCursorPos == i) {
-				Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.white);
-			} else {
-				Global.drawFont24(305 - gameOverOptionsSize[i], 355 + i * 70, gameOverOptions[i], Color.black);
-			}
+
 				/*if (pauseCursorPos == 0) {
 					Global.drawFont24(330, 240, "Next Level", Color.white);
 					Global.drawFont24(425, 480, "Restart", Color.black);
@@ -870,13 +1113,9 @@ public abstract class PuzzleModeLevel {
 					Global.drawFont24(440, 380, "Quit the level.", Color.black);
 				}*/
 		}		
-	
-		Color.lightGray.bind();
-		Global.uiWhite.draw(420, 303, 252, 192);
+
 		
-		Color.white.bind();
-		Global.drawFont24(490, 365, "GAME OVER", Color.black);
-		Global.drawFont24(500, 389, "Try Again", Color.black);
+
 		
 		if (Global.getControlActive(Global.GameControl.CANCEL)) {
 			this.levelFinished = true;
@@ -1312,14 +1551,16 @@ public abstract class PuzzleModeLevel {
 						break;
 
 					case 1:
-						gameOver = false;
+						resetVariables();
+						/*gameOver = false;
 						remainClears = totalClears;
 						noMoves = false;
 						noRemainClears = false;
 						buildGrid();
 						score = 0;
 						gamePaused = false;
-						inputDelay = Global.inputReadDelayTimer;	
+						energy = energyMax;
+						inputDelay = Global.inputReadDelayTimer;*/	
 						break;
 						
 					case 2:
@@ -1365,7 +1606,8 @@ public abstract class PuzzleModeLevel {
 				
 				switch (pauseCursorPos) {
 					case 0:
-						gameOver = false;
+						resetVariables();
+						/*gameOver = false;
 						//energy = energyMax;
 						//score = score/2;
 						remainClears = totalClears;
@@ -1374,7 +1616,8 @@ public abstract class PuzzleModeLevel {
 						//resetMoves = true;
 						buildGrid();
 						score = 0;
-						inputDelay = 4 * Global.inputReadDelayTimer;	
+						energy = energyMax;
+						inputDelay = 4 * Global.inputReadDelayTimer;*/	
 						break;
 					case 1:
 						gameOver = true;
@@ -1428,11 +1671,13 @@ public abstract class PuzzleModeLevel {
 						levelFinished = true;
 						gameOver = false;
 						score = 0;
+
 						inputDelay = 10 * Global.inputReadDelayTimer;	
 						break;
 	
 					case 1:
-						gameOver = false;
+						resetVariables();
+						/*gameOver = false;
 						levelFinished = false;
 						levelComplete = false;
 						//energy = energyMax;
@@ -1445,7 +1690,8 @@ public abstract class PuzzleModeLevel {
 						cursorGridPos[0] = grid.length / 2;
 						cursorGridPos[1] = grid[0].blocks.length / 2;
 						pauseCursorPos = 0;
-						inputDelay = 10 * Global.inputReadDelayTimer;	
+						energy = energyMax;
+						inputDelay = 10 * Global.inputReadDelayTimer;*/	
 						break;
 					case 2:
 						gameOver = true;
@@ -1677,7 +1923,7 @@ public abstract class PuzzleModeLevel {
 				counter = checkGrid(cursorGridPos);
 				int adj = (int)Math.pow(counter - 1, 2);
 				updateScore(adj);
-				addEnergy(adj);
+				//addEnergy(adj);
 				//updateMoves(1);
 				break;
 			case BOMB:
@@ -1813,6 +2059,7 @@ public abstract class PuzzleModeLevel {
 	 * @author Mario
 	 */
 	protected void drawEnergy() {
+		float percent;
 		emptyEnergy.draw(20, 740);
 		energyBar.bind();
 		if (energy > energyDisplay) {
@@ -1823,7 +2070,11 @@ public abstract class PuzzleModeLevel {
 			energyDisplay = energy;
 		}
 		
-		float percent = (float) energyDisplay/(float) energyMax;
+		if (energy == 0) {
+			percent = 0;
+		} else {
+			percent = (float) energyDisplay/(float) energyMax;
+		}
 		glPushMatrix();
 		glTranslatef(20,740,0); // x y z
 		glBegin(GL_QUADS);
