@@ -629,13 +629,16 @@ public abstract class BlockStandardLevel {
 				
 				// check conditions that prevent column movement
 				if (grid[xc].blocks[0] == null) { continue; }
-				if (Global.useBlockCascading && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
+				if (Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty
+					grid[xc].columnOffset = 0;
+					continue; 
+				} 
 				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 
 					grid[xc].columnOffset = 0;
 					continue; 
 				} 
-				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
-					grid[xc].columnOffset = 0;
+				if (grid[next].blocks[0] != null && grid[next].columnOffset < grid[xc].columnOffset) { // no room to move or trying to move ahead (this should also match next column rock blocks) 
+					grid[xc].columnOffset = grid[next].columnOffset;
 					continue; 
 				}
 				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
@@ -669,12 +672,19 @@ public abstract class BlockStandardLevel {
 				
 				// check conditions that prevent column movement
 				if (grid[xc].blocks[0] == null) { continue; }
-				if (Global.useBlockCascading && grid[next].blocks[0] != null) { continue; } // cascading forces each column to wait for the next to be empty
-				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { continue; } // rock in current column, do no shift
+				if (Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty 
+					grid[xc].columnOffset = 0;
+					continue; 
+				} 
+				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 
+					grid[xc].columnOffset = 0;
+					continue; 
+				} 
 				if (grid[next].blocks[0] != null && grid[next].columnOffset == 0) { // no room to move (this should also match next column rock blocks) 
 					grid[xc].columnOffset = 0;
 					continue; 
 				}
+				
 				if (next == wedgePos[0] && topblock[xc] >= wedgePos[1]) { // the column is too tall to fit under a wedge block
 					grid[xc].columnOffset = 0;
 					continue;
@@ -982,6 +992,14 @@ public abstract class BlockStandardLevel {
 		for (int xc = 0; xc < grid.length; xc++) {
 			for (int yc = 0; yc < grid[0].blocks.length; yc++) {
 				if (grid[xc].blocks[yc] != null && grid[xc].blocks[yc].clearMark) {
+					if (grid[xc].blocks[yc].type == Block.BlockType.BLOCK) {
+						int cid = grid[xc].blocks[yc].colorID;
+						blockCounts[cid]--;
+						if (blockCounts[cid] == 0 && totalColors > minColors) {
+							totalColors--;
+							allowedColors = allowedColors ^ (1 << cid);
+						}
+					}
 					grid[xc].blocks[yc] = null;
 					blocksRemaining--;
 				}
@@ -1077,6 +1095,9 @@ public abstract class BlockStandardLevel {
 				if (grid[x].blocks[yMax] == null) {
 					grid[x].blocks[yMax] = queue[x];
 					blocksRemaining++;
+					if (queue[x].type == Block.BlockType.BLOCK) {
+						blockCounts[queue[x].colorID]++;
+					}
 				} else {
 					overflow++;
 				}
@@ -1090,6 +1111,28 @@ public abstract class BlockStandardLevel {
 		//shiftGridColumns();
 		queueCount = 0;
 		return overflow;
+	}
+	
+
+	//TODO: finish block color checks for cleared blocks
+	private Block getQueueBlock(boolean override) {
+		Block b = null;
+		int r, a;
+		do {
+			r = Global.rand.nextInt(100000);
+			if (r < 50) { // 0.5% chance for heart block
+				b = new Block(Block.BlockType.HEART);
+			} else {
+				b = getQueueBlock();
+				if (b.type == Block.BlockType.BLOCK) {
+					a = 1 << b.colorID;
+					if ( (a & allowedColors) != a) {
+						b = null;
+					}
+				}
+			}
+		} while (b == null);
+		return b;
 	}
 	
 	protected abstract Block getQueueBlock();
@@ -1184,7 +1227,7 @@ public abstract class BlockStandardLevel {
 			return; 
 		}
 		queueStepCount = 0; // reset steps-remaining-until-block-add timer
-		Block b = getQueueBlock();
+		Block b = getQueueBlock(true);
 		int firstNull = queue.length - 1;
 		if (queue[firstNull] != null) {
 			for (int x = xMax - 1; x > 0; x--) { // find closest null from right
@@ -1453,5 +1496,44 @@ public abstract class BlockStandardLevel {
 			return count;
 		}
 	}
+	
+	private int[] blockCounts = new int[Block.blockColorCount];
+	private int allowedColors = 0;
+	private int totalColors = 0;
+	protected int minColors = 2;
+	
+	protected void setGridCounts() {
+		
+		for (int i = 0; i < blockCounts.length; i++) {
+			blockCounts[i] = 0;
+		}
+		
+		for (int x = 0; x < grid.length; x++) {
+			for (int y = 0; y < grid[0].blocks.length; y++) {
+				if (grid[x].blocks[y] != null) {
+					if (grid[x].blocks[y].type == Block.BlockType.BLOCK) {
+						blockCounts[grid[x].blocks[y].colorID]++;
+					} else if (grid[x].blocks[y].type == Block.BlockType.WEDGE) {
+						if (wedgePos[0] >= 0 && !(wedgePos[0] == x && wedgePos[1] == y )) {
+							Global.writeToLog("Too many wedge blocks! Additional wedges will be converted to TRASH type.", true);
+							grid[x].blocks[y] = new Block(Block.BlockType.TRASH);
+						} else {
+							wedgePos = new int[] { x, y };
+						}
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < blockCounts.length; i++) {
+			if (blockCounts[i] > 0) {
+				allowedColors = allowedColors | (1 << i);
+				totalColors++;
+			}
+		}
+		
+		
+	}
+	
 }
 

@@ -397,7 +397,7 @@ public class BlockBreakStandard implements GameMode {
 				switch (cursorPos) {
 					case 0: // normal mode
 						if (Global.getControlActive(Global.GameControl.LEFT)) {
-							playLevel = new BlockStandardLevelEx(localTexMap);
+							playLevel = new BlockStandardLevelBuilder(localTexMap);
 							playLevel.levelTitle = "Build Mode";
 						} else {
 							loadLevel(1);

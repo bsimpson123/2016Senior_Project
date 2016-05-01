@@ -49,7 +49,10 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
 		// set energy max if not default
-		energy = energyMax = 200000;	
+		energy = energyMax = 200000;
+		
+		
+		setGridCounts();
 	}
 	
 	@Override
@@ -61,12 +64,16 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				//r = (int)Math.floor( Math.abs( 9.5 - k) + Math.abs(9.5 - i));
-				//r = (int) Math.floor( Math.sqrt(Math.pow(9.5 - k, 2) + Math.pow(9.5 - i, 2)) );
-				r = Global.rand.nextInt(2);
-				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
+				//r = (int)Math.floor( Math.abs( 9.5 - k) + Math.abs(9.5 - i)); // Manhattan distance from center
+				//r = (int) Math.floor( Math.sqrt(Math.pow(9.5 - k, 2) + Math.pow(9.5 - i, 2)) ); // Euclidean distance from center
+				//r = Global.rand.nextInt(2);
+				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
 				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, (r % 2) ^ (r % 6));
-				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, ((i + k) % 5) ^ 5 );
+				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, 
+						//((i + k) % 5) ^ 5
+						(i % 4) | (k % 4)
+						//(r % 2) ^ (r % 6)
+					);
 			}
 		}
 		// set the block count for the level

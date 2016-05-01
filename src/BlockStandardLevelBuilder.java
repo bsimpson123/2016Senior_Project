@@ -144,6 +144,11 @@ public class BlockStandardLevelBuilder extends BlockStandardLevel {
 					if (grid[x].blocks[y].type != Block.BlockType.WEDGE) {
 						if (keyDelay > 0) { break; } 
 						undo.push(GridColumn.copyGrid(grid));
+						if (wedgePos[0] >= 0 && grid[wedgePos[0]].blocks[wedgePos[1]].type == Block.BlockType.WEDGE) {
+							grid[wedgePos[0]].blocks[wedgePos[1]] = new Block(Block.BlockType.BLOCK);
+						}
+						wedgePos[0] = x;
+						wedgePos[1] = y;
 						grid[x].blocks[y] = list[6].clone();
 						keyDelay = Global.inputReadDelayTimer;
 					}
