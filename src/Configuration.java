@@ -26,7 +26,7 @@ public class Configuration implements GameMode {
 		"Block Cascading",
 		"Wait For Block Fall",
 		"Fullscreen",
-		"Input",
+		"Configure Input",
 		""
 		};
 	
@@ -147,7 +147,7 @@ public class Configuration implements GameMode {
 		
 		int barW = ( (settings[0] * 100) / delayMax ) * 5;
 		
-		for (int i = 0, xs = 20, ys = 200; i < menus.length; i++, ys += 80) {
+		for (int i = 0, ys = 200; i < menus.length; i++, ys += 80) {
 			shader.bind();
 			if (i < 5) { // do not draw for last option
 				Global.uiTransWhite.draw(spacing[0][0], ys, spacing[1][0], 54);

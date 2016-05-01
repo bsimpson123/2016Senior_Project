@@ -205,7 +205,7 @@ public class BlockStandardLevelBuilder extends BlockStandardLevel {
 					break;
 				case Keyboard.KEY_L:
 					if (fileDelay > 0) { break; } 
-					GridColumn[] newGrid = GridColumn.loadFromFile("inport.dat");
+					GridColumn[] newGrid = GridColumn.loadFromFile("import.dat");
 					if (newGrid != null) {  // ensure data loaded properly before switching grids 
 						undo.push(GridColumn.copyGrid(grid));
 						grid = newGrid; 

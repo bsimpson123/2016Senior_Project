@@ -51,39 +51,12 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
 		
-		
+		setGridCounts();
 	}
 	
 	@Override
 	protected void buildGrid() {
 		grid = GridColumn.loadFromFile("media/sp2.csv");
-		/*
-		try {
-			String parseline;
-			String[] parseCSV;
-			infile = new BufferedReader(new FileReader("media/sp2.csv"));
-			parseline = infile.readLine();
-			int x=0;
-			while (parseline!= null) {
-				parseCSV = parseline.split(",");
-				grid[x] = new GridColumn(gridSize[1]);
-				for (int i = 0; i < parseCSV.length; i++) {
-					
-					grid[x].blocks[i] = new Block(Block.BlockType.BLOCK, Integer.parseInt(parseCSV[i]));
-				}
-				x++;
-				parseline = infile.readLine();
-			}
-			
-			infile.close();
-			//outfile.close();
-			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} //*/
-
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
