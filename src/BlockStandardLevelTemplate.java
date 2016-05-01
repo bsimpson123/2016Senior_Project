@@ -40,7 +40,6 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
 		// create the grid with x-dimension as specified above
 		grid = new GridColumn[gridSize[0]];
-		queue = new Block[gridSize[0]];
 		// build the grid according the level difficulty
 		buildGrid();
 		// set the grid draw starting position derived from grid and block size
@@ -48,6 +47,7 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
+		queue = new Block[gridSize[0]];
 		// TODO: [CUSTOM] set energy and energyMax if different than default (100000)
 		// set energy max if not default
 		energy = energyMax = 200000;		
