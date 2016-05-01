@@ -38,10 +38,10 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 		// TODO: [CUSTOM] set the block size and grid size
 		// valid block dimensions are { 16, 32, 64 }
 		// valid grid sizes (respective to block size) are { 40, 20, 10 }
-		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
-		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
 		// create the grid with x-dimension as specified above
 		grid = new GridColumn[gridSize[0]];
+		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		gridSize = new int[] { grid.length,  }; // default grid size is { 20, 20 }
 		queue = new Block[gridSize[0]];
 		// build the grid according the level difficulty
 		buildGrid();
