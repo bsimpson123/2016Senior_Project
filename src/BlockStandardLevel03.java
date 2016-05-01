@@ -51,7 +51,8 @@ public class BlockStandardLevel03 extends BlockStandardLevel {
 		// set energy max if not default
 		energy = energyMax = 200000;		
 
-		
+		setGridCounts();
+
 	}
 	
 	@Override

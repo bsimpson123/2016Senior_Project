@@ -52,6 +52,9 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// set energy max if not default
 		energy = energyMax = 200000;		
 	
+		
+		setGridCounts();
+
 	}
 	
 	@Override
@@ -87,23 +90,5 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 
 		return b;		
-	}
-
-	@Override
-	protected void processActivate() {
-		// TODO: score base value calculation is to be done within each case statement
-		// [CUSTOM] add case statements for each type of block that can be activated in the level
-		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
-			case BLOCK:
-				counter = checkGrid(cursorGridPos);
-				int adj = (int)Math.pow(counter - 1, 2);
-				updateScore(adj);
-				addEnergy(adj);
-				break;
-			default:
-				super.processActivate();
-				break;
-		}
-		
 	}
 }

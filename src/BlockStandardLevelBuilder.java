@@ -9,7 +9,7 @@ import org.newdawn.slick.Color;
  * Example level to demonstrate the flow and references need to build a level
  * @author John
  */
-public class BlockStandardLevelEx extends BlockStandardLevel {
+public class BlockStandardLevelBuilder extends BlockStandardLevel {
 	private Block[] list = new Block[12];
 	private Stack<GridColumn[]> undo = new Stack<GridColumn[]>();
 	private boolean fillToggle = false;
@@ -20,7 +20,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 	private final long fileDelayTimer = 5000l;
 	private long fileDelay = 0;
 	
-	public BlockStandardLevelEx(HashMap<String,Texture> rootTex) {
+	public BlockStandardLevelBuilder(HashMap<String,Texture> rootTex) {
 		// set the score multiplier for the level when 
 		levelMultiplier = 1.5f;
 		// Set environment textures and variables
@@ -144,6 +144,11 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					if (grid[x].blocks[y].type != Block.BlockType.WEDGE) {
 						if (keyDelay > 0) { break; } 
 						undo.push(GridColumn.copyGrid(grid));
+						if (wedgePos[0] >= 0 && grid[wedgePos[0]].blocks[wedgePos[1]].type == Block.BlockType.WEDGE) {
+							grid[wedgePos[0]].blocks[wedgePos[1]] = new Block(Block.BlockType.BLOCK);
+						}
+						wedgePos[0] = x;
+						wedgePos[1] = y;
 						grid[x].blocks[y] = list[6].clone();
 						keyDelay = Global.inputReadDelayTimer;
 					}
@@ -200,7 +205,7 @@ public class BlockStandardLevelEx extends BlockStandardLevel {
 					break;
 				case Keyboard.KEY_L:
 					if (fileDelay > 0) { break; } 
-					GridColumn[] newGrid = GridColumn.loadFromFile("inport.dat");
+					GridColumn[] newGrid = GridColumn.loadFromFile("import.dat");
 					if (newGrid != null) {  // ensure data loaded properly before switching grids 
 						undo.push(GridColumn.copyGrid(grid));
 						grid = newGrid; 
