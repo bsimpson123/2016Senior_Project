@@ -1118,24 +1118,38 @@ public abstract class BlockStandardLevel {
 	private Block getQueueBlock(boolean override) {
 		Block b = null;
 		int r, a;
-		do {
+		//do {
 			r = Global.rand.nextInt(100000);
 			if (r < 50) { // 0.5% chance for heart block
 				b = new Block(Block.BlockType.HEART);
 			} else {
-				b = getQueueBlock();
-				if (b.type == Block.BlockType.BLOCK) {
+				b = getQueueBlock(allowedColors);
+				/*if (b.type == Block.BlockType.BLOCK) {
 					a = 1 << b.colorID;
 					if ( (a & allowedColors) != a) {
 						b = null;
 					}
-				}
+				} //*/
 			}
-		} while (b == null);
+		//} while (b == null);
 		return b;
 	}
 	
 	protected abstract Block getQueueBlock();
+	
+	protected Block getQueueBlock(int blockColors) {
+		int[] list = new int[Block.blockColorCount];
+		int bsc, count = 0;
+		for (int i = 0; i < list.length; i++) {
+			bsc = 1 << i;
+			if ( (blockColors & bsc) == bsc) {
+				list[count] = i;
+				count++;
+			}
+		}
+		return new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(count)]);
+		
+	}
 	
 	protected void processActivate() {
 		// TODO: score base value calculation is to be done within each case statement
@@ -1343,8 +1357,6 @@ public abstract class BlockStandardLevel {
 			xMax = pos[0] + radius,
 			yMin = pos[1] - radius, 
 			yMax = pos[1] + radius;
-		int[] xEdge = new int[] { xMin, xMax }; // edge values before range checks
-		int[] yEdge = new int[] { yMin, yMax };
 
 		int cornerRadius = radius / 3;
 		if (cornerRadius <= 0) { cornerRadius = 1; }
@@ -1360,11 +1372,6 @@ public abstract class BlockStandardLevel {
 		count++;
 		for (int i = xMin; i <= xMax; i++) {
 			for (int k = yMin; k <= yMax; k++) {
-				/*if (i < (xEdge[0] + cornerRadius) || i > (xEdge[1] - cornerRadius)) {
-					if (k < (yEdge[0] + cornerRadius) || k > (yEdge[1] - cornerRadius)) {
-						continue; // skip corner checks
-					}
-				}//*/
 				dist = Math.abs(i - pos[0]) + Math.abs(k - pos[1]) - flex;
 				if (dist > radius) { continue; }
 				if (grid[i].blocks[k] != null && !grid[i].blocks[k].clearMark) {
@@ -1507,7 +1514,8 @@ public abstract class BlockStandardLevel {
 		for (int i = 0; i < blockCounts.length; i++) {
 			blockCounts[i] = 0;
 		}
-		
+		blocksRemaining = grid.length * grid[0].blocks.length;
+
 		for (int x = 0; x < grid.length; x++) {
 			for (int y = 0; y < grid[0].blocks.length; y++) {
 				if (grid[x].blocks[y] != null) {
@@ -1519,7 +1527,10 @@ public abstract class BlockStandardLevel {
 							grid[x].blocks[y] = new Block(Block.BlockType.TRASH);
 						} else {
 							wedgePos = new int[] { x, y };
+							blocksRemaining--;
 						}
+					} else if (grid[x].blocks[y].type == Block.BlockType.ROCK) {
+						blocksRemaining--;
 					}
 				}
 			}

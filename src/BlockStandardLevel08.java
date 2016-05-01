@@ -76,7 +76,6 @@ public class BlockStandardLevel08 extends BlockStandardLevel {
 		grid[Global.rand.nextInt(grid.length)].blocks[Global.rand.nextInt(grid[0].blocks.length)] = a;
 
 		// set the block count for the level
-		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
 	}
