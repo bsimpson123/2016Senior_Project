@@ -52,6 +52,7 @@ public class BlockStandardLevel04 extends BlockStandardLevel {
 		// set energy max if not default
 		energy = energyMax = 200000;		
 	
+		setGridCounts();
 	}
 	
 	@Override
@@ -64,7 +65,7 @@ public class BlockStandardLevel04 extends BlockStandardLevel {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
 				r = Global.rand.nextInt(10000);
-				b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
+				b = new Block(Block.BlockType.BLOCK, r % 3 + 2);
 				grid[i].blocks[k] = b;
 			}
 		}
@@ -74,12 +75,20 @@ public class BlockStandardLevel04 extends BlockStandardLevel {
 		// remember to decrease blocksRemaining for each such block added 
 		
 		
+		
 	}
 
 	@Override
 	protected Block getQueueBlock() {
 		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		return new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
+		Block b;
+		int r = Global.rand.nextInt(100000);
+		if (r < 20) {
+			b = new Block(Block.BlockType.BOMB, r % 2 + 2);
+		} else {
+			b = new Block(Block.BlockType.BLOCK, r % 3 + 2);
+		}
+		return b;
 	}
 
 	@Override

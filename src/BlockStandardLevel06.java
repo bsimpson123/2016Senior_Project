@@ -50,7 +50,9 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 		cursorGridPos[0] = grid.length / 2;
 		cursorGridPos[1] = grid[0].blocks.length / 2;
 		// set energy max if not default
-		energy = energyMax = 200000;		
+		energy = energyMax = 200000;
+		
+		setGridCounts();
 	}
 	
 	@Override
@@ -65,7 +67,6 @@ public class BlockStandardLevel06 extends BlockStandardLevel {
 				grid[i].blocks[k] = b;
 			}
 		}
-		grid[Global.rand.nextInt(grid.length)].blocks[Global.rand.nextInt(grid[0].blocks.length)] = new Block(Block.BlockType.HEART);
 		grid[Global.rand.nextInt(grid.length)].blocks[Global.rand.nextInt(grid[0].blocks.length)] = new Block(Block.BlockType.HEART);
 
 		// set the block count for the level
