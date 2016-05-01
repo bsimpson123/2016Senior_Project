@@ -326,32 +326,40 @@ public abstract class PuzzleModeLevel {
 		/**
 		 * funtion for ending conditions
 		 */
-		
-		if (blocksRemaining > 0 && remainClears > 0) {
-			// If not out of clears but no moves left, then game over
-			int xMax = grid.length - 1;
-			int yMax = grid[0].blocks.length - 1;
-			sumMoves = 0;
-			for (int i = 0; i < xMax; i++) {
-				for (int j = 0; j < yMax; j++) {
-					if (grid[i].blocks[j] == null) {
-						continue;
-					} else {
-						sumMoves += checkGridMovesRemain(i, j, grid[i].blocks[j].colorID);		
-					}
-				}				
-			}
-			//sumMoves = 0;
-			if ( sumMoves == 0  && movesUpdateDelay == 0) {
-				noMoves = true;
-				gameOver = true;
-				pauseCursorPos = 0;
-			}
-
-			//sumMoves = 0;
- 
-
-		} 
+		//if (blocksMoving == false) {
+			if (blocksRemaining > 0 && remainClears > 0  && movesUpdateDelay == 0) {
+				// If not out of clears but no moves left, then game over
+				int xMax = grid.length - 1;
+				int yMax = grid[0].blocks.length - 1;
+				sumMoves = 0;
+				for (int i = 0; i < xMax; i++) {
+					for (int j = 0; j < yMax; j++) {
+						if (grid[i].blocks[j] == null) {
+							continue;
+						} else {
+							//sumMoves += checkGridMovesRemain(i, j, grid, grid[i].blocks[j].colorID);
+							sumMoves += checkGrid(i, j);
+						}
+					}				
+				}
+				//sumMoves = 0;
+				if ( sumMoves <= 1 ) {
+					noMoves = true;
+					gameOver = true;
+					pauseCursorPos = 0;
+				} else if (sumMoves >= 2) {
+					sumMoves = 0;
+				}
+				
+				/*else if (sumMoves > 1) {
+					sumMoves = 0;
+				}*/
+	
+				//sumMoves = 0;
+	 
+	
+			//} 
+		}
 
 		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0) {
 	        // game over with one block remaining
@@ -492,22 +500,31 @@ public abstract class PuzzleModeLevel {
 		return checkGrid(xy[0], xy[1], grid[xy[0]].blocks[xy[1]].colorID);
 	}
 	
+	protected final int checkGrid(int xc, int yc ) {
+		if (grid[xc].blocks[yc] == null) { return 0; }
+		if (grid[xc].blocks[yc].type == Block.BlockType.BOMB)  {return 2; }
+		if (grid[xc].blocks[yc].type == Block.BlockType.STAR)  {return 2; }
+		if (grid[xc].blocks[yc].type == Block.BlockType.HEART)  {return 2; }
+		if (grid[xc].blocks[yc].type != Block.BlockType.BLOCK) { return 0; }
+		return checkGrid(xc, yc, grid[xc].blocks[yc].colorID);
+	}
+	
 	protected final int checkGridMovesRemain(int xc, int yc, GridColumn[] grid, int colorID) {
 		int sum = 0;
 		
 		//GridColumn gc = grid[x];
 		
 		if (xc > 0 && grid[xc-1].blocks[yc] != null && grid[xc-1].blocks[yc].colorID == colorID) {
-			sum ++;
+			sum++;
 		}
 		if (yc > 0 && grid[xc].blocks[yc-1] != null && grid[xc].blocks[yc-1].colorID == colorID) {
-			sum ++;
+			sum++;
 		}
 		if ( (xc + 1) < grid.length && grid[xc+1].blocks[yc] != null && grid[xc+1].blocks[yc].colorID == colorID) {
-			sum ++;
+			sum++;
 		}
 		if ( (yc + 1) < grid[0].blocks.length && grid[xc].blocks[yc+1] != null && grid[xc].blocks[yc+1].colorID == colorID) {
-			sum ++;
+			sum++;
 		}
 		
 		/*if (xc > 0 && grid[xc-1].blocks[yc] != null && grid[xc-1].blocks[yc].colorID == colorID) {
