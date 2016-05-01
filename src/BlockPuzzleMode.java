@@ -90,9 +90,10 @@ public class BlockPuzzleMode implements GameMode {
 		"Play",
 		"Level Select",
 		"Achievements",
+		"Play Guide",
 		"Back"
 	};
-	private int[] menuOptionOffset = new int[4];
+	private int[] menuOptionOffset = new int[5];
 	
 	//private boolean selectPractice = false;
 	protected static Sprite Yellow_star;
@@ -459,7 +460,17 @@ public class BlockPuzzleMode implements GameMode {
 				movementInputDelay -= Global.delta;
 			}
 			
-		} else {
+			
+		} else if (showPuzzleGuide) {
+			drawPuzzlePlayGuide();
+			if (movementInputDelay <= 0 && Global.getControlActive(Global.GameControl.CANCEL)) {
+				movementInputDelay = 2 * Global.inputReadDelayTimer;
+				showPuzzleGuide = false;
+			} else {
+				movementInputDelay -= Global.delta;
+			}
+		}
+		else {
 // @author Brock
 			GameSelector_background.draw(0, 0);
 			moveCursorMain();
@@ -521,7 +532,7 @@ public class BlockPuzzleMode implements GameMode {
 				
 				if (cursorPos < 0) {
 					
-					cursorPos = 3;
+					cursorPos = 4;
 				}
 				movementInputDelay = Global.inputReadDelayTimer;
 			}
@@ -529,13 +540,13 @@ public class BlockPuzzleMode implements GameMode {
 				cursorPos++;
 				Global.sounds.playSoundEffect("button_click");
 
-				if (cursorPos > 3) {
+				if (cursorPos > 4) {
 					cursorPos = 0;
 				}
 				movementInputDelay = Global.inputReadDelayTimer;
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
-				cursorPos = 3;
+				cursorPos = 4;
 					//PuzzleModeLevel.gamePaused = false;
 				
 			}
@@ -564,7 +575,10 @@ public class BlockPuzzleMode implements GameMode {
 						showHighScore = true;
 						newHighScore = false;
 						break;
-					case 3: // exit
+					case 3: 
+						showPuzzleGuide = true;
+						break;
+					case 4: // exit
 					default:
 						pageBack = true;
 						break;
@@ -735,15 +749,23 @@ public class BlockPuzzleMode implements GameMode {
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
-			
+			if (medals[i] < 3) {
+				for (int k = 1; k <= 4; k++) {
+					Color.black.bind();
+					Yellow_star.draw(medalOffset * k + 100, firstDrop + i * interval + 5);
+				}
+		    } 
 			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "Level " + i, Color.white);
 			if (medals[i] == 4) {
 				if (i <= 3) {
 					for (int j = 1; j <= medals[i]; j++) {
 
+						
 						if (j == 4) {
+							Color.white.bind();
 							Challenge_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
 						} else {
+							Color.white.bind();
 							Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
 						}
 						//medalOffset -= 5;
@@ -771,6 +793,55 @@ public class BlockPuzzleMode implements GameMode {
 		Global.drawFont24(512, 715, "Press [CANCEL] to return to game menu.", Color.black, true);
 	}
 	
+	private String[] starInfo = new String[] {
+			"-> The player is given stars upon completing a level",
+			"      based on score and speed of completetion",
+			"-> Three basic stars are given, then a player can",
+			"      achieve a challenge star for completing an extra goal",
+			
+	};
+	private String[] starTag = new String[] {
+			"Standard Star",
+			"Challenge Star"
+	};
+	private String[] basicInfo = new String[] {
+			"-> Each level the user is given ruleson how to complete the level",
+			"-> The level will state how to beat the level."
+	};
+	private boolean showPuzzleGuide = false;
+	private int guideOffset = 40;
+	private int starGuideOffset = 180;
+	private final int screenWidth = 512; 
+	/**
+	 * This function draws the play guide for puzzle mode.
+	 */
+	protected void drawPuzzlePlayGuide() {
+		GameSelector_background.draw(0, 0);
+		
+		Global.drawFont48(screenWidth - 250, 25, "Puzzle Mode Play Guide", Color.white);
+		// Puzzle mode basic information
+		Global.uiGreen.draw(screenWidth - 455, 115, screenWidth + 400, 100);
+		Global.drawFont24(screenWidth - 450, 90, "Puzzle Mode Basic Rules", Color.white);
+		for (int i = 0; i < basicInfo.length; i++) {
+			Global.drawFont24(screenWidth - 450, guideOffset * i + 120, basicInfo[i], Color.white);	
+		}
+		
+		// Scoring System Info
+		Global.drawFont24(screenWidth - 455, 225, "Scoring System", Color.white);
+		for (int i = 0; i < starInfo.length; i++ ) {
+			Global.drawFont24(screenWidth - 450, guideOffset * i + 255, starInfo[i], Color.white);
+		}
+		for (int j = 0; j < starTag.length; j++) {
+			if (j == 0) {
+				Global.drawFont24(starGuideOffset * j + (screenWidth - 420), 405, starTag[j], Color.white);
+				Yellow_star.draw(140, 425);
+			} else {
+				Global.drawFont24(starGuideOffset * j + (screenWidth - 420), 405, starTag[j], Color.white);
+				Challenge_star.draw(325, 425);	
+			}
+			
+		}
+	}
 	/**
 	 * Load custom values and high scores from file. Loads default values for
 	 * high scores if data is not present or corrupted.

@@ -131,7 +131,7 @@ public abstract class PuzzleModeLevel {
 	protected static boolean standCond = true;
 	protected static boolean specCond = false;
 	
-	private Sprite optionFrameMid = new Sprite(
+	/*private Sprite optionFrameMid = new Sprite(
 			Global.textureMap.get("blue_ui"),
 			new int[] { 0, 59 },
 			new int[] { 190, 20 },
@@ -142,20 +142,20 @@ public abstract class PuzzleModeLevel {
 			new int[] { 0, 144 },
 			new int[] { 190, 48 },
 			new int[] { 190, 48 }
-		);
+		);*/
 	
 	protected int pauseCursorPos = 0;
 	
-	private Sprite pauseBox = new Sprite(
+	/*private Sprite pauseBox = new Sprite(
 			Global.textureMap.get("green_ui"),
 			new int[] { 0, 0 },
 			new int[] { 190, 48 },
 			new int[] { 180, 38 }
-		);
+		);*/
 	
 	//private Sprite[] pauseText = new Sprite[2];
 	
-	private Sprite pause_RE_sel = new Sprite(
+	/*private Sprite pause_RE_sel = new Sprite(
 			Global.textureMap.get("pause_text"),
 			new int[] { 180, 0 },
 			new int[] { 180, 26 },
@@ -178,7 +178,7 @@ public abstract class PuzzleModeLevel {
 			new int[] { 0, 26 },
 			new int[] { 180, 26 },
 			new int[] { 180, 38 }
-		);
+		);*/
 	
 	private final String[] pauseOptions = new String[] {
 			"Resume",
@@ -327,7 +327,7 @@ public abstract class PuzzleModeLevel {
 		 * funtion for ending conditions
 		 */
 		
-		if (blocksRemaining > 0 && remainClears > 0 && movesUpdateDelay == 0) {
+		if (blocksRemaining > 0 && remainClears > 0) {
 			// If not out of clears but no moves left, then game over
 			int xMax = grid.length - 1;
 			int yMax = grid[0].blocks.length - 1;
@@ -342,17 +342,18 @@ public abstract class PuzzleModeLevel {
 				}				
 			}
 			//sumMoves = 0;
-			if ( sumMoves == 0 ) {
+			if ( sumMoves == 0  && movesUpdateDelay == 0) {
 				noMoves = true;
 				gameOver = true;
 				pauseCursorPos = 0;
 			}
 
-			sumMoves = 0;
+			//sumMoves = 0;
  
 
 		} 
-		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0 && !blocksMoving) {
+
+		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0) {
 	        // game over with one block remaining
 			noMoves = true;
 			gameOver = true;
@@ -491,10 +492,38 @@ public abstract class PuzzleModeLevel {
 		return checkGrid(xy[0], xy[1], grid[xy[0]].blocks[xy[1]].colorID);
 	}
 	
-	protected final int checkGridMovesRemain(int xc, int yc) {
-		if (grid[xc].blocks[yc] == null) { return 0; }
-		if (grid[xc].blocks[yc].type != Block.BlockType.BLOCK) { return 0; }
-		return checkGridMovesRemain(xc, yc, grid[xc].blocks[yc].colorID);
+	protected final int checkGridMovesRemain(int xc, int yc, GridColumn[] grid, int colorID) {
+		int sum = 0;
+		
+		//GridColumn gc = grid[x];
+		
+		if (xc > 0 && grid[xc-1].blocks[yc] != null && grid[xc-1].blocks[yc].colorID == colorID) {
+			sum ++;
+		}
+		if (yc > 0 && grid[xc].blocks[yc-1] != null && grid[xc].blocks[yc-1].colorID == colorID) {
+			sum ++;
+		}
+		if ( (xc + 1) < grid.length && grid[xc+1].blocks[yc] != null && grid[xc+1].blocks[yc].colorID == colorID) {
+			sum ++;
+		}
+		if ( (yc + 1) < grid[0].blocks.length && grid[xc].blocks[yc+1] != null && grid[xc].blocks[yc+1].colorID == colorID) {
+			sum ++;
+		}
+		
+		/*if (xc > 0 && grid[xc-1].blocks[yc] != null && grid[xc-1].blocks[yc].colorID == colorID) {
+			sum ++;
+		}
+		if (yc > 0 && grid[xc].blocks[yc-1] != null && grid[xc].blocks[yc-1].colorID == colorID) {
+			sum ++;
+		}
+		if ( (xc + 1) < grid.length && grid[xc+1].blocks[yc] != null && grid[xc+1].blocks[yc].colorID == colorID) {
+			sum ++;
+		}
+		if ( (yc + 1) < grid[0].blocks.length && grid[xc].blocks[yc+1] != null && grid[xc].blocks[yc+1].colorID == colorID) {
+			sum ++;
+		}*/
+
+		return sum;
 	}
 	
 	/**
@@ -837,8 +866,10 @@ public abstract class PuzzleModeLevel {
 	 * @author John
 	 */
 	protected void drawTopLevelUI() {
-		Global.uiGreen.draw(700, 16, 300, 56);
-		Global.uiGreen.draw(700, 72, 300, 96);
+		Global.uiTransWhite.draw(700, 16, 300, 56);
+		Color.green.bind();
+		Global.uiTransWhite.draw(700, 72, 300, 96);
+		Color.white.bind();
 		userInterface.draw(0,0);
 		//remainClears = 6;
 		Global.drawFont48(710, 25, levelTitle, Color.white);
@@ -1671,7 +1702,7 @@ public abstract class PuzzleModeLevel {
 						levelFinished = true;
 						gameOver = false;
 						score = 0;
-
+						resetMoves = true;
 						inputDelay = 10 * Global.inputReadDelayTimer;	
 						break;
 	
