@@ -12,7 +12,8 @@ public class PuzzleModeLevel01 extends PuzzleModeLevel{
 		/**
 		 * Change totalClears for number of moves to clear the grid.
 		 */
-		totalClears = 3;
+		remainClears = -1;
+		totalClears = 5;
 		
 		/**
 		 * 1 = shift right
@@ -34,6 +35,7 @@ public class PuzzleModeLevel01 extends PuzzleModeLevel{
 		useScore = true;
 		useTime = false;
 		
+		standCond = true;
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime
@@ -78,6 +80,13 @@ public class PuzzleModeLevel01 extends PuzzleModeLevel{
 		
 	}
 	
+	public PuzzleModeLevel01() {
+		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+		grid = new GridColumn[gridSize[0]];
+		buildGrid();
+		gridBasePos = new int[] { 375 + 82, 700 };
+	}
 	
 	@Override
 	protected void buildGrid() {
@@ -88,15 +97,23 @@ public class PuzzleModeLevel01 extends PuzzleModeLevel{
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				//r = Global.rand.nextInt(2);
+				//r = 1;//Global.rand.nextInt(2);
 				if (i % 2 == 0 && k % 2 == 0) {
 					r = 1;
 				} else {
 					r = 2;
 				}
+				/*if (i == 0 && k == 1) {
+					grid[0].blocks[1] = new Block(Block.BlockType.BLOCK, 2);
+				} else if ( i == 0 && k == 2) {
+					grid[0].blocks[2] = new Block(Block.BlockType.BLOCK, 3);
+				} else {
+					grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, 1);
+				}*/
 				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
 			}
 		}
+		
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)

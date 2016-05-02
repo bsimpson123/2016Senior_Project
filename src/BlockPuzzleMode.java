@@ -29,6 +29,7 @@ public class BlockPuzzleMode implements GameMode {
 	protected int cursorPos = 0;
 	//protected long inputDelay = Global.inputReadDelayTimer;
 	private PuzzleModeLevel playLevel;
+	private PuzzleModeLevel playLevelDisplay;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
 	protected int[] blockOffSet = new int[] { 32, 32 };
@@ -651,35 +652,162 @@ public class BlockPuzzleMode implements GameMode {
 		}
 		//}
 	}*/
+	private GridColumn[] grid;
+	private int[] gridSize;
+	private int[] gridBasePos;
+	private int[] blockSize;
+	
+	private void selectDisplayGrid(int level) {
+		int r = 0;
+		//blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		blockSize = new int[] { 24, 24 };
+		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+		//gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
+		gridBasePos = new int[] { pracOffset + 82, 700 };
+		
+		// create the grid with x-dimension as specified above
+		//grid = new GridColumn[gridSize[0]];
+		//Global.rand.setSeed(LocalDateTime.now().getNano());
+		//for (int i = 0; i < grid.length; i++) {
+			//grid[i] = new GridColumn(gridSize[1]);
+			//for (int k = 0; k < grid[0].blocks.length; k++) {
+				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
+				///r = 2;//Global.rand.nextInt(2);
+				
+				//playLevel.level = level;
+				
+				/*switch(level) {
+					case 1:
+						if (i % 2 == 0) {
+							r = 1;
+						} else if (k % 2 == 0) {
+							r = 2;
+						} else {
+							r = 3;
+						}
+						break;
+					case 2:
+						if (i % 2 == 0 && k % 2 == 0) {
+							r = 1;
+						} else {
+							r = 2;
+						}
+						break;
+					default:
+						r = 1;
+						break;
+				}*/
+				switch(level) {
+					case 1:
+						playLevelDisplay = new PuzzleModeLevelTemplate();
+						break;
+					case 2:
+						playLevelDisplay = new PuzzleModeLevel01();
+						break;
+					default:
+						playLevelDisplay = new PuzzleModeLevelStandard();
+						//r = 1;
+						//Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", level) , true );
+						return ;
+				}
+				
+				//playLevelDisplay.buildGrid();
+				
+				/*if (((i + k) % 2 == 0)) {
+					r = 4;
+				}*/
+					
+				/*if (i % 2 == 0) {
+					r = 1;
+				} else if (k % 2 == 0){
+					r = 2;
+				} else if (i / 2 != 1 && k / 2 != 1){
+					r = 2;
+				} else {
+					r = 3;
+				}*/
+				
+				/*if (i % 2 == 0 && k % 2 == 0) {
+					r = 1;
+				} else {
+					r = 2;
+				}*/
+				
+
+				
+				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
+		//	}
+	//	}
+	}
+	
+	private void drawGridDisplay(GridColumn[] grid) {
+		// The old grid draw functions will not work with the new grid management algorithm, the math will not move the blocks the same
+		for (int i = 0; i < grid.length; i++) {
+			for (int k = 0; k < grid[0].blocks.length; k++) {
+					grid[i].blocks[k].draw(
+							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
+							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
+							blockSize
+							);
+			}
+		}
+		//drawQueue();
+	}
+	
 	private void drawPracticeSelect() {
 		String num = Integer.toString(pracLevel);
 		int numOffset = Global.getNumbers24DrawSize(num) / 2;
 		Color numCol = pracLevel > this.maxUnlocked ? Color.gray : Color.white;
 		
+		selectDisplayGrid(pracLevel);
+		
 		pracArrows[0].draw(pracOffset, 410);
 		//pracBox.draw(pracOffset + 40, 250);
 		Global.menuButtonShader.bind();
 		//Global.uiTransWhite.draw(pracOffset + 40, 180, 565, 450);
-		Global.uiTransWhite.draw(pracOffset + 40, 180, 565, 525);
+		//Global.uiTransWhite.draw(pracOffset + 40, 180, 565, 525);
+		Global.uiTransWhite.draw(pracOffset + 40, 180, 565, 575);
 		Color.white.bind();
-		ex_screen.draw(pracOffset + 65, 243);
+		//ex_screen.draw(pracOffset + 65, 243);
+		
+		drawGridDisplay(playLevelDisplay.grid);
+		
 		//Global.uiGreen.draw(pracOffset + 40, 250, 49, 45);
 		//PuzzleModeLevel.numbers[pracLevel].draw(525, 255);
-		Global.drawFont48(pracOffset + 65, pracSelectDrop - 50, "Level ", numCol);
-		Global.drawNumbers48(pracOffset + 190, pracSelectDrop - 55, num, numCol);
+		Global.drawFont48(pracOffset + 80, pracSelectDrop - 50, "Level ", numCol);
+		Global.drawNumbers48(pracOffset + 195, pracSelectDrop - 55, num, numCol);
 		//Global.drawNumbers24(pracOffset + 165, pracSelectDrop - 50, num, numCol);
 		pracArrows[1].draw(pracOffset + 595, 410);
 		//for (int i = 0; i < medals.length; i++) {
 		if (pracLevel <= PuzzleModeLevel.nLevels) {
 			if (medals[pracLevel] > 0) {
-				for (int j = 1; j <= medals[pracLevel]; j++) {
-					if (j == 4) {
-						Challenge_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
-					} else {
-						Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+				if (medals[pracLevel] == 4) {
+					for (int j = 1; j <= medals[pracLevel]; j++) {
+						if (j == 4) {
+							Challenge_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+						} else {
+							Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+						}
+						//Yellow_star.draw(medalOffset * j + 700, 652);
+						//medalOffset -= 5;
 					}
-					//Yellow_star.draw(medalOffset * j + 700, 652);
-					//medalOffset -= 5;
+				} else {
+					for (int j = 1; j <= 4; j++) {
+						//Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+						//medalOffset -= 5;
+					
+					//else if ((4 - medals[j]) <= 0){
+						if (j <= medals[pracLevel]) {
+							Color.white.bind();
+							Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+						} else {
+							//for (int k = 1; k <= fillRemainStars; k++) {
+								Color.black.bind();
+								Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+								Color.white.bind();
+							//}
+						}
+					}
 				}
 			}
 		}
@@ -695,9 +823,10 @@ public class BlockPuzzleMode implements GameMode {
 	private int[] hsBackShift = new int[] { 1, 0 };
 	private float[] hsBackDraw = new float[] { 1024 / 4096f, 768 / 1024f };
 	private int starMargin = 50;
+	private int fillRemainStars = 0;
 
 	private void showHighScores() {
-		int drawWidth = 1024 - 2 * hsMargin;
+		int drawWidth = 1024 - 725;
 		int interval = hsBarHeight + hsBarSpace;
 		int firstDrop = 100;
 		int limit = 10;
@@ -749,33 +878,47 @@ public class BlockPuzzleMode implements GameMode {
 			boxColor.bind();
 			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			resetColor.bind();
-			if (medals[i] < 3) {
-				for (int k = 1; k <= 4; k++) {
-					Color.black.bind();
-					Yellow_star.draw(medalOffset * k + 100, firstDrop + i * interval + 5);
-				}
-		    } 
 			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "Level " + i, Color.white);
 			if (medals[i] == 4) {
-				if (i <= 3) {
+				//if (i == 3) {
 					for (int j = 1; j <= medals[i]; j++) {
 
 						
 						if (j == 4) {
 							Color.white.bind();
-							Challenge_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+							Challenge_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
 						} else {
 							Color.white.bind();
-							Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+							Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
 						}
+						/* else {
+							for (int k = 1; k <= 4; k++) {
+								Color.black.bind();
+								Yellow_star.draw(medalOffset * k + 100, firstDrop + i * interval + 5);
+							}
+						}*/
 						//medalOffset -= 5;
+					//}
 					}
-				} 
+					
 			} else {
-				for (int j = 1; j <= medals[i]; j++) {
-					Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+				fillRemainStars = 5 - medals[i];
+				for (int j = 1; j <= 4; j++) {
+					//Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
 					//medalOffset -= 5;
+				
+				//else if ((4 - medals[j]) <= 0){
+					if (j <= medals[i]) {
+						Color.white.bind();
+						Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
+					} else {
+						//for (int k = 1; k <= fillRemainStars; k++) {
+							Color.black.bind();
+							Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
+						//}
+					}
 				}
+				//}
 			}
 			//Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			//resetColor.bind();
