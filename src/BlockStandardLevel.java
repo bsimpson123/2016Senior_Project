@@ -126,30 +126,6 @@ public abstract class BlockStandardLevel {
 	
 	private Block[] heartMenuBlocks = new Block[6];
 
-	
-/*	public void run() {
-		// decrement delay variables
-		queueManualShiftDelay -= Global.delta;
-		gridShiftActionDelay -= Global.delta;
-		actionDelay -= Global.delta;
-		inputDelay -= Global.delta;
-		// Draw all background elements. These should always be the first items drawn to screen. 
-		background.draw(0, 0);
-		counter = 0;
-		
-		if (blocksRemaining == 0) {
-			levelComplete = true;
-			if (!endLevelDelayed) {
-				endLevelDelayed = true;
-				inputDelay = Global.inputReadDelayTimer * 2;
-			}
-		} else if (energy == 0) {
-			// game over
-			gameOver = true;
-		}
-		
-	}//*/
-
 	public final void run() {
 		// decrement delay variables
 		queueManualShiftDelay -= Global.delta;
@@ -536,6 +512,11 @@ public abstract class BlockStandardLevel {
 	private boolean blocksMoving = false;
 	//private boolean Global.useBlockCascading = true;
 	
+	/**
+	 * Moves and processes grid blocks.
+	 * @param grid
+	 * @author John
+	 */
 	protected void processGridBlocks(GridColumn[] grid) {
 		blockDropDelay -= Global.delta;
 		if (blockDropDelay > 0) { return ; }
@@ -714,27 +695,61 @@ public abstract class BlockStandardLevel {
 		if (blocksMoving || starBlockCounter < 2) {
 			return;
 		}
-		
+		int clears = 0;
 		for (int x = 0; x < grid.length; x++) {
 			for (int y = 0; y < grid[0].blocks.length; y++) {
 				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
 					// TODO: add activation call for star blocks found sharing an edge
+					if (grid[x].blocks[y].clearMark) { continue; } // block has already been processed
 					if (x + 1 < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
+						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
 					if (x > 0 && grid[x-1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
+						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
 					if (y + 1 < grid[0].blocks.length && grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
+						clears += activateStarBlock(new int[] { x, y }, true);
 					} else
 					if (y > 0 && grid[x].blocks[y-1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
-						
+						clears += activateStarBlock(new int[] { x, y }, true);
 					}
 				}
 			}
 		}
+		if (clears > 0) {
+			removeMarkedBlocks();
+		}
 		
+	}
+	
+	private int activateStarBlock(int[] pos, boolean eventActivation) {
+		if (grid[pos[0]].blocks[pos[1]] == null) { return 0; }
+		if (!eventActivation && pos[1] > 0) { return 0; } // manual activation requires the star to be at the bottom row
+		int count = 1;
+		int xMin = (pos[0] - 1) < 0 ? 0 : pos[0] - 1;
+		int xMax = (pos[0] + 1) >= grid.length ? grid.length - 1 : pos[0] + 1;
+		int yMin = (pos[1] - 1) < 0 ? 0 : pos[1] - 1;
+		int yMax = (pos[1] + 1) >= grid[0].blocks.length ? grid[0].blocks.length - 1 : pos[1] + 1;
+		grid[pos[0]].blocks[pos[1]].clearMark = true;
+		for (int xx = xMin; xx <= xMax; xx++) {
+			for (int yy = yMin; yy <= yMax; yy++) {
+				if (grid[xx].blocks[yy] == null) { continue; }
+				if (grid[xx].blocks[yy].type == Block.BlockType.ROCK) { continue; }
+				if (grid[xx].blocks[yy].clearMark) { continue; }
+				if (grid[xx].blocks[yy].type == Block.BlockType.STAR) {
+					count += activateStarBlock(new int[] { xx, yy }, true);
+					continue;
+				}
+				if (grid[xx].blocks[yy].type == Block.BlockType.BOMB) {
+					count += activateBombBlock(new int[] { xx, yy });
+					continue;
+				}
+				// no exception check for wedge blocks. star blocks can remove wedge blocks, though bomb block cannot
+				grid[xx].blocks[yy].clearMark = true;
+				count++;
+			}
+		}
+		return count;
 	}
 	
 	/** Draws the grid to the screen. Calculates block offsets used by the updated
@@ -1114,44 +1129,30 @@ public abstract class BlockStandardLevel {
 		return overflow;
 	}
 	
-
-	//TODO: finish block color checks for cleared blocks
-	private Block getQueueBlock(boolean override) {
+	private Block getQueueBlock() {
 		Block b = null;
 		int r, a;
-		//do {
-			r = Global.rand.nextInt(100000);
-			if (r < 50) { // 0.5% chance for heart block
-				b = new Block(Block.BlockType.HEART);
-			} else {
-				b = getQueueBlock(allowedColors);
-				/*if (b.type == Block.BlockType.BLOCK) {
-					a = 1 << b.colorID;
-					if ( (a & allowedColors) != a) {
-						b = null;
-					}
-				} //*/
+		r = Global.rand.nextInt(100000);
+		if (r < 50) { // 0.5% chance for heart block
+			b = new Block(Block.BlockType.HEART);
+		} else {
+			int[] list = new int[Block.blockColorCount];
+			int bsc, count = 0;
+			for (int i = 0; i < list.length; i++) {
+				bsc = 1 << i;
+				if ( (allowedColors & bsc) == bsc) {
+					list[count] = i;
+					count++;
+				}
 			}
-		//} while (b == null);
+			b = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(count)]);
+		}
 		return b;
 	}
 	
-	protected abstract Block getQueueBlock();
-	
-	protected Block getQueueBlock(int blockColors) {
-		int[] list = new int[Block.blockColorCount];
-		int bsc, count = 0;
-		for (int i = 0; i < list.length; i++) {
-			bsc = 1 << i;
-			if ( (blockColors & bsc) == bsc) {
-				list[count] = i;
-				count++;
-			}
-		}
-		return new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(count)]);
-		
-	}
-	
+	/**
+	 * @author John
+	 */
 	protected void processActivate() {
 		// TODO: score base value calculation is to be done within each case statement
 		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
@@ -1169,7 +1170,14 @@ public abstract class BlockStandardLevel {
 			case HEART:
 				heartSpecialActive = true;
 				actionDelay = Global.inputReadDelayTimer * 3;
-				energy += energyMax / 10; // regenerate 10% of max energy on use
+				addEnergy(energyMax / 10); // regenerate 10% of max energy on use
+				break;
+			case STAR:
+				counter = activateStarBlock(cursorGridPos, false);
+				if (counter > 0) {
+					actionDelay = Global.inputReadDelayTimer;
+					updateScore(50);
+				}
 				break;
 			default: // block does not activate, do nothing
 				break;
@@ -1179,7 +1187,7 @@ public abstract class BlockStandardLevel {
 	
 	/**
 	 * Shifts the <code>Block</code> queue across the screen 
-	 * @param direction 1 to shift the queue to the right, eles shift to the left
+	 * @param direction 1 to shift the queue to the right, else shift to the left
 	 * @author John
 	 */
 	private void shiftQueue(int direction) {
@@ -1242,7 +1250,7 @@ public abstract class BlockStandardLevel {
 			return; 
 		}
 		queueStepCount = 0; // reset steps-remaining-until-block-add timer
-		Block b = getQueueBlock(true);
+		Block b = getQueueBlock();
 		int firstNull = queue.length - 1;
 		if (queue[firstNull] != null) {
 			for (int x = xMax - 1; x > 0; x--) { // find closest null from right
@@ -1262,7 +1270,7 @@ public abstract class BlockStandardLevel {
 	}
 	
 	/**
-	 * Removes all instances of a specific block from the queue
+	 * Removes all instances of a specific block color from the queue
 	 * @param block The matching block color to be removed.
 	 * @author John
 	 */
@@ -1275,6 +1283,12 @@ public abstract class BlockStandardLevel {
 		}
 	}
 	
+	/**
+	 * Removes all instance of a specific block color from the queue. 
+	 * Blocks removed in this way are replaced with a new <code>Block</code> of type <code>replaceType</code>.
+	 * @param color
+	 * @param replaceType
+	 */
 	protected void removeFromQueue(int color, Block.BlockType replaceType) {
 		for (int i = 0; i < queue.length; i++) {
 			if (queue[i] != null && queue[i].type == Block.BlockType.BLOCK && queue[i].colorID == color) {
@@ -1283,8 +1297,8 @@ public abstract class BlockStandardLevel {
 		}
 	}
 
-	
 	/**
+	 * Draw the queue across the screen above the grid
 	 * @author John
 	 */
 	protected void drawQueue() {
@@ -1386,6 +1400,8 @@ public abstract class BlockStandardLevel {
 				if (grid[i].blocks[k] != null && !grid[i].blocks[k].clearMark) {
 					if (grid[i].blocks[k].type == Block.BlockType.BOMB) {
 						count += activateBombBlock( new int[] { i, k } );
+					} else if (grid[i].blocks[k].type == Block.BlockType.STAR) {
+						count += activateStarBlock(new int[] {i, k }, true);
 					} else if (grid[i].blocks[k].type == Block.BlockType.ROCK) { // ignore rock blocks
 						continue;
 					} else if (grid[i].blocks[k].type == Block.BlockType.WEDGE) { // ignore wedge blocks

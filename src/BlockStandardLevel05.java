@@ -63,32 +63,4 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 		// remember to decrease blocksRemaining for each such block added 
 		
 	}
-	
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-
-		return b;		
-	}
-
-	@Override
-	protected void processActivate() {
-		// TODO: score base value calculation is to be done within each case statement
-		// [CUSTOM] add case statements for each type of block that can be activated in the level
-		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
-			case BLOCK:
-				counter = checkGrid(cursorGridPos);
-				int adj = (int)Math.pow(counter - 1, 2);
-				updateScore(adj);
-				addEnergy(adj);
-				break;
-			default: // block does not activate, do nothing
-				break;
-		}
-		
-	}
-
-
 }

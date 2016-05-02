@@ -378,12 +378,6 @@ public class BlockStandardLevelBuilder extends BlockStandardLevel {
 		}
 		this.blocksRemaining = grid.length * grid[0].blocks.length;
 	}
-	
-	@Override
-	protected Block getQueueBlock() {
-		return null;		
-	}
-	
 }
 
 

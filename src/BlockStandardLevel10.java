@@ -63,13 +63,4 @@ public class BlockStandardLevel10 extends BlockStandardLevel {
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
 	}
-
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
-
-		return b;		
-	}
 }

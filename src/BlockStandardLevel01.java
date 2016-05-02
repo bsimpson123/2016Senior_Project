@@ -83,14 +83,4 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 		//grid[4].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
 		//grid[16].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
 	}
-
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(2));
-
-		return b;		
-	}
-
 }
