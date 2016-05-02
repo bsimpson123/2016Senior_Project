@@ -1,13 +1,8 @@
 import java.util.HashMap;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 import org.newdawn.slick.opengl.Texture;
 
 public class BlockStandardLevelex3 extends BlockStandardLevel {
-	private boolean specialActive = false;
-	private  BufferedReader infile;
 	
 	public BlockStandardLevelex3(HashMap<String,Texture> rootTexMap) {
 		
