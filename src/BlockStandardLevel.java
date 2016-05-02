@@ -997,6 +997,7 @@ public abstract class BlockStandardLevel {
 						blockCounts[cid]--;
 						if (blockCounts[cid] == 0 && totalColors > minColors) {
 							totalColors--;
+							removeFromQueue(cid, Block.BlockType.STAR);
 							allowedColors = allowedColors ^ (1 << cid);
 						}
 					}
@@ -1274,6 +1275,14 @@ public abstract class BlockStandardLevel {
 		}
 	}
 	
+	protected void removeFromQueue(int color, Block.BlockType replaceType) {
+		for (int i = 0; i < queue.length; i++) {
+			if (queue[i] != null && queue[i].type == Block.BlockType.BLOCK && queue[i].colorID == color) {
+				queue[i] = new Block(replaceType);
+			}
+		}
+	}
+
 	
 	/**
 	 * @author John
