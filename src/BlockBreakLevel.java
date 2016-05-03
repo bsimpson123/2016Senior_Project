@@ -5,8 +5,12 @@ import java.util.HashMap;
 
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.Color;
+import org.newdawn.slick.openal.Audio;
 
 public class BlockBreakLevel {
+	private static GameSounds soundbank;
+	private static Audio blockfall;
+	
 	protected static Sprite[] numbers = new Sprite[10];
 	//private static Sprite pauseCursor;
 	protected static Sprite cursor;
@@ -33,8 +37,11 @@ public class BlockBreakLevel {
 	protected GridColumn[] grid;
 	protected int[] gridBasePos;
 	protected int[] blockSize = new int[] { 32, 32 };
+	/** Defines which direction the grid columns should shift where there is space between them.<br>
+	 * 1 => right-shift, -1 => left-shift, 0 => do not shift grid columns */
 	private int gridShiftDir = 1;
-	private long gridShiftActionDelayTimer = 1000;
+	/** The amount of time the player must wait between each switch of the grid direction. */
+	private final long gridShiftActionDelayTimer = 1000;
 	private long gridShiftActionDelay = gridShiftActionDelayTimer;
 	protected int blocksRemaining = 0;
 	protected int[] wedgePos = new int[] { -1, -1 };
@@ -45,16 +52,20 @@ public class BlockBreakLevel {
 	
 	// grid queue variables
 	private Block[] queue;
+	/** Time delay between each 'step' for the queue, lower values will cause the queue to advance quicker */
 	private long queueStepDelayTimer = 500;
 	private long queueStepDelay = queueStepDelayTimer;
+	/** The number of 'empty' steps to take before adding a block to the queue. */
 	private int queueStepReq = 4;
 	private int queueStepCount = 0;
 	private int queueCount = 0;
+	/** The number of blocks that should be in the queue before forcibly adding to the grid */
 	private int queueLimit = 5;
-	private final long queueManualShiftDelayTimer = 250;
+	private final long queueManualShiftDelayTimer = 200;
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
-	protected boolean queueDisabled;
+	/** If <code>true</code>, no queue processing will be done. */
+	protected boolean queueDisabled = false;
 	
 	private boolean heartSpecialActive = false;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
@@ -148,12 +159,17 @@ public class BlockBreakLevel {
 				new int[] { 1024, 768 },
 				new int[] { Global.glEnvWidth, Global.glEnvHeight }
 			);
+		
+		
+		
+		
 	}
 	
 	
 	public BlockBreakLevel(int levelSelect) { 
 		level = levelSelect;
 		buildGrid(level);
+		levelTitle = String.format("Level %02d", level);
 	} 
 	
 	private GridColumn[] buildGrid(String source) {
@@ -162,14 +178,31 @@ public class BlockBreakLevel {
 	
 	
 	protected void buildGrid(int levelSelect) {
+		// set the energy amount for the level
 		energy = energyMax = 200000;
 		levelMultiplier = 1.0f;
 		energyGainMultiplier = 1.0f;
 		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		// time between each 'step' for the queue, lower values will cause the queue to advance quicker
+		queueStepDelayTimer = 500;
+		queueStepDelay = queueStepDelayTimer;
+		// the number of 'empty' steps to take before adding a block to the queue
+		queueStepReq = 4;
+		// the number of blocks that should be in the queue before forcibly adding to the grid
+		queueLimit = 5;
+		// disable the queue. no queue processing will be done if set to true
+		queueDisabled = false;
 
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 
+		
+		Block b = null;
+		int r, rx, ry;
 		// TODO: finish all level grid builds
+		/* The switch/case statements below are for building the level-dependent grids.
+		 * Variables for blocks remaining, wedge positioning, allowed block color generation, etc.,
+		 * are calculated by setGridCounts() after the grid is built.
+		 */
 		switch (levelSelect) {
 			case 1:
 				grid = new GridColumn[20];
@@ -183,8 +216,89 @@ public class BlockBreakLevel {
 					}
 				}
 				break;
+			case 2:
+				// 3 colors and many bombs
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
+						r = Global.rand.nextInt(256);
+						if (r > 16) { 
+							b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
+						} else {
+							b = new Block(Block.BlockType.BOMB, Global.rand.nextInt(3) + 2);
+						}
+						grid[i].blocks[k] = b;
+					}
+				}
+				break;
+			case 3:
+				// 3 colors, no bombs
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
+					}
+				}
+				break;
+			case 4:
+				// 3 colors (2 new)
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 2);
+					}
+				}
+				break;
 			case 5:
 				grid = GridColumn.loadFromFile("media/sp2.csv");
+				break;
+			case 6:
+				// 3 colors, first show of the wedge block, with heart block
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
+					}
+				}
+				grid[Global.rand.nextInt(grid.length)].blocks[Global.rand.nextInt(grid[0].blocks.length)] = new Block(Block.BlockType.HEART);
+				rx = Global.rand.nextInt(10) + 5;
+				ry = Global.rand.nextInt(4) + 8;
+				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
+				break;
+			case 7:
+				// 3 colors, wedge, no starter heart block
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						// TODO: [CUSTOM] define the randomly generated blocks rate of appearance 
+						b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
+						grid[i].blocks[k] = b;
+					}
+				}
+				rx = Global.rand.nextInt(10) + 5;
+				ry = Global.rand.nextInt(4) + 8;
+				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
+				break;
+			case 8:
+				// 3 colors (last 3), wedge
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						// TODO: [CUSTOM] define the randomly generated blocks rate of appearance 
+						b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 3);
+						grid[i].blocks[k] = b;
+					}
+				}
+				rx = Global.rand.nextInt(10) + 5;
+				ry = Global.rand.nextInt(4) + 8;
+				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				break;
 			case 10:
 				grid = GridColumn.loadFromFile("media/sp9.csv");
@@ -298,6 +412,7 @@ public class BlockBreakLevel {
 		grid[xc].blocks[yc].checked = true;
 		
 		if (grid[xc].blocks[yc].dropDistance != 0) { return 0; }
+		if (grid[xc].columnOffset != 0) { return 0; }
 		if (grid[xc].blocks[yc].colorID != colorID) { return 0; }
 		if (grid[xc].blocks[yc].type != Block.BlockType.BLOCK) { return 0; }
 		
@@ -708,16 +823,16 @@ public class BlockBreakLevel {
 				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
 					// TODO: add activation call for star blocks found sharing an edge
 					if (grid[x].blocks[y].clearMark) { continue; } // block has already been processed
-					if (x + 1 < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+					if (x + 1 < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
-					if (x > 0 && grid[x-1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+					if (x > 0 && grid[x-1].blocks[y] != null && grid[x-1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
 					if (y + 1 < grid[0].blocks.length && grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else
-					if (y > 0 && grid[x].blocks[y-1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+					if (y > 0 && grid[x].blocks[y-1] != null && grid[x].blocks[y-1].type == Block.BlockType.STAR) {
 						clears += activateStarBlock(new int[] { x, y }, true);
 					}
 				}
@@ -779,7 +894,7 @@ public class BlockBreakLevel {
 					count += activateBombBlock(new int[] { xx, yy });
 					continue;
 				}
-				// no exception check for wedge blocks. star blocks can remove wedge blocks, though bomb block cannot
+				// no exception check for wedge blocks. star blocks can remove wedge blocks, though bombs cannot
 				grid[xx].blocks[yy].clearMark = true;
 				count++;
 			}
@@ -1208,6 +1323,7 @@ public class BlockBreakLevel {
 	 * @author John
 	 */
 	protected void drawQueue() {
+		if (queueDisabled) { return; }
 		int[] anchorPos = new int[] { 20, 40 };
 		int offset = 0;
 		for (int i = 0; i < queue.length; i++) {

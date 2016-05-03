@@ -352,6 +352,7 @@ public class BlockStandardLevelBuilder extends BlockBreakLevel {
 	
 	@Override	
 	protected void buildGrid(int wudfnlisduhfiu) {
+		grid = new GridColumn[20];
 		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new GridColumn(20);
 			for (int k = 0; k < grid[0].blocks.length; k++) {

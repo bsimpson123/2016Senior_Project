@@ -322,7 +322,6 @@ public class BlockBreakStandard implements GameMode {
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorPos--;
 				Global.sounds.playSoundEffect("button_click");
-				
 				if (cursorPos < 0) {
 					
 					cursorPos = 3;
@@ -340,11 +339,6 @@ public class BlockBreakStandard implements GameMode {
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
 				cursorPos = 3;
-					//BlockStandardLevel.gamePaused = false;
-				
-			}
-			if (Global.getControlActive(Global.GameControl.PAUSE)) {
-				//BlockStandardLevel.gamePaused = true;
 			}
 			if (cursorPos == 1) { // practice selected, not confirmed
 				inputPracMenu();
@@ -386,76 +380,7 @@ public class BlockBreakStandard implements GameMode {
 	}
 	
 	private void loadLevel(int levelID) {
-		/*switch (levelID) {
-			case 1:
-				//playLevel = new BlockStandardLevelex3(localTexMap);//BlockStandardLevel01(localTexMap);
-				playLevel = new BlockStandardLevel01(localTexMap);
-				break;
-			case 2:
-				playLevel = new BlockStandardLevel02(localTexMap);
-				break;
-			case 3:
-				playLevel = new BlockStandardLevel03(localTexMap);
-				break;
-			case 4:
-				playLevel = new BlockStandardLevel04(localTexMap);
-				break;
-			case 5:
-				playLevel = new BlockStandardLevel05(localTexMap);
-				break;
-			case 6:
-				playLevel = new BlockStandardLevel06(localTexMap);
-				break;
-			case 7:
-				playLevel = new BlockStandardLevel07(localTexMap);
-				break;
-			case 8:
-				playLevel = new BlockStandardLevel08(localTexMap);
-				break;
-			case 9:
-				playLevel = new BlockStandardLevel09(localTexMap);
-				break;
-			case 10: 
-				playLevel = new BlockStandardLevel10(localTexMap);
-				break;
-			case 11:
-				playLevel = new BlockStandardLevel11(localTexMap);
-				break;
-			case 12:
-				playLevel = new BlockStandardLevel12(localTexMap);
-				break;
-			case 13:
-				playLevel = new BlockStandardLevel13(localTexMap);
-				break;
-			case 14:
-				playLevel = new BlockStandardLevel14(localTexMap);
-				break;
-			case 15:
-				playLevel = new BlockStandardLevel15(localTexMap);
-				break;
-			case 16:
-				playLevel = new BlockStandardLevel16(localTexMap);
-				break;
-			case 17:
-				playLevel = new BlockStandardLevel17(localTexMap);
-				break;
-			case 18:
-				playLevel = new BlockStandardLevel18(localTexMap);
-				break;
-			case 19:
-				playLevel = new BlockStandardLevel19(localTexMap);
-				break;
-			case 20:
-				playLevel = new BlockStandardLevel20(localTexMap);
-				break;
-			default:
-				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
-				return ;
-		} //*/
-		
-		//playLevel.level = levelID;
 		playLevel = new BlockBreakLevel(levelID);
-		playLevel.levelTitle = String.format("Level %02d", playLevel.level);
 	}
 		
 	private void inputPracMenu() {
