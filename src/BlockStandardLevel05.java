@@ -9,8 +9,6 @@ import org.newdawn.slick.opengl.Texture;
  * @author John
  */
 public class BlockStandardLevel05 extends BlockStandardLevel {
-	private  BufferedReader infile;
-	
 	public BlockStandardLevel05(HashMap<String,Texture> rootTexMap) {
 		
 		// TODO: [CUSTOM] set background and user interface sprites

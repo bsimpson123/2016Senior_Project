@@ -24,7 +24,7 @@ public class BlockBreakStandard implements GameMode {
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected int cursorPos = 0;
 	//protected long inputDelay = Global.inputReadDelayTimer;
-	private BlockStandardLevel playLevel;
+	private BlockBreakLevel playLevel;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
 	protected int[] blockOffSet = new int[] { 32, 32 };
@@ -128,8 +128,10 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 1425, 768 },
 				new int[] { 1425, 600 }
 				);
+		BlockBreakLevel.buildStaticAssets(localTexMap);
 		
 		
+		/*
 		//author: Mario
 		BlockStandardLevel.nLevel = new Sprite(
 				localTexMap.get("nLevel"),
@@ -168,7 +170,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 512, 32 },
 				new int[] { 640, 32 }
 			);
-		BlockStandardLevel.energyBar = localTexMap.get("energybar");
+		BlockStandardLevel.energyBar = localTexMap.get("energybar");//*/
 		int offset = 0;
 		for (int i = 0; i < BlockStandardLevel.numbers.length; i++) {
 			offset = i * 24 - 1;
@@ -397,7 +399,7 @@ public class BlockBreakStandard implements GameMode {
 				switch (cursorPos) {
 					case 0: // normal mode
 						if (Global.getControlActive(Global.GameControl.LEFT)) {
-							playLevel = new BlockStandardLevelBuilder(localTexMap);
+							playLevel = new BlockStandardLevelBuilder(-1);
 							playLevel.levelTitle = "Build Mode";
 						} else {
 							loadLevel(1);
@@ -430,7 +432,7 @@ public class BlockBreakStandard implements GameMode {
 	}
 	
 	private void loadLevel(int levelID) {
-		switch (levelID) {
+		/*switch (levelID) {
 			case 1:
 				//playLevel = new BlockStandardLevelex3(localTexMap);//BlockStandardLevel01(localTexMap);
 				playLevel = new BlockStandardLevel01(localTexMap);
@@ -495,8 +497,10 @@ public class BlockBreakStandard implements GameMode {
 			default:
 				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
 				return ;
-		}
-		playLevel.level = levelID;
+		} //*/
+		
+		//playLevel.level = levelID;
+		playLevel = new BlockBreakLevel(levelID);
 		playLevel.levelTitle = String.format("Level %02d", playLevel.level);
 	}
 		
