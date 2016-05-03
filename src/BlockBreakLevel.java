@@ -160,6 +160,7 @@ public class BlockBreakLevel {
 		return GridColumn.loadFromFile(source);
 	}
 	
+	
 	protected void buildGrid(int levelSelect) {
 		energy = energyMax = 200000;
 		levelMultiplier = 1.0f;
@@ -168,6 +169,7 @@ public class BlockBreakLevel {
 
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 
+		// TODO: finish all level grid builds
 		switch (levelSelect) {
 			case 1:
 				grid = new GridColumn[20];
@@ -181,7 +183,18 @@ public class BlockBreakLevel {
 					}
 				}
 				break;
-				
+			case 5:
+				grid = GridColumn.loadFromFile("media/sp2.csv");
+				break;
+			case 10:
+				grid = GridColumn.loadFromFile("media/sp9.csv");
+				break;
+			case 15:
+				grid = GridColumn.loadFromFile("media/sp7.csv");
+				break;
+			case 20:
+				grid = GridColumn.loadFromFile("media/sp4.csv");
+				break;
 			default:
 				return;
 		}
