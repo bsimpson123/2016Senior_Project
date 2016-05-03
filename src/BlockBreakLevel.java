@@ -93,8 +93,6 @@ public class BlockBreakLevel {
 	private int totalColors = 0;
 	protected int minColors = 2;
 
-	// TODO: end variable declarations
-	
 	public static void buildStaticAssets(HashMap<String,Texture> localTexMap) {
 		overlay = new Sprite(
 				Global.textureMap.get("overlay"),

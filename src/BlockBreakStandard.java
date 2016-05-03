@@ -128,49 +128,9 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 1425, 768 },
 				new int[] { 1425, 600 }
 				);
+		
 		BlockBreakLevel.buildStaticAssets(localTexMap);
 		
-		
-		/*
-		//author: Mario
-		BlockStandardLevel.nLevel = new Sprite(
-				localTexMap.get("nLevel"),
-				new int[] { 0, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		// author: John
-		BlockStandardLevel.overlay = new Sprite(
-				Global.textureMap.get("overlay"),
-				new int[] { 0, 0 },
-				new int[] { 1024, 768 },
-				new int[] { 1024, 768 }
-			);		
-		BlockStandardLevel.cursor = new Sprite(
-				Global.textureMap.get("blocksheet"),
-				new int[] { 240, 0 },
-				new int[] { 32, 32 },
-				blockOffSet
-			);
-		BlockStandardLevel.shiftLR[0] = new Sprite( // left indicator
-				localTexMap.get("white_ui_controls"),
-				new int[] { 300, 600 },
-				new int[] { 100, 100 },
-				new int[] { 100, 100 }
-			);
-		BlockStandardLevel.shiftLR[1] = new Sprite( // right indicator
-				localTexMap.get("white_ui_controls"),
-				new int[] { 200, 300 },
-				new int[] { 100, 100 },
-				new int[] { 100, 100 }
-			);
-		BlockStandardLevel.emptyEnergy = new Sprite(
-				localTexMap.get("energy_empty"),
-				new int[] { 0, 0 },
-				new int[] { 512, 32 },
-				new int[] { 640, 32 }
-			);
-		BlockStandardLevel.energyBar = localTexMap.get("energybar");//*/
 		int offset = 0;
 		for (int i = 0; i < BlockStandardLevel.numbers.length; i++) {
 			offset = i * 24 - 1;
@@ -217,8 +177,6 @@ public class BlockBreakStandard implements GameMode {
 	@Override
 	public void run() {
 		currentState = LoadState.READY;
-		//movementInputDelay = Global.inputReadDelayTimer;
-
 		
 		if (playLevel != null) {
 			if (!playLevel.levelFinished) {
@@ -228,7 +186,6 @@ public class BlockBreakStandard implements GameMode {
 			} else {
 				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
-					// TODO: selectPractice = false;
 					movementInputDelay = Global.inputReadDelayTimer;
 					if (!playLevel.practice) {
 						for (int i = 9; i >= 0; i--) {
@@ -244,15 +201,12 @@ public class BlockBreakStandard implements GameMode {
 					lastLevel = playLevel.level;
 					playLevel = null;
 				} else {
-					// load next level
-					// TODO: add test for at last level and return to menu
 					loadLevel(playLevel.level + 1);
 				}
 			}
 		} else if (showHighScore) {
 			showHighScores();
 			if (newHighScore) {
-				// TODO: get high score user data
 				if (!preClearComplete) {
 					int c = Keyboard.getNumKeyboardEvents();
 					if (c > 0) {
