@@ -340,7 +340,7 @@ public class BlockBreakLevel {
 		setGridCounts();
 	}
 	
-	public final void run() {
+	public void run() {
 		// decrement input delay variables
 		actionDelay -= Global.delta;
 		inputDelay -= Global.delta;
