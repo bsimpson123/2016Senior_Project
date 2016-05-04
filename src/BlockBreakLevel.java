@@ -8,6 +8,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.openal.Audio;
 
 public class BlockBreakLevel {
+
 	private static GameSounds soundbank;
 	private static Audio blockfall;
 	
@@ -103,6 +104,8 @@ public class BlockBreakLevel {
 	private int allowedColors = 0;
 	private int totalColors = 0;
 	protected int minColors = 2;
+	private int heartGenChance = 20;
+	private int bombGenChance = 20;
 
 	public static void buildStaticAssets(HashMap<String,Texture> localTexMap) {
 		overlay = new Sprite(
@@ -160,7 +163,9 @@ public class BlockBreakLevel {
 				new int[] { Global.glEnvWidth, Global.glEnvHeight }
 			);
 		
-		
+		String[] soundList = new String[] {
+				
+		};
 		
 		
 	}
@@ -222,7 +227,6 @@ public class BlockBreakLevel {
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
 						r = Global.rand.nextInt(256);
 						if (r > 16) { 
 							b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
@@ -276,7 +280,6 @@ public class BlockBreakLevel {
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						// TODO: [CUSTOM] define the randomly generated blocks rate of appearance 
 						b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 						grid[i].blocks[k] = b;
 					}
@@ -291,17 +294,35 @@ public class BlockBreakLevel {
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						// TODO: [CUSTOM] define the randomly generated blocks rate of appearance 
-						b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 3);
-						grid[i].blocks[k] = b;
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 3);
 					}
 				}
 				rx = Global.rand.nextInt(10) + 5;
 				ry = Global.rand.nextInt(4) + 8;
 				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				break;
+			case 9:
+				// 4 colors, no wedge
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(4) + 1);
+					}
+				}
+				break;
 			case 10:
 				grid = GridColumn.loadFromFile("media/sp9.csv");
+				break;
+			case 11:
+				
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						
+					}
+				}
 				break;
 			case 15:
 				grid = GridColumn.loadFromFile("media/sp7.csv");
@@ -1152,9 +1173,11 @@ public class BlockBreakLevel {
 	private Block getQueueBlock() {
 		Block b = null;
 		int r;
-		r = Global.rand.nextInt(100000);
-		if (r < 50) { // 0.5% chance for heart block
+		r = Global.rand.nextInt(10000);
+		if (r < heartGenChance) {
 			b = new Block(Block.BlockType.HEART);
+		} else if (r < (heartGenChance + bombGenChance)) {
+			b = new Block(Block.BlockType.BOMB, Global.rand.nextInt(4)); // 75% chance for size 2 bomb, 25% size 3
 		} else {
 			int[] list = new int[Block.blockColorCount];
 			int bsc, count = 0;

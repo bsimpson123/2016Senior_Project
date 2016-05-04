@@ -49,7 +49,7 @@ public class Block implements Cloneable {
 			colorID = 0; 
 		} else if ( (colorID < 2 || colorID > 9) && type == BlockType.BOMB ) {
 			colorID = 2; // default,minimum bomb radius, used if set value is out of range
-		} else {
+		} else { // colorID may hold state or data information for other block types
 			this.colorID = colorID;
 		}
 		setSprite();
