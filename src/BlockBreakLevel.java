@@ -1175,7 +1175,6 @@ public class BlockBreakLevel {
 	 */
 	protected int processActivate() {
 		int counter = 0;
-		// TODO: score base value calculation is to be done within each case statement
 		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
 			case BLOCK:
 				counter = checkGrid(cursorGridPos);
