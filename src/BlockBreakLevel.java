@@ -8,7 +8,6 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.openal.Audio;
 
 public class BlockBreakLevel {
-
 	private static GameSounds soundbank;
 	private static Audio blockfall;
 	
@@ -33,6 +32,7 @@ public class BlockBreakLevel {
 	protected int energy = energyMax;
 	private int energyDisplay = energyMax;
 	protected float energyGainMultiplier = 1.0f;
+	protected boolean disableEnergy = false;
 	
 	// grid variables
 	protected GridColumn[] grid;
@@ -192,6 +192,8 @@ public class BlockBreakLevel {
 		queueLimit = 5;
 		// disable the queue. no queue processing will be done if set to true
 		queueDisabled = false;
+		// disable energy use. the bar will not show and energy will not decrease during gameplay
+		disableEnergy = false;
 
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 
@@ -351,7 +353,7 @@ public class BlockBreakLevel {
 				energy = 0;
 				inputDelay = Global.inputReadDelayTimer;
 			}
-		} else if (energy == 0 && !gameOver) {
+		} else if (energy == 0 && !gameOver && !disableEnergy) {
 			// game over
 			gameOver = true;
 			pauseCursorPos = 0;
@@ -361,14 +363,14 @@ public class BlockBreakLevel {
 			// process active gameplay
 			queueManualShiftDelay -= Global.delta;
 			gridShiftActionDelay -= Global.delta;
-			energy -= Global.delta;
+			if (!disableEnergy) { 
+				energy -= Global.delta; 
+				if (energy < 0) { energy = 0; }
+				else if (energy > energyMax) { energy = energyMax; }
+			}
 			processQueue();
-			if (energy < 0) { energy = 0; }
-			else if (energy > energyMax) { energy = energyMax; }
-			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			processGridBlocks(grid);
 			drawGrid(grid);
-			
 			drawCursor();
 
 			// check if heart special control is active and handle accordingly
@@ -540,9 +542,7 @@ public class BlockBreakLevel {
 		if (levelComplete) {
 			//drawGrid();
 			overlay.draw(0, 0);
-			//nLevel.draw(200, 200);
 			levelFinishedControls();
-			//pauseMenuFrame.draw(412,250); //180 250
 			Global.uiBlue.draw(387, 250, 250, 250);
 			Global.menuButtonShader.bind();
 			Global.uiTransWhite.draw(417, 312, 190, 48);
@@ -555,25 +555,6 @@ public class BlockBreakLevel {
 				Global.drawFont24(512, 320, "Next Level", Color.black, true);
 				Global.drawFont24(512, 380, "Quit", Color.white, true);
 			}
-				
-			
-			/* if (pauseCursorPos == 0) {
-				//pauseBox.draw(457, 372);
-				//hoverBox.draw(210, 310);
-				pauseBox.draw(457, 312);
-				Global.drawFont24(488, 312, "Next Level", Color.white);
-				Global.drawFont24(512, 372, "Quit", Color.black);
-			} else if (pauseCursorPos == 1) {
-				//hoverBox.draw(210, 370);
-				pauseBox.draw(457, 372);
-				pauseBox.draw(457, 312);
-				Global.drawFont24(512, 372, "Quit", Color.white);
-				Global.drawFont24(488, 312, "Next Level", Color.black);
-			} //*/
-			//if (actionDelay < 0 && Global.getControlActive(Global.GameControl.SELECT)) {
-			//	levelFinished = true;
-			//}
-			// placeholder for level advancement
 		} else if (gamePaused) {
 			/** @author Brock */
 			pauseControls();
@@ -591,27 +572,6 @@ public class BlockBreakLevel {
 				Global.drawFont24(512, 320, "Resume", Color.black, true);
 				Global.drawFont24(512, 380, "Quit", Color.white, true);
 			}
-
-			
-			/*pauseMenuFrame.draw(180, 250);
-			for (int i = 0; i < pauseOptions.length; i++) {
-				pauseOptionSize[i] = Global.getFont24DrawSize(pauseOptions[i]) / 2;
-			}
-			for (int i = 0; i < pauseOptions.length; i++ ) {
-				
-				if (pauseCursorPos == i) {
-					hoverBox.draw(210, 310 + i * 70);
-					pauseBox.draw(215, 312 + i * 70);	
-				} else {
-					pauseBox.draw(215, 312 + i * 70);
-				}
-					
-				if (pauseCursorPos == i) {
-					Global.drawFont24(305 - pauseOptionSize[i], 319 + i * 70, pauseOptions[i], Color.white);
-				} else {
-					Global.drawFont24(305 - pauseOptionSize[i], 319 + i * 70, pauseOptions[i], Color.black);
-				}
-			} //*/
 		} else if (gameOver) {
 			drawGrid(grid);
 			showGameOver();
@@ -1063,7 +1023,6 @@ public class BlockBreakLevel {
 				gridShiftActionDelay = gridShiftActionDelayTimer;
 				blocksMoving = true;
 				gridShiftDir *= -1;
-				System.out.printf("energy/energyMax: %d/%d\n", energy, energyMax);
 			}
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorGridPos[1]++;
@@ -1356,6 +1315,7 @@ public class BlockBreakLevel {
 	 * @author Mario
 	 */
 	protected void drawEnergy() {
+		if (disableEnergy) { return; }
 		float percent;
 		emptyEnergy.draw(20, 740);
 		energyBar.bind();
