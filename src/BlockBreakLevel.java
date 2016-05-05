@@ -177,11 +177,6 @@ public class BlockBreakLevel {
 		levelTitle = String.format("Level %02d", level);
 	} 
 	
-	private GridColumn[] buildGrid(String source) {
-		return GridColumn.loadFromFile(source);
-	}
-	
-	
 	protected void buildGrid(int levelSelect) {
 		// set the energy amount for the level
 		energy = energyMax = 200000;
@@ -366,9 +361,10 @@ public class BlockBreakLevel {
 			// process active gameplay
 			queueManualShiftDelay -= Global.delta;
 			gridShiftActionDelay -= Global.delta;
+			energy -= Global.delta;
 			processQueue();
 			if (energy < 0) { energy = 0; }
-			if (energy > energyMax) { energy = energyMax; }
+			else if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			processGridBlocks(grid);
 			drawGrid(grid);
@@ -385,8 +381,6 @@ public class BlockBreakLevel {
 					updateScore(counter);
 					addEnergy(counter);
 					removeMarkedBlocks();
-					//dropBlocks();
-					//shiftGridColumns();
 					heartSpecialActive = false;
 					clearColor = false;
 
@@ -1069,6 +1063,7 @@ public class BlockBreakLevel {
 				gridShiftActionDelay = gridShiftActionDelayTimer;
 				blocksMoving = true;
 				gridShiftDir *= -1;
+				System.out.printf("energy/energyMax: %d/%d\n", energy, energyMax);
 			}
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorGridPos[1]++;
