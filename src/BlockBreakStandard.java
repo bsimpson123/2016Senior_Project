@@ -352,7 +352,7 @@ public class BlockBreakStandard implements GameMode {
 						} else {
 							loadLevel(1);
 						}
-						BlockStandardLevel.score = 0;
+						BlockBreakLevel.score = 0;
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode

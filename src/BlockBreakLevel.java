@@ -170,7 +170,6 @@ public class BlockBreakLevel {
 		
 	}
 	
-	
 	public BlockBreakLevel(int levelSelect) { 
 		level = levelSelect;
 		buildGrid(level);
@@ -491,7 +490,7 @@ public class BlockBreakLevel {
 	/**
 	 * @author John 
 	 */
-	private Sprite getNumber(char c) {
+	protected Sprite getNumber(char c) {
 		switch (c) {
 			case '0':
 				return numbers[0];
@@ -578,7 +577,7 @@ public class BlockBreakLevel {
 		}
 	}
 	
-	private void showGameOver() {
+	protected void showGameOver() {
 		overlay.draw(0, 0);
 		gameOverControls();
 		
@@ -847,7 +846,7 @@ public class BlockBreakLevel {
 		drawQueue();
 	}
 
-	private int activateStarBlock(int[] pos, boolean eventActivation) {
+	protected int activateStarBlock(int[] pos, boolean eventActivation) {
 		if (grid[pos[0]].blocks[pos[1]] == null) { return 0; }
 		if (!eventActivation && pos[1] > 0) { return 0; } // manual activation requires the star to be at the bottom row
 		int count = 1;
