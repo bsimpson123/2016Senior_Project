@@ -803,7 +803,7 @@ public class BlockBreakLevel {
 					if (x > 0 && grid[x-1].blocks[y] != null && grid[x-1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
-					if (y + 1 < grid[0].blocks.length && grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+					if (y + 1 < grid[x].blocks.length && grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else
 					if (y > 0 && grid[x].blocks[y-1] != null && grid[x].blocks[y-1].type == Block.BlockType.STAR) {
@@ -1271,6 +1271,7 @@ public class BlockBreakLevel {
 	 * @author John
 	 */
 	protected void removeFromQueue(int color) {
+		if (queueDisabled) { return; }
 		for (int i = 0; i < queue.length; i++) {
 			if (queue[i] != null && queue[i].type == Block.BlockType.BLOCK && queue[i].colorID == color) {
 				queue[i] = null;
@@ -1286,6 +1287,7 @@ public class BlockBreakLevel {
 	 * @param replaceType
 	 */
 	protected void removeFromQueue(int color, Block.BlockType replaceType) {
+		if (queueDisabled) { return; }
 		for (int i = 0; i < queue.length; i++) {
 			if (queue[i] != null && queue[i].type == Block.BlockType.BLOCK && queue[i].colorID == color) {
 				queue[i] = new Block(replaceType);
