@@ -320,6 +320,9 @@ public class BlockBreakLevel {
 					}
 				}
 				break;
+			case 12:
+				grid = GridColumn.loadFromFile("level.2016-05-05.123604.dat");
+				break;
 			case 15:
 				grid = GridColumn.loadFromFile("media/sp7.csv");
 				break;
@@ -803,7 +806,7 @@ public class BlockBreakLevel {
 					if (x > 0 && grid[x-1].blocks[y] != null && grid[x-1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
-					if (y + 1 < grid[x].blocks.length && grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+					if (y + 1 < grid[x].blocks.length && grid[x].blocks[y+1] != null && grid[x].blocks[y+1].type == Block.BlockType.STAR) {
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else
 					if (y > 0 && grid[x].blocks[y-1] != null && grid[x].blocks[y-1].type == Block.BlockType.STAR) {
@@ -1054,7 +1057,9 @@ public class BlockBreakLevel {
 						Global.getControlActive(Global.GameControl.SELECT) &&
 						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
 					int counter = processActivate();
-					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
+					if (counter > 1 
+							|| grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB
+							|| grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.STAR ) {
 						// decrease the blocksRemaining counter after blocks are cleared
 						removeMarkedBlocks();
 					}
