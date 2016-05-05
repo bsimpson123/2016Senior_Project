@@ -132,9 +132,9 @@ public class BlockBreakStandard implements GameMode {
 		BlockBreakLevel.buildStaticAssets(localTexMap);
 		
 		int offset = 0;
-		for (int i = 0; i < BlockStandardLevel.numbers.length; i++) {
+		for (int i = 0; i < BlockBreakLevel.numbers.length; i++) {
 			offset = i * 24 - 1;
-			BlockStandardLevel.numbers[i] = new Sprite(
+			BlockBreakLevel.numbers[i] = new Sprite(
 					localTexMap.get("number_white"),
 					new int[] { offset, 0 },
 					new int[] { 24, 30 },
@@ -189,7 +189,7 @@ public class BlockBreakStandard implements GameMode {
 					movementInputDelay = Global.inputReadDelayTimer;
 					if (!playLevel.practice) {
 						for (int i = 9; i >= 0; i--) {
-							if (hsRecords.get(i).getScore() < BlockStandardLevel.score) {
+							if (hsRecords.get(i).getScore() < BlockBreakLevel.score) {
 								newHighScore = true;
 								showHighScore = true;
 								hsNameEntry = "";
@@ -221,7 +221,7 @@ public class BlockBreakStandard implements GameMode {
 						new HighScoreRecord(
 							hsNameEntry,
 							LocalDateTime.now(),
-							BlockStandardLevel.score,
+							BlockBreakLevel.score,
 							lastLevel
 						)
 					);
@@ -250,7 +250,7 @@ public class BlockBreakStandard implements GameMode {
 				Global.uiBlue.draw(256, 256, 512, 376);
 				Global.drawFont24(276, 276, "Level: " + Integer.toString(lastLevel), Color.white);
 				Global.drawFont24(276, 310, "Score:", Color.white);
-				Global.drawFont24(276, 334, Integer.toString(BlockStandardLevel.score), Color.white);
+				Global.drawFont24(276, 334, Integer.toString(BlockBreakLevel.score), Color.white);
 				Global.uiBlueSel.draw(276, 360, 472, 48);
 				Global.drawFont24(282, 386, hsNameEntry + '_', Color.black);
 				
@@ -360,7 +360,7 @@ public class BlockBreakStandard implements GameMode {
 						loadLevel(pracLevel);
 						playLevel.practice = true;
 						movementInputDelay = Global.inputReadDelayTimer;
-						BlockStandardLevel.score = 0;
+						BlockBreakLevel.score = 0;
 						//selectPractice = true;
 						break;
 					case 2: // high score
@@ -409,7 +409,7 @@ public class BlockBreakStandard implements GameMode {
 		
 		pracArrows[0].draw(pracOffset, 248);
 		pracBox.draw(pracOffset + 40, 250);
-		//BlockStandardLevel.numbers[pracLevel].draw(525, 255);
+		//BlockBreakLevel.numbers[pracLevel].draw(525, 255);
 		Global.drawNumbers24(pracOffset + 65 - numOffset, pracSelectDrop + 12, num, numCol);
 		pracArrows[1].draw(pracOffset + 80, 248);
 	}
