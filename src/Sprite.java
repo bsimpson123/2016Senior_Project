@@ -50,6 +50,15 @@ public class Sprite {
 		this.drawSpace = drawSize.clone();
 	}
 	
+	public Sprite(Texture tex) {
+		texture = tex;
+		width = 1.0f;
+		height = 1.0f;
+		top = 0.0f;
+		left = 0.0f;
+		drawSpace = new int[] { (int) texture.getWidth(), (int) texture.getHeight() };
+	}
+	
 	public void draw(int x, int y)  {
 		// store the current model matrix
 		glPushMatrix();
