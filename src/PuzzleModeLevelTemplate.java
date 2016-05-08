@@ -13,7 +13,9 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		/**
 		 * totalClears is the total number of clears the user is given for the level.
 		 */
+		remainClears = -1;
 		totalClears = 31;
+		//remainClears = totalClears = 31;
 		
 		/**
 		 * 1 = shift right
@@ -26,14 +28,16 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		 * 
 		 */
 		scoreMedal1 = 8000;
-		scoreMedal2 = 15000;
-		scoreMedal3 = 21000;
+		scoreMedal2 = 21000;
+		//scoreMedal3 = 21000;
 		
 		/**
 		 * boolean values for scoring system
 		 */
 		useScore = true;
 		useTime = true;
+		
+		standCond = true;
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime
@@ -76,6 +80,14 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 				energy = energyMax = 20000;	
 		
 		
+	}
+	
+	public PuzzleModeLevelTemplate() {
+		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+		grid = new GridColumn[gridSize[0]];
+		buildGrid();
+		gridBasePos = new int[] { 375 + 82, 700 };
 	}
 	
 	

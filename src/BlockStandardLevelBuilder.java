@@ -9,7 +9,7 @@ import org.newdawn.slick.Color;
  * Example level to demonstrate the flow and references need to build a level
  * @author John
  */
-public class BlockStandardLevelBuilder extends BlockStandardLevel {
+public class BlockStandardLevelBuilder extends BlockBreakLevel {
 	private Block[] list = new Block[12];
 	private Stack<GridColumn[]> undo = new Stack<GridColumn[]>();
 	private boolean fillToggle = false;
@@ -20,29 +20,10 @@ public class BlockStandardLevelBuilder extends BlockStandardLevel {
 	private final long fileDelayTimer = 5000l;
 	private long fileDelay = 0;
 	
-	public BlockStandardLevelBuilder(HashMap<String,Texture> rootTex) {
-		// set the score multiplier for the level when 
-		levelMultiplier = 1.5f;
-		// Set environment textures and variables
-		background = new Sprite(
-				rootTex.get("bg_space_1"),
-				new int[] { 0, 0 },
-				new int[] { 1024, 768 },
-				new int[] { Global.glEnvWidth, Global.glEnvHeight }
-			);
-		userInterface = new Sprite(
-				rootTex.get("ui_stdmode"),
-				new int[] { 0, 0 },
-				new int[] { 1024, 768 },
-				new int[] { Global.glEnvWidth, Global.glEnvHeight }
-			);
-		// this value can be { 16, 16 } or { 8, 8 } to reduce the size of the blocks
-		// but the grid size should be increased proportionately
-		blockSize = new int[] { 32, 32 };
-		gridSize = new int[] { 20, 20 };
-		grid = new GridColumn[gridSize[0]];
-		queue = new Block[gridSize[0]];
-		buildGrid();
+	public BlockStandardLevelBuilder(int level) {
+		super(-1);
+		grid = new GridColumn[20];
+		buildGrid(-1);
 		gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
 		// set the cursor starting position in the center of the grid
 		cursorGridPos[0] = grid.length / 2;
@@ -369,21 +350,17 @@ public class BlockStandardLevelBuilder extends BlockStandardLevel {
 		fillPoint2 = null;
 	}
 	
-	@Override	protected void buildGrid() {
+	@Override	
+	protected void buildGrid(int wudfnlisduhfiu) {
+		grid = new GridColumn[20];
 		for (int i = 0; i < grid.length; i++) {
-			grid[i] = new GridColumn(gridSize[1]);
+			grid[i] = new GridColumn(20);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Block.BLUE); 
 			}
 		}
-		this.blocksRemaining = grid.length * grid[0].blocks.length;
+		blocksRemaining = grid.length * grid[0].blocks.length;
 	}
-	
-	@Override
-	protected Block getQueueBlock() {
-		return null;		
-	}
-	
 }
 
 

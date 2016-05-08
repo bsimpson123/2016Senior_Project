@@ -7,7 +7,7 @@ import org.newdawn.slick.opengl.Texture;
  *
  */
 public class Sprite {
-	protected final float width, height, left, top;
+	private final float width, height, left, top;
 	protected final int[] drawSpace;
 	/** The texture containing the image used for the sprite */
 	protected final Texture texture;
@@ -80,10 +80,6 @@ public class Sprite {
 		glPopMatrix();
 	}
 
-	public int[] getDefinedSpace() {
-		return drawSpace.clone();
-	}
-	
 	public void draw(int xc, int yc, int[] size) {
 		glPushMatrix();
 		glMatrixMode(GL_MODELVIEW);

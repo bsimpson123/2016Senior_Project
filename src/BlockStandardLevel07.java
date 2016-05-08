@@ -79,13 +79,4 @@ public class BlockStandardLevel07 extends BlockStandardLevel {
 		blocksRemaining--;
 		wedgePos = new int[] { rx, ry };
 	}
-
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 1);
-
-		return b;		
-	}
 }

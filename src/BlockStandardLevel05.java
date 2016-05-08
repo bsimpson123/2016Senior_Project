@@ -9,8 +9,6 @@ import org.newdawn.slick.opengl.Texture;
  * @author John
  */
 public class BlockStandardLevel05 extends BlockStandardLevel {
-	private  BufferedReader infile;
-	
 	public BlockStandardLevel05(HashMap<String,Texture> rootTexMap) {
 		
 		// TODO: [CUSTOM] set background and user interface sprites
@@ -38,10 +36,10 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 		// TODO: [CUSTOM] set the block size and grid size
 		// valid block dimensions are { 16, 32, 64 }
 		// valid grid sizes (respective to block size) are { 40, 20, 10 }
-		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
-		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
 		// create the grid with x-dimension as specified above
 		grid = new GridColumn[gridSize[0]];
+		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		gridSize = new int[] { grid.length,  }; // default grid size is { 20, 20 }
 		queue = new Block[gridSize[0]];
 		// build the grid according the level difficulty
 		buildGrid();
@@ -63,32 +61,4 @@ public class BlockStandardLevel05 extends BlockStandardLevel {
 		// remember to decrease blocksRemaining for each such block added 
 		
 	}
-	
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-
-		return b;		
-	}
-
-	@Override
-	protected void processActivate() {
-		// TODO: score base value calculation is to be done within each case statement
-		// [CUSTOM] add case statements for each type of block that can be activated in the level
-		switch (grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type) {
-			case BLOCK:
-				counter = checkGrid(cursorGridPos);
-				int adj = (int)Math.pow(counter - 1, 2);
-				updateScore(adj);
-				addEnergy(adj);
-				break;
-			default: // block does not activate, do nothing
-				break;
-		}
-		
-	}
-
-
 }

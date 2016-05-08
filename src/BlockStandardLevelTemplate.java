@@ -36,12 +36,16 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// TODO: [CUSTOM] set the block size and grid size
 		// valid block dimensions are { 16, 32, 64 }
 		// valid grid sizes (respective to block size) are { 40, 20, 10 }
+		// do not set these values if loading a grid from file
 		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
 		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
 		// create the grid with x-dimension as specified above
 		grid = new GridColumn[gridSize[0]];
+
 		// build the grid according the level difficulty
 		buildGrid();
+		// if loading from a file, set these 
+		
 		// set the grid draw starting position derived from grid and block size
 		gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
 		// set the cursor starting position in the center of the grid
@@ -81,14 +85,5 @@ public class BlockStandardLevelTemplate extends BlockStandardLevel {
 		// remember to decrease blocksRemaining for each such block added 
 		
 		
-	}
-
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-
-		return b;		
 	}
 }

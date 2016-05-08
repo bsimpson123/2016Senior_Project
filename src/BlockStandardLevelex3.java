@@ -1,13 +1,8 @@
 import java.util.HashMap;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 import org.newdawn.slick.opengl.Texture;
 
 public class BlockStandardLevelex3 extends BlockStandardLevel {
-	private boolean specialActive = false;
-	private  BufferedReader infile;
 	
 	public BlockStandardLevelex3(HashMap<String,Texture> rootTexMap) {
 		
@@ -56,47 +51,10 @@ public class BlockStandardLevelex3 extends BlockStandardLevel {
 	@Override
 	protected void buildGrid() {
 		grid = GridColumn.loadFromFile("media/sp6.csv");
-		/*
-		try {
-			String parseline;
-			String[] parseCSV;
-			infile = new BufferedReader(new FileReader("media/sp6.csv"));
-			parseline = infile.readLine();
-			int x=0;
-			while (parseline!= null) {
-				parseCSV = parseline.split(",");
-				grid[x] = new GridColumn(gridSize[1]);
-				for (int i = 0; i < parseCSV.length; i++) {
-					
-					grid[x].blocks[i] = new Block(Block.BlockType.BLOCK, Integer.parseInt(parseCSV[i]));
-//change above line to account for starting at 0 or 1 in matrix  ... integer.parseInt(parseCV[i])-1);					
-				}
-				x++;
-				parseline = infile.readLine();
-			}
-			
-			infile.close();
-			//outfile.close();
-			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} //*/
-
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added 
 		
-	}
-	
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-
-		return b;		
 	}
 }

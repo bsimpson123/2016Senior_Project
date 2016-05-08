@@ -68,9 +68,9 @@ public abstract class PuzzleModeLevel {
 	protected int blocksRemaining = 0;
 	
 	protected static int totalClears = 0;
-	protected static int remainClears = totalClears;
+	protected static int remainClears = -1;//totalClears;
 	private static int movesDisplay = 0;
-	protected boolean resetMoves = true;
+	protected boolean resetMoves = false;
 	protected boolean noRemainClears = false;
 	
 	private boolean gamePaused = false;
@@ -323,11 +323,13 @@ public abstract class PuzzleModeLevel {
 		//drawTopLevelUI();
 		
 		//oldMedal = medals[level];
+
+		
 		/**
 		 * funtion for ending conditions
 		 */
-		//if (blocksMoving == false) {
-			if (blocksRemaining > 0 && remainClears > 0  && movesUpdateDelay == 0) {
+		//if (!gridMoving || !Global.waitForGridMovement) {
+			if (blocksRemaining > 0 && remainClears > 0) {
 				// If not out of clears but no moves left, then game over
 				int xMax = grid.length - 1;
 				int yMax = grid[0].blocks.length - 1;
@@ -343,11 +345,11 @@ public abstract class PuzzleModeLevel {
 					}				
 				}
 				//sumMoves = 0;
-				if ( sumMoves <= 1 ) {
+				if ( sumMoves <= 1  && movesUpdateDelay == 0 ) {
 					noMoves = true;
 					gameOver = true;
 					pauseCursorPos = 0;
-				} else if (sumMoves >= 2) {
+				} else if (sumMoves >= 2  && movesUpdateDelay == 0) {
 					sumMoves = 0;
 				}
 				
@@ -358,8 +360,8 @@ public abstract class PuzzleModeLevel {
 				//sumMoves = 0;
 	 
 	
-			//} 
-		}
+			} 
+	//	}
 
 		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0) {
 	        // game over with one block remaining
@@ -432,13 +434,18 @@ public abstract class PuzzleModeLevel {
 		// draw the grid and handle grid mechanics and input if the game is not paused
 		if (!gamePaused && !gameOver && !levelComplete) {
 			//processQueue();
+
 			energy -= Global.delta;
 			if (energy < 0) { energy = 0; }
 			if (energy > energyMax) { energy = energyMax; }
 			// draw the grid, return value indicates if there are blocks still falling from the last clear
 			processGridBlocks(grid);
 			this.drawGridRework(grid);
-			gridMoving = blocksMoving;//drawGrid(500);
+			gridMoving = blocksMoving;
+			//drawGrid(500);
+			//if (movesUpdateDelay == 0) {
+			
+			//}
 
 			// for cursor surrounding block
 			cursor.draw(
@@ -468,12 +475,13 @@ public abstract class PuzzleModeLevel {
 				}
 			} else { // no special circumstance, handle input normally
 				if (inputDelay <= 0l) {
+					//blocksMoving = false;
 					checkCommonControls();
 					// DEBUG: back out of the game to the main menu. not to be included in finished levels
 					if (Global.getControlActive(Global.GameControl.CANCEL)) {
 						levelFinished = true;
 						gameOver = true;
-						remainClears = totalClears;
+						//remainClears = -1;
 					}
 				}
 			}
@@ -555,7 +563,7 @@ public abstract class PuzzleModeLevel {
 			} else if (score > scoreMedal1 && score <= scoreMedal2) {
 				//medals[level] = 2;
 				levelMedal = 2;
-			} else if (score > scoreMedal2) {
+			} else if (score >= scoreMedal2) {
 				//medals[level] = 3;
 				levelMedal = 3;
 			}
@@ -586,8 +594,8 @@ public abstract class PuzzleModeLevel {
 	 */
 	protected void endingConditions() {
 		if (standCond) {
-			if (movesUpdateDelay == 0) {
-				if (blocksRemaining == 0 && remainClears > 0 ) {
+			//if (movesUpdateDelay == 0) {
+				if (blocksRemaining == 0 && remainClears > 0 && movesUpdateDelay == 0) {
 					levelComplete = true;
 					if (!endLevelDelayed) {
 						
@@ -609,7 +617,7 @@ public abstract class PuzzleModeLevel {
 					}
 					pauseCursorPos = 0;
 				} 
-				if (blocksRemaining > 0 && remainClears == 0) {
+				if (blocksRemaining > 0 && remainClears == 0 && movesUpdateDelay == 0) {
 					// game over
 					//if (blockDropDelay == 0) {
 						noRemainClears = true;
@@ -629,7 +637,7 @@ public abstract class PuzzleModeLevel {
 						pauseCursorPos = 0;
 					
 				}*/
-			}
+			//}
 		} else if (specCond) {
 
 			
@@ -673,7 +681,8 @@ public abstract class PuzzleModeLevel {
 			levelMedal = 0;
 			//energy = energyMax;
 			//score = score/2;
-			remainClears = totalClears;
+			remainClears = -1;
+			//remainClears = -1;
 			noMoves = false;
 			noRemainClears = false;
 			buildGrid();
@@ -819,15 +828,19 @@ public abstract class PuzzleModeLevel {
 	 * @author Brock
 	 */
 	protected void drawMovesRemain() {
+		//if (remainClears == -1) {
+		//	remainClears = totalClears;
+		//	movesDisplay = remainClears;
+		//}
 		if (remainClears >= 0) {
 			movesUpdateDelay -= Global.delta;
 			//inputDelay -= Global.delta;
 			//remainClears = 6;
-			if (resetMoves) {
-				remainClears = totalClears;
-				movesDisplay = remainClears;
-				resetMoves = false;
-			}
+			//if (resetMoves) {
+			//	remainClears = totalClears;
+			//	movesDisplay = remainClears;
+			//	resetMoves = false;
+			//}
 			if (movesUpdateDelay <= 0 && remainClears != movesDisplay) {
 				//if (movesDisplay < remainClears) {
 				//	movesChange = (remainClears - movesDisplay) >> 2;
@@ -852,7 +865,8 @@ public abstract class PuzzleModeLevel {
 			//movesUpdateDelay -= Global.delta;
 			//	inputDelay -= Global.delta;
 			//}
-		} else {
+		} 
+		else {
 			remainClears = totalClears;
 			movesDisplay = remainClears;
 		}
@@ -1373,6 +1387,7 @@ public abstract class PuzzleModeLevel {
 						
 					} else {
 						gc.blocks[y].dropDistance = 0;
+						//blocksMoving = false;
 					}
 					if (gc.blocks[y] != null) {
 						if (x != wedgePos[0] || y < wedgePos[1]) {
@@ -1671,7 +1686,7 @@ public abstract class PuzzleModeLevel {
 						gameOver = true;
 						levelFinished = true;
 						inputDelay = 4 * Global.inputReadDelayTimer;
-						remainClears = totalClears;
+						remainClears = -1;
 						break;
 				}
 				//inputDelay = Global.inputReadDelayTimer * 2;
@@ -1719,7 +1734,9 @@ public abstract class PuzzleModeLevel {
 						levelFinished = true;
 						gameOver = false;
 						score = 0;
-						resetMoves = true;
+						//resetMoves = true;
+						remainClears = -1;
+						//remainClears = totalClears;
 						inputDelay = 10 * Global.inputReadDelayTimer;	
 						break;
 	

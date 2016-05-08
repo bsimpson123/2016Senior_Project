@@ -64,33 +64,26 @@ public class BlockStandardLevel01 extends BlockStandardLevel {
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				//r = (int)Math.floor( Math.abs( 9.5 - k) + Math.abs(9.5 - i)); // Manhattan distance from center
-				//r = (int) Math.floor( Math.sqrt(Math.pow(9.5 - k, 2) + Math.pow(9.5 - i, 2)) ); // Euclidean distance from center
-				//r = Global.rand.nextInt(2);
+				
+				//r = Global.rand.nextInt(2); // normal level generation
 				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
-				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, (r % 2) ^ (r % 6));
-				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, 
-						//((i + k) % 5) ^ 5
-						(i % 4) | (k % 4)
-						//(r % 2) ^ (r % 6)
-					);
+
+				//r = (int) Math.floor( Math.abs( 9.5 - k) + Math.abs(9.5 - i)); // Manhattan distance from center (assumes 20x20 grid)
+				r = (int) Math.floor( Math.sqrt(Math.pow(9.5 - k, 2) + Math.pow(9.5 - i, 2)) ); // Euclidean distance from center (assumes 20x20 grid)
+				//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, );
+				grid[i].blocks[k] = new Block(Block.BlockType.BLOCK,
+						// algorithms for mathematical grid models
+						// ((i + k) % 5) ^ 5
+						// (i % 4) | (k % 4)
+						(i % 4) | (k % 3)
+						// (r % 2) ^ (r % 6) // r = Euclidean distance
+						// (r % 2) ^ (r % 6) // use either distance calculation
+					); //*/
 			}
 		}
 		// set the block count for the level
 		blocksRemaining = grid.length * grid[0].blocks.length;
 		// TODO: [CUSTOM] add any custom/special blocks that have limited generation (rocks, trash, wedge, etc.)
 		// remember to decrease blocksRemaining for each such block added
-		//grid[4].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
-		//grid[16].blocks[Global.rand.nextInt(20)] = new Block(Block.BlockType.HEART);
 	}
-
-	@Override
-	protected Block getQueueBlock() {
-		Block b = null;
-		// TODO: [CUSTOM] define the type and rate of blocks that are added to the grid via the queue
-		b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(2));
-
-		return b;		
-	}
-
 }
