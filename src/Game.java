@@ -124,9 +124,10 @@ public class Game {
 	
 	private final String[] modeOptions = new String[] {
 		"Standard Mode",
-		"Puzzle Mode"
+		"Puzzle Mode",
+		"Endless Mode"
 	};
-	private int[] modeOptionOffset = new int[2];
+	private int[] modeOptionOffset = new int[3];//2
 	
 	private long mouseDelay = Global.inputReadDelayTimer;
 	private Thread gameModeLoader = null;
@@ -137,7 +138,7 @@ public class Game {
 	private GameMode game;
 	
 	private int GameModeType = 0;
-	private Sprite[] GameModeArrows = new Sprite[2];
+	private Sprite[] GameModeArrows = new Sprite[3]; //2
 	/**
 	 * Get the high resolution time in milliseconds
 	 * @return The high resolution time in milliseconds
@@ -396,6 +397,8 @@ public class Game {
 							case 1:
 								game = new BlockPuzzleMode();
 								break;
+							case 2: 
+								game = new BlockEndlessMode();
 							default:
 								break;
 						}
@@ -493,12 +496,12 @@ public class Game {
 		if (Global.getControlActive(Global.GameControl.LEFT)) {
 			GameModeType--;
 			Global.sounds.playSoundEffect("button_click"); 
-			if (GameModeType < 0) { GameModeType = 1; }
+			if (GameModeType < 0) { GameModeType = 2; }//1
 			movementInputDelay = Global.inputReadDelayTimer;
 		} else if (Global.getControlActive(Global.GameControl.RIGHT)) {
 			GameModeType++;
 			Global.sounds.playSoundEffect("button_click"); 
-			if (GameModeType > 1) { GameModeType = 0; }
+			if (GameModeType > 2) { GameModeType = 0; }
 			movementInputDelay = Global.inputReadDelayTimer;
 		} 		
 	}
