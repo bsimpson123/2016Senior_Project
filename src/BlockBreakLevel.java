@@ -714,6 +714,10 @@ public class BlockBreakLevel {
 				if (Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty
 					grid[xc].columnOffset = 0;
 					continue; 
+				}
+				if (!Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty 
+					grid[xc].columnOffset = grid[next].columnOffset;
+					continue; 
 				} 
 				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 
 					grid[xc].columnOffset = 0;
@@ -756,6 +760,10 @@ public class BlockBreakLevel {
 				if (grid[xc].blocks[0] == null) { continue; }
 				if (Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty 
 					grid[xc].columnOffset = 0;
+					continue; 
+				} 
+				if (!Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty 
+					grid[xc].columnOffset = grid[next].columnOffset;
 					continue; 
 				} 
 				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 

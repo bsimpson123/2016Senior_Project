@@ -25,11 +25,12 @@ import org.newdawn.slick.util.ResourceLoader;
 
 public class BlockPuzzleMode implements GameMode {
 	protected LoadState currentState = LoadState.NOT_LOADED;
-	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
+	protected static HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected int cursorPos = 0;
 	//protected long inputDelay = Global.inputReadDelayTimer;
-	private PuzzleModeLevel playLevel;
-	private PuzzleModeLevel playLevelDisplay;
+	//private PuzzleModeLevel playLevel;
+	private PuzzleBreakLevel playLevel;
+	//private PuzzleModeLevel playLevelDisplay;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
 	protected int[] blockOffSet = new int[] { 32, 32 };
@@ -63,13 +64,14 @@ public class BlockPuzzleMode implements GameMode {
 		new String[] { "bigsky", "media/bigsky_cedf10.png" },
 		new String[] { "Gold_Star", "media/star_gold.png"},
 		//new String[] { "Gold_Star", "media/tileYellow_09.png"},
-		new String[] { "Silver_Star", "media/tileGrey_09.png"},
+		new String[] { "Silver_Star", "media/star_silver.png"},
 		//new String[] { "Gold_Star", "media/flat_medal8.png"}
 		new String[] { "ex_game_screen", "media/game_screen.png"},
 		new String[] { "Chall_Star", "media/star_bronze.png"}
 	};
-	
+	public GridColumn[] puzzleGrids;
 	private Sprite GameSelector_background;
+	private Sprite gridOverLay;
 	/*private Sprite[] selector = new Sprite[2];
 	private Sprite optionBox;
 	private Sprite play_unselect;
@@ -105,16 +107,21 @@ public class BlockPuzzleMode implements GameMode {
 	private Sprite pracBox;
 	private Sprite[] pracArrows = new Sprite[2];
 	private int pracLevel = 1;
-	private int pracMax = 20;
+	private int pracMax = 20;//PuzzleModeLevel.nLevels;
 	private int lastLevel = 1;
 	private int maxUnlocked = 1;
+	private int levelSelect = 0;
 	
 	private boolean newHighScore = false;
 	private String hsNameEntry = "";
 	private boolean preClearComplete = false;
 	private int level = 1;
-	protected int[] medals = PuzzleModeLevel.medals;
+	protected int[] medals = PuzzleBreakLevel.medals;//PuzzleBreakLevel.medals;//PuzzleModeLevel.medals;
 	
+	protected List<GridColumn[]> gridDispLevel = new ArrayList<GridColumn[]>();
+
+	//protected List<PuzzleModeLevel> gridDisplay = new ArrayList<PuzzleModeLevel>();
+	protected List<PuzzleBreakLevel> gridDisplay = new ArrayList<PuzzleBreakLevel>();
 	
 	public BlockPuzzleMode() {
 		
@@ -159,6 +166,24 @@ public class BlockPuzzleMode implements GameMode {
 // author Brock
 		//moveClick = new GameSounds(GameSounds.soundType.SOUND, "media/click3.ogg");
 
+		//for (int i = 0; i < PuzzleModeLevel.nLevels; i++) {
+
+		for (int i = 0; i <= pracMax; i++) {
+			
+			loadLevel(i);
+			gridDisplay.add(playLevel);
+			gridDispLevel.add(playLevel.grid);
+			playLevel = null;
+		//	preloadLevel(i);
+		//}
+			//gridDisplay.add(playLevel.buildGridPuzzle(i));
+			//gridDisplay.add(selectDisplayGrid(i));
+			//gridDisplay.add(i,loadLevel(i));
+			//playLevel = null;
+			//gridDispLevel.add(GridColumn.copyGrid(gridDisplay.get(i).grid));
+			
+		}
+		PuzzleBreakLevel.buildStaticAssets(localTexMap);
 		GameSelector_background = new Sprite(
 				Global.textureMap.get("main_menu_background"),
 				new int[] {0,0},
@@ -206,6 +231,8 @@ public class BlockPuzzleMode implements GameMode {
 		for (int i = 0; i < medals.length; i++) {
 			medals[i] = 0;
 		}
+		
+		
 
 		/*optionBox = new Sprite(
 				Global.textureMap.get("green_ui"),
@@ -241,7 +268,7 @@ public class BlockPuzzleMode implements GameMode {
 			);
 		
 		prac_unselect = new Sprite(
-				localTexMap.get("new_test"),
+				localTexMap.getrun"new_test"),
 				new int[] { 0, 30 },
 				new int[] { 190, 30 },
 				new int[] { 190, 48 }
@@ -301,6 +328,12 @@ public class BlockPuzzleMode implements GameMode {
 				new int[] { 1024, 768 },
 				new int[] { 1024, 768 }
 			);		
+		gridOverLay = new Sprite (
+				Global.textureMap.get("overlay"),
+				new int[] {0,0},
+				new int[] {1024,768},
+				new int[] {480,480}
+				);
 		PuzzleModeLevel.cursor = new Sprite(
 				Global.textureMap.get("blocksheet"),
 				new int[] { 240, 0 },
@@ -375,16 +408,36 @@ public class BlockPuzzleMode implements GameMode {
 		//Yellow_star.draw(medalOffset * j + 500, 250);
 		//medalOffset -= 5;
 
+		//playLevel = gridDisplay.get(1);
 		if (playLevel != null) {
+
+			//playLevel = gridDisplay.get(index);
 			if (!playLevel.levelFinished) {
+				//gridDisplay.get(playLevel.level).run();
+				//playLevel.remainClears = -1;
+				//playLevel.remainClears = gridDisplay.get(playLevel.level).totalClears;
 				playLevel.run();
-			} else {
+			} else if (playLevel.level == 0){
+				playLevel = null;
+			}
+			else {
+
+				//if (playLevel.levelFinished) {
+
+				//}
 				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
+				//	gridDisplay.get(playLevel.level).levelFinished = false;
 					// TODO: selectPractice = false;
 					movementInputDelay = Global.inputReadDelayTimer;
-					if (!playLevel.practice) {
-						for (int i = 9; i >= 0; i--) {
+					//if (!playLevel.practice) {
+						//for (int i = 0; i < pracMax; i++) {
+							//	preloadLevel(i);
+							//}
+							//gridDisplay.clear();
+							//	selectDisplayGrid(i);
+							//}
+						//for (int i = 9; i >= 0; i--) {
 							/*if (hsRecords.get(i).getScore() < PuzzleModeLevel.score) {
 								newHighScore = true;
 								showHighScore = true;
@@ -392,14 +445,40 @@ public class BlockPuzzleMode implements GameMode {
 								preClearComplete = false;
 								break;
 							}*/
-						}
-					}
+						//}
+					//}
 					lastLevel = playLevel.level;
+					gridDisplay.get(lastLevel).levelFinished = false;
+					gridDisplay.get(lastLevel).gamePaused = false;
+					gridDisplay.get(lastLevel).gameOver = false;
+					//gridDisplay.get(lastLevel).buildGridPuzzle(lastLevel);
+					/*if (gridDisplay.get(playLevel.level).gameOver) {
+						gridDisplay.get(lastLevel).levelFinished = false;
+						gridDisplay.get(lastLevel).gameOver = false;
+						
+					}*/
+					//gridDisplay.get(lastLevel).levelFinished = false;
+					//gridDisplay.get(playLevel.level).resetMoves = true;
+					///gridDisplay.get(playLevel.level).levelComplete = false;
+					//gridDisplay.get(playLevel.level).gameOver = false;
+					//gridDisplay.get(playLevel.level).remainClears = gridDisplay.get(playLevel.level).totalClears;
 					playLevel = null;
 				} else {
 					// load next level
 					// TODO: add test for at last level and return to menu
-					loadLevel(playLevel.level + 1);
+					playLevel = gridDisplay.get(playLevel.level + 1);
+					//loadLevel(playLevel.level + 1);
+					//gridDisplay.get(playLevel.level).levelFinished = false;
+					//preloadLevel(playLevel.level + 1);
+					
+					//playLevel = gridDisplay.get(playLevel.level + 1);
+					
+					//levelSelect = gridDisplay.get(playLevel.level + 1).level;
+					//playLevel = null;
+					//playLevel = gridDisplay.get(playLevel.level + 1);
+					//levelSelect = playLevel.level;
+					//playLevel.level = gridDisplay.get(playLevel.level - 1).level;
+					//playLevel.levelTitle = String.format("Level %02d", gridDisplay.get(playLevel.level - 1).level);
 				}
 			}
 		} else if (showHighScore) {
@@ -473,6 +552,7 @@ public class BlockPuzzleMode implements GameMode {
 		}
 		else {
 // @author Brock
+			
 			GameSelector_background.draw(0, 0);
 			moveCursorMain();
 			
@@ -560,16 +640,36 @@ public class BlockPuzzleMode implements GameMode {
 			if (Global.getControlActive(Global.GameControl.SELECT)) {
 				switch (cursorPos) {
 					case 0: // normal mode
+						//playLevel = gridDisplay.get(1);
 						loadLevel(1);
-						PuzzleModeLevel.score = 0;
+						//preloadLevel(1);
+						//playLevel = null;
+						//playLevel.levelFinished = false;
+						//playLevel = null;
+						//playLevel = gridDisplay.get(1);
+						//playLevel.level = 1;
+						//playLevel.levelTitle = String.format("Level %02d", 1);
+						//playLevel.	
+						PuzzleBreakLevel.score = 0;
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode
 						if (pracLevel > maxUnlocked) { break; }
 						loadLevel(pracLevel);
+						//playLevel = gridDisplay.get(pracLevel);
+						//preloadLevel(pracLevel);
+						//playLevel.
+						//playLevel = null;
+						//playLevel.levelFinished = false;
+						//playLevel = gridDisplay.get(pracLevel);
+						//playLevel.level = pracLevel;
+						//playLevel.levelTitle = String.format("Level %02d", pracLevel);
+						//gridDisplay.get(pracLevel).level = pracLevel;
+						//gridDisplay.get(pracLevel).levelTitle = String.format("Level %02d", pracLevel);
+						//gridDisplay.get(gridDisplay.get(pracLevel).level);
 						//playLevel.practice = true;
 						movementInputDelay = Global.inputReadDelayTimer;
-						PuzzleModeLevel.score = 0;
+						PuzzleBreakLevel.score = 0;
 						//selectPractice = true;
 						break;
 					case 2: // high score
@@ -592,19 +692,124 @@ public class BlockPuzzleMode implements GameMode {
 	}
 	
 	private void loadLevel(int levelID) {
-		switch (levelID) {
+		playLevel = new PuzzleBreakLevel(levelID);
+		/*switch (levelID) {
 			case 1:
-				playLevel = new PuzzleModeLevelTemplate(localTexMap);
+				playLevel = new PuzzleModeLevel01(localTexMap);
+				//gridDisplay.add(playLevel.grid);
 				break;
 			case 2:
-				playLevel = new PuzzleModeLevel01(localTexMap);
+				playLevel = new PuzzleModeLevel02(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 3:
+				playLevel = new PuzzleModeLevel03(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 4:
+				playLevel = new PuzzleModeLevel04(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 5:
+				playLevel = new PuzzleModeLevel05(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 6:
+				playLevel = new PuzzleModeLevel06(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 7:
+				playLevel = new PuzzleModeLevel07(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 8:
+				playLevel = new PuzzleModeLevel08(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 9:
+				playLevel = new PuzzleModeLevel09(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 10:
+				playLevel = new PuzzleModeLevel10(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			case 11:
+				playLevel = new PuzzleModeLevelTemplate(localTexMap);
+				//gridDisplay.add(playLevel.grid);
+				break;
+			default:
+				//playLevel = new PuzzleModeLevelTemplate(localTexMap);
+				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
+				//break;
+				return ;
+		}
+		//if (levelID > 0) {
+		playLevel.level = levelID;
+		//gridDisplay.
+		playLevel.levelTitle = String.format("Level %02d", levelID);*/
+		//gridDisplay.add(playLevel);
+		//return playLevel;
+		//}
+		
+		//return playLevel;
+		//playLevel = null;
+	}
+	private void preloadLevel(int levelID) {
+		playLevel = new PuzzleBreakLevel(levelID);
+		/*switch (levelID) {
+			case 1:
+				playLevelDisplay = new PuzzleModeLevel01(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 2:
+				playLevelDisplay = new PuzzleModeLevel02(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 3:
+				playLevelDisplay = new PuzzleModeLevel03(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 4:
+				playLevelDisplay = new PuzzleModeLevel04(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 5:
+				playLevelDisplay = new PuzzleModeLevel05(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 6:
+				playLevelDisplay = new PuzzleModeLevel06(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 7:
+				playLevelDisplay = new PuzzleModeLevel07(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 8:
+				playLevelDisplay = new PuzzleModeLevel08(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 9:
+				playLevelDisplay = new PuzzleModeLevel09(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 10:
+				playLevelDisplay = new PuzzleModeLevel10(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
+				break;
+			case 11:
+				playLevelDisplay = new PuzzleModeLevelTemplate(localTexMap);
+				gridDisplay.add(playLevelDisplay.grid);
 				break;
 			default:
 				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
 				return ;
-		}
-		playLevel.level = levelID;
-		playLevel.levelTitle = String.format("Level %02d", playLevel.level);
+		}*/
+	//	playLevel = gridDisplay.get(levelID);
+	//	playLevel.level = levelID;
+	//	playLevel.levelTitle = String.format("Level %02d", playLevel.level);
+		
 	}
 		
 	private void inputPracMenu() {
@@ -657,14 +862,22 @@ public class BlockPuzzleMode implements GameMode {
 	private int[] gridBasePos;
 	private int[] blockSize;
 	
-	private void selectDisplayGrid(int level) {
+	private PuzzleModeLevel selectDisplayGrid(int level) {
 		int r = 0;
+		PuzzleModeLevel playLevelDisplay;
 		//blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
-		blockSize = new int[] { 24, 24 };
-		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
-		//gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
-		gridBasePos = new int[] { pracOffset + 82, 700 };
-		
+		/*if (cursorPos == 1) {
+			blockSize = new int[] { 24, 24 };
+			gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+			//gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
+			gridBasePos = new int[] { pracOffset + 82, 700 };
+		} else {
+			blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+			gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+			grid = new GridColumn[gridSize[0]];
+			//buildGrid();
+			gridBasePos = new int[] { 375 + 82, 700 };
+		}*/
 		// create the grid with x-dimension as specified above
 		//grid = new GridColumn[gridSize[0]];
 		//Global.rand.setSeed(LocalDateTime.now().getNano());
@@ -699,17 +912,105 @@ public class BlockPuzzleMode implements GameMode {
 				}*/
 				switch(level) {
 					case 1:
-						playLevelDisplay = new PuzzleModeLevelTemplate();
+						//gridDisplay.get(level);
+						playLevelDisplay = new PuzzleModeLevel01(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
 						break;
 					case 2:
-						playLevelDisplay = new PuzzleModeLevel01();
+						playLevelDisplay = new PuzzleModeLevel02(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 3:
+						playLevelDisplay = new PuzzleModeLevel03(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 4:
+						playLevelDisplay = new PuzzleModeLevel04(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 5:
+						playLevelDisplay = new PuzzleModeLevel05(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 6:
+						playLevelDisplay = new PuzzleModeLevel06(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 7:
+						playLevelDisplay = new PuzzleModeLevel07(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 8:
+						playLevelDisplay = new PuzzleModeLevel08(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 9:
+						playLevelDisplay = new PuzzleModeLevel09(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 10:
+						playLevelDisplay = new PuzzleModeLevel10(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
+						break;
+					case 11:
+						playLevelDisplay = new PuzzleModeLevelTemplate(localTexMap);
+						///gridDisplay.add(playLevelDisplay);
 						break;
 					default:
-						playLevelDisplay = new PuzzleModeLevelStandard();
+						playLevelDisplay = new PuzzleModeLevelStandard(localTexMap);
+						//gridDisplay.add(playLevelDisplay);
 						//r = 1;
 						//Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", level) , true );
-						return ;
+						break ;
 				}
+				
+				
+			/*	if (level == 1) {
+					//gridDisplay.get(level);
+					return playLevelDisplay = new PuzzleModeLevel01(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 2) {
+					return playLevelDisplay = new PuzzleModeLevel02(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 3) {
+					return playLevelDisplay = new PuzzleModeLevel03(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 4) {
+					return playLevelDisplay = new PuzzleModeLevel04(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 5) {
+					return playLevelDisplay = new PuzzleModeLevel05(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 6) {
+					return playLevelDisplay = new PuzzleModeLevel06(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 7) {
+					return playLevelDisplay = new PuzzleModeLevel07(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 8) {
+					return playLevelDisplay = new PuzzleModeLevel08(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 9) {
+					return playLevelDisplay = new PuzzleModeLevel09(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 10) {
+					return playLevelDisplay = new PuzzleModeLevel10(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+				} else if (level == 11) {
+					return playLevelDisplay = new PuzzleModeLevelTemplate(localTexMap);
+					///gridDisplay.add(playLevelDisplay);
+				} else {
+					return playLevelDisplay = new PuzzleModeLevelTemplate(localTexMap);
+					//gridDisplay.add(playLevelDisplay);
+					//r = 1;
+					//Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", level) , true );
+					
+				}*/
+				
+				playLevelDisplay.level = level;
+				playLevelDisplay.levelTitle = String.format("Level %02d", level);
+				
+				return playLevelDisplay;
 				
 				//playLevelDisplay.buildGrid();
 				
@@ -741,17 +1042,22 @@ public class BlockPuzzleMode implements GameMode {
 	}
 	
 	private void drawGridDisplay(GridColumn[] grid) {
+		blockSize = new int[] { 24, 24 };
+		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+		//gridBasePos = new int[] { 20, Global.glEnvHeight - blockSize[1] - 50 };
+		gridBasePos = new int[] { pracOffset + 82, 700 };
+		
 		// The old grid draw functions will not work with the new grid management algorithm, the math will not move the blocks the same
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 					grid[i].blocks[k].draw(
-							gridBasePos[0] + blockSize[0] * i + grid[i].columnOffset,
-							(gridBasePos[1] - blockSize[1] * k) + grid[i].blocks[k].dropDistance,
+							gridBasePos[0] + blockSize[0] * i,
+							(gridBasePos[1] - blockSize[1] * k),
 							blockSize
 							);
 			}
 		}
-		//drawQueue();
+		
 	}
 	
 	private void drawPracticeSelect() {
@@ -759,7 +1065,7 @@ public class BlockPuzzleMode implements GameMode {
 		int numOffset = Global.getNumbers24DrawSize(num) / 2;
 		Color numCol = pracLevel > this.maxUnlocked ? Color.gray : Color.white;
 		
-		selectDisplayGrid(pracLevel);
+		//selectDisplayGrid(pracLevel);
 		
 		pracArrows[0].draw(pracOffset, 410);
 		//pracBox.draw(pracOffset + 40, 250);
@@ -770,16 +1076,24 @@ public class BlockPuzzleMode implements GameMode {
 		Color.white.bind();
 		//ex_screen.draw(pracOffset + 65, 243);
 		
-		drawGridDisplay(playLevelDisplay.grid);
+		//drawGridDisplay(gridDisplay.get(pracLevel + 1));
+		//playLevelDisplay = gridDisplay.get(pracLevel);
+
+//		drawGridDisplay(gridDisplay.get(pracLevel).grid);
+		drawGridDisplay(gridDispLevel.get(pracLevel));
 		
 		//Global.uiGreen.draw(pracOffset + 40, 250, 49, 45);
 		//PuzzleModeLevel.numbers[pracLevel].draw(525, 255);
 		Global.drawFont48(pracOffset + 80, pracSelectDrop - 50, "Level ", numCol);
 		Global.drawNumbers48(pracOffset + 195, pracSelectDrop - 55, num, numCol);
+		if (numCol == Color.gray) {
+			gridOverLay.draw(pracOffset + 82, 244);
+		}
 		//Global.drawNumbers24(pracOffset + 165, pracSelectDrop - 50, num, numCol);
 		pracArrows[1].draw(pracOffset + 595, 410);
 		//for (int i = 0; i < medals.length; i++) {
-		if (pracLevel <= PuzzleModeLevel.nLevels) {
+		//if (pracLevel <= PuzzleModeLevel.nLevels) {
+		
 			if (medals[pracLevel] > 0) {
 				if (medals[pracLevel] == 4) {
 					for (int j = 1; j <= medals[pracLevel]; j++) {
@@ -810,25 +1124,34 @@ public class BlockPuzzleMode implements GameMode {
 					}
 				}
 			}
-		}
+			else {
+				for (int k = 1; k <= 4; k++) {
+					Color.black.bind();
+					Yellow_star.draw(medalOffset * k + 700, pracSelectDrop - 55);	
+					Color.white.bind();
+				}
+			} 
+		//}
 		//}
 	}	
 	// TODO: move high score vars to top after finished implementation
 	private boolean showHighScore = false;
 	private final int hsBarSpace = 10;
 	private final int hsBarHeight = 48;
-	private final int hsMargin = 30;
+	private int hsMargin = 30;
 	private List<HighScoreRecord> hsRecords = new ArrayList<HighScoreRecord>(10);
 	private Texture hsBack;
 	private int[] hsBackShift = new int[] { 1, 0 };
 	private float[] hsBackDraw = new float[] { 1024 / 4096f, 768 / 1024f };
 	private int starMargin = 50;
 	private int fillRemainStars = 0;
+	private int adjustment = 0;//hsMargin;
 
 	private void showHighScores() {
 		int drawWidth = 1024 - 725;
 		int interval = hsBarHeight + hsBarSpace;
-		int firstDrop = 100;
+		//int firstDrop = 100;
+		int firstDrop = 52;
 		int limit = 10;
 		
 		if (hsBackShift[0] == 1) {
@@ -872,54 +1195,73 @@ public class BlockPuzzleMode implements GameMode {
 		HighScoreRecord hsr;
 		int scoreOff = 0;
 		
-		for (int i = 1; i < medals.length; i++) {
+		int levelCounter = 0;
+		int currentLevel = 0;
+		//for (int i = 1; i < medals.length; i++) {
+		for (int k = 0; k < 3; k++) {
+		for (int i = 1; i <= 10; i++) {
 			//hsr = hsRecords.get(i);
 			//hsr = ((ArrayList<HighScoreRecord>) hsLevelArray[i]).get(i);
-			boxColor.bind();
-			Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
-			resetColor.bind();
-			Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, "Level " + i, Color.white);
-			if (medals[i] == 4) {
-				//if (i == 3) {
-					for (int j = 1; j <= medals[i]; j++) {
 
-						
-						if (j == 4) {
-							Color.white.bind();
-							Challenge_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
-						} else {
-							Color.white.bind();
-							Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
-						}
-						/* else {
-							for (int k = 1; k <= 4; k++) {
-								Color.black.bind();
-								Yellow_star.draw(medalOffset * k + 100, firstDrop + i * interval + 5);
-							}
-						}*/
-						//medalOffset -= 5;
-					//}
-					}
-					
-			} else {
-				fillRemainStars = 5 - medals[i];
-				for (int j = 1; j <= 4; j++) {
-					//Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
-					//medalOffset -= 5;
-				
-				//else if ((4 - medals[j]) <= 0){
-					if (j <= medals[i]) {
-						Color.white.bind();
-						Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
-					} else {
-						//for (int k = 1; k <= fillRemainStars; k++) {
-							Color.black.bind();
-							Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 3);
-						//}
-					}
+				levelCounter++;
+				if (i < medals.length){
+					currentLevel++;
 				}
-				//}
+				boxColor.bind();
+				Global.uiTransWhite.draw((drawWidth + 35) * k + hsMargin , firstDrop + i * interval, drawWidth, hsBarHeight);
+				resetColor.bind();
+				Global.drawFont24((drawWidth + 35) * k + 10 + hsMargin , firstDrop + i * interval + 15, "Level " + (levelCounter), Color.white);
+
+
+			if (i >= medals.length || levelCounter >= medals.length) {
+				for (int j = 1; j <= 4; j++) {
+					Color.black.bind();
+					Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+				}
+			} else if (i < medals.length && levelCounter < medals.length){
+				if (medals[levelCounter] == 4) {
+					//if (i == 3) {
+						for (int j = 1; j <= medals[levelCounter]; j++) {
+	
+							
+							if (j == 4) {
+								Color.white.bind();
+								Challenge_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+							} else {
+								Color.white.bind();
+								Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+							}
+							/* else {
+								for (int k = 1; k <= 4; k++) {
+									Color.black.bind();
+									Yellow_star.draw(medalOffset * k + 100, firstDrop + i * interval + 5);
+								}
+							}*/
+							//medalOffset -= 5;
+						//}
+						}
+						
+				} else {
+					fillRemainStars = 5 - medals[i];
+					for (int j = 1; j <= 4; j++) {
+						//Yellow_star.draw(medalOffset * j + 100, firstDrop + i * interval + 5);
+						//medalOffset -= 5;
+					
+					//else if ((4 - medals[j]) <= 0){
+						if (j <= medals[levelCounter]) {
+							Color.white.bind();
+							Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+						} else {
+							//for (int k = 1; k <= fillRemainStars; k++) {
+								Color.black.bind();
+								Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+							//}
+						}
+					}
+					//}
+				}
 			}
+			//}
 			//Global.uiTransWhite.draw(hsMargin, firstDrop + i * interval, drawWidth, hsBarHeight);
 			//resetColor.bind();
 			//Global.drawFont24(hsMargin + 10, firstDrop + i * interval + 15, hsr.getName(), textColor);
@@ -928,6 +1270,7 @@ public class BlockPuzzleMode implements GameMode {
 			//Global.drawNumbers24(hsMargin + 740 - scoreOff, firstDrop + i * interval + 15, hsr.getScoreAsString(), textColor);
 			//Global.drawNumbers24(hsMargin + 770, firstDrop + i * interval + 15, hsr.getDate(), textColor);
 			//Global.drawFont24(hsMargin + 920, firstDrop + i * interval + 15, hsr.getLevel(), textColor);
+		}
 		}
 		Color.white.bind();
 		//Global.menuButtonShader.bind();
@@ -1002,6 +1345,7 @@ public class BlockPuzzleMode implements GameMode {
 			line = prefFile.readLine();
 			while (line != null) {
 				for (int i = 1; i < medals.length; i++) {
+					//if (line != null) {
 					if (line.compareToIgnoreCase("[HighScore" + i +"]") == 0) {
 						try {
 							line = prefFile.readLine();
@@ -1009,7 +1353,11 @@ public class BlockPuzzleMode implements GameMode {
 								//hsr = HighScoreRecord.getNewEmptyRecord();
 								//hsr.readRecord(line);
 								//hsRecords.add(hsr);
+								//if (i >= medals.length) {
+									
+								//} else if (i < medals.length){
 								medals[i] = Integer.parseInt(line);
+								//}
 								line = prefFile.readLine();
 							}
 						} catch (NumberFormatException nfe) {
@@ -1026,6 +1374,7 @@ public class BlockPuzzleMode implements GameMode {
 				}
 				line = prefFile.readLine();
 			}
+			//}
 			prefFile.close();
 		} catch (IOException err) {
 			
@@ -1048,14 +1397,19 @@ public class BlockPuzzleMode implements GameMode {
 			prefFile.newLine();
 			prefFile.write(Integer.toString(maxUnlocked));
 			prefFile.newLine();
-			for (int i = 1; i < medals.length; i++) {
+			for (int i = 1; i < pracMax + 1; i++) {
 				prefFile.write("[HighScore" + i +"]");
 				//if (maxUnlocked == playLevel.level) {
 					prefFile.newLine();
 					///for(HighScoreRecord hsr : hsRecords) {
 					//	prefFile.write(hsr.toString());
+					if (i < medals.length) {
 						prefFile.write(Integer.toString(medals[i]).toString());
-						prefFile.newLine();
+						
+					} else if (i >= medals.length){
+						prefFile.write("0");
+					}
+					prefFile.newLine();
 					//}
 				//}
 			}
