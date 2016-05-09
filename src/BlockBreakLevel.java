@@ -54,10 +54,10 @@ public class BlockBreakLevel {
 	// grid queue variables
 	private Block[] queue;
 	/** Time delay between each 'step' for the queue, lower values will cause the queue to advance quicker */
-	private long queueStepDelayTimer = 500;
+	protected long queueStepDelayTimer = 500;
 	private long queueStepDelay = queueStepDelayTimer;
 	/** The number of 'empty' steps to take before adding a block to the queue. */
-	private int queueStepReq = 4;
+	protected int queueStepReq = 4;
 	private int queueStepCount = 0;
 	private int queueCount = 0;
 	/** The number of blocks that should be in the queue before forcibly adding to the grid */
@@ -193,6 +193,7 @@ public class BlockBreakLevel {
 		queueDisabled = false;
 		// disable energy use. the bar will not show and energy will not decrease during gameplay
 		disableEnergy = false;
+		minColors = 2;
 
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 
@@ -321,7 +322,8 @@ public class BlockBreakLevel {
 				}
 				break;
 			case 12:
-				grid = GridColumn.loadFromFile("level.2016-05-05.123604.dat");
+				queueDisabled = true;
+				grid = GridColumn.loadFromFile("2-hit-go.dat");
 				break;
 			case 15:
 				grid = GridColumn.loadFromFile("media/sp7.csv");
@@ -800,13 +802,13 @@ public class BlockBreakLevel {
 				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
 					// TODO: add activation call for star blocks found sharing an edge
 					if (grid[x].blocks[y].clearMark) { continue; } // block has already been processed
-					if (x + 1 < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) { 
+					if ( (x + 1) < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
 					if (x > 0 && grid[x-1].blocks[y] != null && grid[x-1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
-					if (y + 1 < grid[x].blocks.length && grid[x].blocks[y+1] != null && grid[x].blocks[y+1].type == Block.BlockType.STAR) {
+					if ( (y + 1) < grid[x].blocks.length && grid[x].blocks[y+1] != null && grid[x].blocks[y+1].type == Block.BlockType.STAR) {
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else
 					if (y > 0 && grid[x].blocks[y-1] != null && grid[x].blocks[y-1].type == Block.BlockType.STAR) {
