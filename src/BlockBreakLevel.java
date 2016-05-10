@@ -714,10 +714,11 @@ public class BlockBreakLevel {
 				if (Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty
 					grid[xc].columnOffset = 0;
 					continue; 
-				} else if (!Global.useBlockCascading && grid[next].blocks[0] != null) {
-					grid[xc].columnOffset = grid[next].columnOffset;
-					continue;
 				}
+				if (!Global.useBlockCascading && grid[next].blocks[0] != null) { 
+					grid[xc].columnOffset = grid[next].columnOffset;
+					continue; 
+				} 
 				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 
 					grid[xc].columnOffset = 0;
 					continue; 
@@ -759,6 +760,10 @@ public class BlockBreakLevel {
 				if (grid[xc].blocks[0] == null) { continue; }
 				if (Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty 
 					grid[xc].columnOffset = 0;
+					continue; 
+				} 
+				if (!Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty 
+					grid[xc].columnOffset = grid[next].columnOffset;
 					continue; 
 				} else if (!Global.useBlockCascading && grid[next].blocks[0] != null) {
 					grid[xc].columnOffset = grid[next].columnOffset;
@@ -807,7 +812,7 @@ public class BlockBreakLevel {
 			for (int y = 0; y < grid[0].blocks.length; y++) {
 				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
 					// TODO: add activation call for star blocks found sharing an edge
-					if (grid[x].blocks[y].clearMark) { continue; } // block has already been processed
+					// if (grid[x].blocks[y].clearMark) { continue; } // block has already been processed
 					if ( (x + 1) < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
