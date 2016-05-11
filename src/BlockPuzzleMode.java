@@ -63,31 +63,13 @@ public class BlockPuzzleMode implements GameMode {
 		new String[] { "new_test", "media/image1.png"},
 		new String[] { "bigsky", "media/bigsky_cedf10.png" },
 		new String[] { "Gold_Star", "media/star_gold.png"},
-		//new String[] { "Gold_Star", "media/tileYellow_09.png"},
 		new String[] { "Silver_Star", "media/star_silver.png"},
-		//new String[] { "Gold_Star", "media/flat_medal8.png"}
 		new String[] { "ex_game_screen", "media/game_screen.png"},
 		new String[] { "Chall_Star", "media/star_bronze.png"}
 	};
 	public GridColumn[] puzzleGrids;
 	private Sprite GameSelector_background;
 	private Sprite gridOverLay;
-	/*private Sprite[] selector = new Sprite[2];
-	private Sprite optionBox;
-	private Sprite play_unselect;
-	private Sprite prac_unselect;
-	private Sprite gamemode_unselect;
-	private Sprite back_unselect;
-	
-	private Sprite play_select;
-	private Sprite prac_select;
-	private Sprite gamemode_select;
-	private Sprite back_select;
-	
-	private Sprite label_unselect[];
-	private Sprite label_select[];
-	private Sprite button_select[];
-	private Sprite ex_screen;*/
 	
 	private final String[] menuOptions = new String[] {
 		"Play",
@@ -116,7 +98,7 @@ public class BlockPuzzleMode implements GameMode {
 	private String hsNameEntry = "";
 	private boolean preClearComplete = false;
 	private int level = 1;
-	protected int[] medals = PuzzleBreakLevel.medals;//PuzzleBreakLevel.medals;//PuzzleModeLevel.medals;
+	protected static int[] medals = PuzzleBreakLevel.medals;//PuzzleBreakLevel.medals;//PuzzleModeLevel.medals;
 	
 	protected List<GridColumn[]> gridDispLevel = new ArrayList<GridColumn[]>();
 
@@ -172,7 +154,10 @@ public class BlockPuzzleMode implements GameMode {
 			
 			loadLevel(i);
 			gridDisplay.add(playLevel);
-			gridDispLevel.add(playLevel.grid);
+			//if (gridDispLevel.size() <= 0) {
+			
+			gridDispLevel.add(GridColumn.copyGrid(playLevel.grid));
+			Global.writeToLog(String.format("init grid: %d", i),true );
 			playLevel = null;
 		//	preloadLevel(i);
 		//}
@@ -225,95 +210,14 @@ public class BlockPuzzleMode implements GameMode {
 		Silver_star = new Sprite(
 				localTexMap.get("Silver_Star"),
 				new int[] {0,0},
-				new int[] {129,120},
-				new int[] {129,120}
+				new int[] {31,30},
+				new int[] {41,40}
 			);
 		for (int i = 0; i < medals.length; i++) {
 			medals[i] = 0;
 		}
 		
-		
-
-		/*optionBox = new Sprite(
-				Global.textureMap.get("green_ui"),
-				new int[] { 0, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		
-		selector[0] = new Sprite( // left-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 39, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
-		selector[1] = new Sprite( // right-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 0, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
-		
-		play_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 0 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		play_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 0 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		
-		prac_unselect = new Sprite(
-				localTexMap.getrun"new_test"),
-				new int[] { 0, 30 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		prac_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 30 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		
-		gamemode_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 60 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		gamemode_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 60 },
-				new int[] { 190, 27 },
-				new int[] { 190, 48 }
-			);
-		
-		back_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 90 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		back_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 90 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		ex_screen = new Sprite (
-				localTexMap.get("ex_game_screen"),
-				new int[] { 0,0 },
-				new int[] { 1425, 768 },
-				new int[] { 1425, 600 }
-				);*/
-
-		//ArrayList<Individual>[] group = (ArrayList<Individual>[])new ArrayList[4];
-		
+				
 		//author: Mario
 		PuzzleModeLevel.nLevel = new Sprite(
 				localTexMap.get("nLevel"),
@@ -451,6 +355,12 @@ public class BlockPuzzleMode implements GameMode {
 					gridDisplay.get(lastLevel).levelFinished = false;
 					gridDisplay.get(lastLevel).gamePaused = false;
 					gridDisplay.get(lastLevel).gameOver = false;
+					//gridDisplay.get(lastLevel).levelComplete = false;
+					//gridDispLevel.get(lastLevel) = gridDisplay.get(lastLevel).grid;
+					
+					
+					//gridDisplay.get(lastLevel).buildGrid(lastLevel);
+					medals = PuzzleBreakLevel.medals;
 					//gridDisplay.get(lastLevel).buildGridPuzzle(lastLevel);
 					/*if (gridDisplay.get(playLevel.level).gameOver) {
 						gridDisplay.get(lastLevel).levelFinished = false;
@@ -464,6 +374,17 @@ public class BlockPuzzleMode implements GameMode {
 					//gridDisplay.get(playLevel.level).remainClears = gridDisplay.get(playLevel.level).totalClears;
 					playLevel = null;
 				} else {
+					
+					//lastLevel = playLevel.level;
+					//gridDisplay.get(lastLevel).levelFinished = false;
+					//gridDisplay.get(lastLevel).gamePaused = false;
+					//gridDisplay.get(lastLevel).gameOver = false;
+					playLevel.levelFinished = false;
+					playLevel.gamePaused = false;
+					playLevel.gameOver = false;
+					//playLevel.buildGrid(playLevel.level);
+					//gridDispLevel.add(playLevel.level,playLevel.grid);
+					
 					// load next level
 					// TODO: add test for at last level and return to menu
 					playLevel = gridDisplay.get(playLevel.level + 1);
@@ -483,56 +404,7 @@ public class BlockPuzzleMode implements GameMode {
 			}
 		} else if (showHighScore) {
 			showHighScores();
-			/*if (newHighScore) {
-				// TODO: get high score user data
-				if (!preClearComplete) {
-					int c = Keyboard.getNumKeyboardEvents();
-					if (c > 0) {
-						while (Keyboard.next()) {
-							c = Keyboard.getEventKey();
-						}
-					} else {
-						preClearComplete = true;
-					}
-				} else if (Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
-					hsRecords.add(
-						new HighScoreRecord(
-							hsNameEntry,
-							LocalDateTime.now(),
-							PuzzleModeLevel.score,
-							lastLevel
-						)
-					);
-					Collections.sort(hsRecords);
-					while (hsRecords.size() > 10) {
-						hsRecords.remove(10);
-					}
-					newHighScore = false;
-				} else if (Keyboard.isKeyDown(Keyboard.KEY_BACK)) {
-					if (hsNameEntry.length() > 0) {
-						hsNameEntry = hsNameEntry.substring(0, hsNameEntry.length() - 1);
-					}
-				} else {
-					while (Keyboard.next()) {
-						char c = Keyboard.getEventCharacter();
-						
-						if (hsNameEntry.length() > 40) {
-							// do nothing
-						} else if (Character.isLetter(c)) {
-							hsNameEntry += Character.toUpperCase(c);
-						} else if (Character.isSpaceChar(c)) {
-							hsNameEntry += ' ';
-						} 
-					}
-				}
-				Global.uiBlue.draw(256, 256, 512, 376);
-				Global.drawFont24(276, 276, "Level: " + Integer.toString(lastLevel), Color.white);
-				Global.drawFont24(276, 310, "Score:", Color.white);
-				Global.drawFont24(276, 334, Integer.toString(PuzzleModeLevel.score), Color.white);
-				Global.uiBlueSel.draw(276, 360, 472, 48);
-				Global.drawFont24(282, 386, hsNameEntry + '_', Color.black);
-				
-			} */
+			
 			if (movementInputDelay <= 0 && Global.getControlActive(Global.GameControl.CANCEL)) {
 				movementInputDelay = 2 * Global.inputReadDelayTimer;
 				showHighScore = false;
@@ -642,32 +514,13 @@ public class BlockPuzzleMode implements GameMode {
 					case 0: // normal mode
 						//playLevel = gridDisplay.get(1);
 						loadLevel(1);
-						//preloadLevel(1);
-						//playLevel = null;
-						//playLevel.levelFinished = false;
-						//playLevel = null;
-						//playLevel = gridDisplay.get(1);
-						//playLevel.level = 1;
-						//playLevel.levelTitle = String.format("Level %02d", 1);
-						//playLevel.	
 						PuzzleBreakLevel.score = 0;
-						//activeGameMode = BlockMatchStandard;
+						
 						break;
 					case 1: // practice mode
 						if (pracLevel > maxUnlocked) { break; }
 						loadLevel(pracLevel);
-						//playLevel = gridDisplay.get(pracLevel);
-						//preloadLevel(pracLevel);
-						//playLevel.
-						//playLevel = null;
-						//playLevel.levelFinished = false;
-						//playLevel = gridDisplay.get(pracLevel);
-						//playLevel.level = pracLevel;
-						//playLevel.levelTitle = String.format("Level %02d", pracLevel);
-						//gridDisplay.get(pracLevel).level = pracLevel;
-						//gridDisplay.get(pracLevel).levelTitle = String.format("Level %02d", pracLevel);
-						//gridDisplay.get(gridDisplay.get(pracLevel).level);
-						//playLevel.practice = true;
+						
 						movementInputDelay = Global.inputReadDelayTimer;
 						PuzzleBreakLevel.score = 0;
 						//selectPractice = true;
@@ -755,62 +608,6 @@ public class BlockPuzzleMode implements GameMode {
 		//return playLevel;
 		//playLevel = null;
 	}
-	private void preloadLevel(int levelID) {
-		playLevel = new PuzzleBreakLevel(levelID);
-		/*switch (levelID) {
-			case 1:
-				playLevelDisplay = new PuzzleModeLevel01(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 2:
-				playLevelDisplay = new PuzzleModeLevel02(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 3:
-				playLevelDisplay = new PuzzleModeLevel03(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 4:
-				playLevelDisplay = new PuzzleModeLevel04(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 5:
-				playLevelDisplay = new PuzzleModeLevel05(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 6:
-				playLevelDisplay = new PuzzleModeLevel06(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 7:
-				playLevelDisplay = new PuzzleModeLevel07(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 8:
-				playLevelDisplay = new PuzzleModeLevel08(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 9:
-				playLevelDisplay = new PuzzleModeLevel09(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 10:
-				playLevelDisplay = new PuzzleModeLevel10(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			case 11:
-				playLevelDisplay = new PuzzleModeLevelTemplate(localTexMap);
-				gridDisplay.add(playLevelDisplay.grid);
-				break;
-			default:
-				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
-				return ;
-		}*/
-	//	playLevel = gridDisplay.get(levelID);
-	//	playLevel.level = levelID;
-	//	playLevel.levelTitle = String.format("Level %02d", playLevel.level);
-		
-	}
 		
 	private void inputPracMenu() {
 		movementInputDelay -= Global.delta;
@@ -871,11 +668,15 @@ public class BlockPuzzleMode implements GameMode {
 		// The old grid draw functions will not work with the new grid management algorithm, the math will not move the blocks the same
 		for (int i = 0; i < grid.length; i++) {
 			for (int k = 0; k < grid[0].blocks.length; k++) {
+				if (grid[i].blocks[k] == null) {
+					continue;
+				} else {
 					grid[i].blocks[k].draw(
 							gridBasePos[0] + blockSize[0] * i,
 							(gridBasePos[1] - blockSize[1] * k),
 							blockSize
 							);
+				}
 			}
 		}
 		
@@ -919,9 +720,9 @@ public class BlockPuzzleMode implements GameMode {
 				if (medals[pracLevel] == 4) {
 					for (int j = 1; j <= medals[pracLevel]; j++) {
 						if (j == 4) {
-							Challenge_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
-						} else {
 							Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+						} else {
+							Silver_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
 						}
 						//Yellow_star.draw(medalOffset * j + 700, 652);
 						//medalOffset -= 5;
@@ -934,11 +735,11 @@ public class BlockPuzzleMode implements GameMode {
 					//else if ((4 - medals[j]) <= 0){
 						if (j <= medals[pracLevel]) {
 							Color.white.bind();
-							Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+							Silver_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
 						} else {
 							//for (int k = 1; k <= fillRemainStars; k++) {
 								Color.black.bind();
-								Yellow_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
+								Silver_star.draw(medalOffset * j + 700, pracSelectDrop - 55);
 								Color.white.bind();
 							//}
 						}
@@ -948,7 +749,7 @@ public class BlockPuzzleMode implements GameMode {
 			else {
 				for (int k = 1; k <= 4; k++) {
 					Color.black.bind();
-					Yellow_star.draw(medalOffset * k + 700, pracSelectDrop - 55);	
+					Silver_star.draw(medalOffset * k + 700, pracSelectDrop - 55);	
 					Color.white.bind();
 				}
 			} 
@@ -1009,15 +810,15 @@ public class BlockPuzzleMode implements GameMode {
 		
 		Color 
 			boxColor = Color.cyan,
-			textColor = Color.black,
+			//textColor = Color.black,
 			resetColor = Color.white;
 		
 		Global.drawFont48(512 - 98, 25, "High Score", Color.white);
-		HighScoreRecord hsr;
-		int scoreOff = 0;
+		//HighScoreRecord hsr;
+		//int scoreOff = 0;
 		
 		int levelCounter = 0;
-		int currentLevel = 0;
+		//int currentLevel = 0;
 		//for (int i = 1; i < medals.length; i++) {
 		for (int k = 0; k < 3; k++) {
 		for (int i = 1; i <= 10; i++) {
@@ -1025,9 +826,9 @@ public class BlockPuzzleMode implements GameMode {
 			//hsr = ((ArrayList<HighScoreRecord>) hsLevelArray[i]).get(i);
 
 				levelCounter++;
-				if (i < medals.length){
-					currentLevel++;
-				}
+				//if (i < medals.length){
+				//	currentLevel++;
+				//}
 				boxColor.bind();
 				Global.uiTransWhite.draw((drawWidth + 35) * k + hsMargin , firstDrop + i * interval, drawWidth, hsBarHeight);
 				resetColor.bind();
@@ -1037,7 +838,7 @@ public class BlockPuzzleMode implements GameMode {
 			if (i >= medals.length || levelCounter >= medals.length) {
 				for (int j = 1; j <= 4; j++) {
 					Color.black.bind();
-					Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+					Silver_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
 				}
 			} else if (i < medals.length && levelCounter < medals.length){
 				if (medals[levelCounter] == 4) {
@@ -1047,10 +848,10 @@ public class BlockPuzzleMode implements GameMode {
 							
 							if (j == 4) {
 								Color.white.bind();
-								Challenge_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+								Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
 							} else {
 								Color.white.bind();
-								Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+								Silver_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
 							}
 							/* else {
 								for (int k = 1; k <= 4; k++) {
@@ -1071,11 +872,11 @@ public class BlockPuzzleMode implements GameMode {
 					//else if ((4 - medals[j]) <= 0){
 						if (j <= medals[levelCounter]) {
 							Color.white.bind();
-							Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+							Silver_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
 						} else {
 							//for (int k = 1; k <= fillRemainStars; k++) {
 								Color.black.bind();
-								Yellow_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
+								Silver_star.draw(((drawWidth + 35) * k) + (medalOffset * j + 100), firstDrop + i * interval + 3);
 							//}
 						}
 					}
@@ -1157,7 +958,7 @@ public class BlockPuzzleMode implements GameMode {
 		BufferedReader prefFile;
 		String line;
 		HighScoreRecord hsr;
-
+		//int i = 1;
 		
 
 
@@ -1171,14 +972,8 @@ public class BlockPuzzleMode implements GameMode {
 						try {
 							line = prefFile.readLine();
 							while (line != null) {
-								//hsr = HighScoreRecord.getNewEmptyRecord();
-								//hsr.readRecord(line);
-								//hsRecords.add(hsr);
-								//if (i >= medals.length) {
-									
-								//} else if (i < medals.length){
 								medals[i] = Integer.parseInt(line);
-								//}
+								
 								line = prefFile.readLine();
 							}
 						} catch (NumberFormatException nfe) {
@@ -1193,6 +988,7 @@ public class BlockPuzzleMode implements GameMode {
 						}
 					}
 				}
+				//i++;
 				line = prefFile.readLine();
 			}
 			//}

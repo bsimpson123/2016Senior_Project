@@ -106,7 +106,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	//protected int minColors = 2;
 	//private int heartGenChance = 20;
 	//private int bombGenChance = 20;
-	
+	private int levelMedals = 0;
 	
 	
 	/**
@@ -173,8 +173,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	
 	private int addScore = 0;
 	
-	
-	
+	private int medalOffset = 45;
+		
 	public static void buildStaticAssets(HashMap<String,Texture> localTexMap) {
 		overlay = new Sprite(
 				Global.textureMap.get("overlay"),
@@ -253,8 +253,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				
 		};
 		
-		levelClears = new int[nLevels + 1];
-		medals = new int[nLevels + 1];
+		//levelClears = levelClears;//new int[nLevels + 1];
+		medals = BlockPuzzleMode.medals;//new int[nLevels + 1];
 		
 		
 	}
@@ -295,14 +295,14 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				//medals[level] = 4;
 				levelMedal = 4;
 			}*/
-			int levelMedals = 0;
+			
 			if (level <= scoreMedal1) {
 				//medals[level] = 1;
 				levelMedals = 1;
 			} else if (level > scoreMedal1 && level <= scoreMedal2) {
 				//medals[level] = 2;
 				levelMedals = 2;
-			} else if (level >= scoreMedal2) {
+			} else if (level > scoreMedal2) {
 				//medals[level] = 3;
 				levelMedals = 3;
 			}
@@ -374,8 +374,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 						
 					}
 				}
-				scoreMedal1 = 2500;
-				scoreMedal2 = 5000;
+				scoreMedal1 = 56000;
+				scoreMedal2 = 56200;
 				scoreMedal3 = 25000;
 				
 				break;
@@ -446,6 +446,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 						//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3) + 2);
 					}
 				}
+				levelClears[level] = 50;
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
 				scoreMedal3 = 25000;
@@ -464,31 +465,36 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, 1);
 					}
 				}
-				grid[Global.rand.nextInt(grid.length)].blocks[Global.rand.nextInt(grid[0].blocks.length)] = new Block(Block.BlockType.HEART);
-				rx = Global.rand.nextInt(10) + 5;
-				ry = Global.rand.nextInt(4) + 8;
-				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
+				grid[0].blocks[1] = new Block(Block.BlockType.BLOCK, 2);
+				grid[0].blocks[2] = new Block(Block.BlockType.BLOCK, 3);
+				grid[0].blocks[3] = new Block(Block.BlockType.BLOCK, 4);
+				//grid[i].blocks[k] = new Block(Block.BlockType.HEART);
+				//rx = Global.rand.nextInt(10) + 5;
+				//ry = Global.rand.nextInt(4) + 8;
+				//grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
 				scoreMedal3 = 25000;
 
 				break;
 			case 7:
+				levelClears[level] = 40;
 				// 3 colors, wedge, no starter heart block
 				grid = new GridColumn[20];
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
-						grid[i].blocks[k] = b;
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK,
+								(i % 4) | (k % 3)
+							);
 					}
 				}
-				rx = Global.rand.nextInt(10) + 5;
-				ry = Global.rand.nextInt(4) + 8;
-				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
+				//rx = Global.rand.nextInt(10) + 5;
+				//ry = Global.rand.nextInt(4) + 8;
+				//grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
 				scoreMedal3 = 25000;
@@ -602,8 +608,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 		
 		//scoreSystem();
 		
-		if (blocksRemaining == 0 && remainClears > 0 && movesUpdateDelay == 0) {
+		if (blocksRemaining == 0 && remainClears > 0 && actionDelay == 0) {
 			levelComplete = true;
+			Global.writeToLog( String.format("levelComplete: %b", levelComplete) , true );
 			if (!endLevelDelayed) {
 				endLevelDelayed = true;
 				pauseCursorPos = 0;
@@ -619,7 +626,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				inputDelay = Global.inputReadDelayTimer * 2;
 			}
 		} 
-		if (blocksRemaining > 0 && remainClears == 0 && movesUpdateDelay == 0) {
+		if (blocksRemaining > 0 && remainClears == 0 && actionDelay == 0) {
 			//if (!endLevelDelayed) {
 			//	endLevelDelayed = true;
 				gameOver = true;
@@ -633,33 +640,35 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 		//	pauseCursorPos = 0;
 		//}
 		
-		sumMoves = 0;
-		for (int i = 0; i < grid.length - 1; i++) {
-			for (int j = 0; j < grid[0].blocks.length; j++) {
-				
-				if (grid[i].blocks[j] == null) {
-					continue;
-				} else {
-					//sumMoves += checkGridMovesRemain(i, j, grid, grid[i].blocks[j].colorID);
-					//while (grid[i].blocks[j].dropDistance != 0) {
-					coordinates[0] = i;
-					coordinates[1] = j;
-					sumMoves += checkGrid(coordinates);
-					//Global.writeToLog( String.format("sumMoves: %d", sumMoves) , true );
-					//}
-				}
-			//	}
-			}				
-		}
 		//sumMoves = 0;
-		if ( sumMoves == 0 && movesUpdateDelay == 0 && remainClears > 0 ) {
-			//noMoves = true;
-			//gameOver = true;
-			//pauseCursorPos = 0;
-		} else if (sumMoves > 1  && movesUpdateDelay == 0) {
-			sumMoves = 0;
-		}
+		//if (actionDelay == 0 && remainClears > 0) {
+			for (int i = 0; i < grid.length; i++) {
+				for (int j = 0; j < grid[0].blocks.length; j++) {
+					if (actionDelay == 0) {
+					if (grid[i].blocks[j] == null) {
+						continue;
+					} else {
+						//sumMoves += checkGridMovesRemain(i, j, grid, grid[i].blocks[j].colorID);
+						//while (grid[i].blocks[j].dropDistance != 0) {
+						coordinates[0] = i;
+						coordinates[1] = j;
+						sumMoves += checkGrid(coordinates);
+						
+					}
+					}
+				//	}
+				}				
+			}
 		
+			//sumMoves = 0;
+			if ( sumMoves == 0 && actionDelay == 0 && remainClears > 0 ) {
+				noMoves = true;
+				gameOver = true;
+				pauseCursorPos = 0;
+			} else if (sumMoves > 1  && movesUpdateDelay == 0) {
+				sumMoves = 0;
+			}
+		//}
 		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0) {
 	        // game over with one block remaining
 			noMoves = true;
@@ -795,10 +804,10 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 					if (movesDisplay < remainClears) { movesDisplay = remainClears; }
 					//movesDisplay = remainClears;
 				//}
-				movesUpdateDelay = movesUpdateDelayTimer * 2;//Global.inputReadDelayTimer;//movesUpdateDelayTimer;
-			} else if (movesUpdateDelay > 0) {
-				movesUpdateDelay -= Global.delta;
-			}
+				movesUpdateDelay = movesUpdateDelayTimer;//Global.inputReadDelayTimer;//movesUpdateDelayTimer;
+			} //else if (movesUpdateDelay > 0) {
+			//	movesUpdateDelay -= Global.delta;
+			//}
 			//	movesUpdateDelay -= Global.delta;
 			//}
 
@@ -808,6 +817,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			//}
 		} 
 		else {
+
+			movesUpdateDelay = movesUpdateDelayTimer * 2;
 			remainClears = levelClears[level];
 			movesDisplay = remainClears;
 		}
@@ -893,9 +904,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			if (levelMedal > 0) {
 				for (int j = 1; j <= levelMedal; j++) {
 					if (j == 4) {
-						BlockPuzzleMode.Challenge_star.draw(BlockPuzzleMode.medalOffset * j + 425, 415);
+						GoldStar.draw(medalOffset * j + 425, 415);
 					} else {
-						BlockPuzzleMode.Yellow_star.draw(BlockPuzzleMode.medalOffset * j + 425, 415);
+						SilverStar.draw(medalOffset * j + 425, 415);
 					}
 					//medalOffset -= 5;
 				}
@@ -1108,11 +1119,13 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 						remainClears = -1;
 						//levelFinished = true;
 						//gameOver = true;
+						score = 0;
 						inputDelay = Global.inputReadDelayTimer;	
 						break;
 					case 2:
 						levelFinished = true;
 						gameOver = true;
+						buildGrid(level);
 						inputDelay = Global.inputReadDelayTimer;
 						break;
 				}
@@ -1149,6 +1162,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 						buildGrid(level);
 						gameOver = false;
 						remainClears = -1;
+						score = 0;
 						//levelFinished = false;
 						inputDelay = 10 * Global.inputReadDelayTimer;	
 						break;
@@ -1187,6 +1201,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 					case 0:
 						levelFinished = true;
 						gameOver = false;
+						score = 0;
 						inputDelay = 10 * Global.inputReadDelayTimer;	
 						break;
 	
@@ -1209,6 +1224,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 					case 2:
 						gameOver = true;
 						levelFinished = true;
+						//buildGrid(level);
 						inputDelay = 10 * Global.inputReadDelayTimer;
 				}
 			}
