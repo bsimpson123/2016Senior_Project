@@ -200,6 +200,7 @@ public class BlockBreakLevel {
 		
 		Block b = null;
 		int r, rx, ry;
+		int[] list;
 		// TODO: finish all level grid builds
 		/* The switch/case statements below are for building the level-dependent grids.
 		 * Variables for blocks remaining, wedge positioning, allowed block color generation, etc.,
@@ -207,14 +208,15 @@ public class BlockBreakLevel {
 		 */
 		switch (levelSelect) {
 			case 1:
+				// 2 colors, nothing special
 				grid = new GridColumn[20];
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, );
-						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK,
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(2) );
+						/* grid[i].blocks[k] = new Block(Block.BlockType.BLOCK,
 								(i % 4) | (k % 3)
-							);
+							); //*/
 					}
 				}
 				break;
@@ -312,21 +314,122 @@ public class BlockBreakLevel {
 				grid = GridColumn.loadFromFile("media/sp9.csv");
 				break;
 			case 11:
-				
+				// 4 colors, randomly selected set, slightly faster queue
+				rx = Global.rand.nextInt(6);
+				do {
+					ry = Global.rand.nextInt(6);
+				} while (ry == rx);
+				list = new int[4];
+				for (int i = 0, x = 0; i < list.length; x++) {
+					if (x == rx || x == ry) { continue; }
+					list[i] = x;
+					i++;
+				}
 				grid = new GridColumn[20];
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(4)]);
 					}
 				}
+				queueStepDelay = 400;
 				break;
 			case 12:
-				queueDisabled = true;
-				grid = GridColumn.loadFromFile("2-hit-go.dat");
+				// 3 colors, rock, queue slightly faster
+				list = new int[3];
+				list[0] = Global.rand.nextInt(6);
+				do {
+					list[1] = Global.rand.nextInt(6);
+				} while (list[0] == list[1]);
+				do {
+					list[2] = Global.rand.nextInt(6);
+				} while (list[2] == list[0] || list[2] == list[1]);
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(3)]);
+					}
+				}
+				queueStepDelay -= 100;
+				rx = Global.rand.nextInt(8) + 6;
+				grid[rx].blocks[0] = new Block(Block.BlockType.ROCK);
+				break;
+			case 13:
+				// 3 colors, rock, queue faster, fewer steps to add blocks
+				list = new int[3];
+				list[0] = Global.rand.nextInt(6);
+				do {
+					list[1] = Global.rand.nextInt(6);
+				} while (list[0] == list[1]);
+				do {
+					list[2] = Global.rand.nextInt(6);
+				} while (list[2] == list[0] || list[2] == list[1]);
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(3)]);
+					}
+				}
+				queueStepDelay -= 150;
+				queueStepReq--; // 1 fewer steps until a block is added
+				queueLimit++; // block limit +1 until forced drop
+				rx = Global.rand.nextInt(8) + 6;
+				grid[rx].blocks[0] = new Block(Block.BlockType.ROCK);
+				break;
+			case 14:
+				// 4 colors, no rock, faster queue, fewer steps to add blocks
+				rx = Global.rand.nextInt(6);
+				do {
+					ry = Global.rand.nextInt(6);
+				} while (ry == rx);
+				list = new int[4];
+				for (int i = 0, x = 0; i < list.length; x++) {
+					if (x == rx || x == ry) { continue; }
+					list[i] = x;
+					i++;
+				}
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(4)]);
+					}
+				}
+				queueStepDelay -= 150;
+				queueStepReq--; // 1 fewer steps until a block is added
+				queueLimit++; // block limit +1 until forced drop
+				
 				break;
 			case 15:
-				grid = GridColumn.loadFromFile("media/sp7.csv");
+				grid = GridColumn.loadFromFile("media/sp6.csv");
+				break;
+			case 16:
+				// 4 colors, wedge, faster queue, fewer steps to add blocks
+				rx = Global.rand.nextInt(6);
+				do {
+					ry = Global.rand.nextInt(6);
+				} while (ry == rx);
+				list = new int[4];
+				for (int i = 0, x = 0; i < list.length; x++) {
+					if (x == rx || x == ry) { continue; }
+					list[i] = x;
+					i++;
+				}
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(4)]);
+					}
+				}
+				queueStepDelay -= 150;
+				queueStepReq--; // 1 fewer steps until a block is added
+				queueLimit++; // block limit +1 until forced drop
+				rx = Global.rand.nextInt(8) + 6;
+				ry = Global.rand.nextInt(4) + 10;
+				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				break;
 			case 20:
 				grid = GridColumn.loadFromFile("media/sp4.csv");
