@@ -40,7 +40,7 @@ public class BlockBreakLevel {
 	protected int[] blockSize = new int[] { 32, 32 };
 	/** Defines which direction the grid columns should shift where there is space between them.<br>
 	 * 1 => right-shift, -1 => left-shift, 0 => do not shift grid columns */
-	private int gridShiftDir = 1;
+	protected int gridShiftDir = 1;
 	/** The amount of time the player must wait between each switch of the grid direction. */
 	private final long gridShiftActionDelayTimer = 1000;
 	private long gridShiftActionDelay = gridShiftActionDelayTimer;
