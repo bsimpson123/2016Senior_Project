@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import org.newdawn.slick.opengl.Texture;
+
+//import Block.BlockType;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.openal.Audio;
 
@@ -40,7 +43,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	//protected int[] blockSize = new int[] { 32, 32 };
 	/** Defines which direction the grid columns should shift where there is space between them.<br>
 	 * 1 => right-shift, -1 => left-shift, 0 => do not shift grid columns */
-	private int gridShiftDir = 1;
+	//protected int gridShiftDir = 1;
 	/** The amount of time the player must wait between each switch of the grid direction. */
 	private final long gridShiftActionDelayTimer = 1000;
 	private long gridShiftActionDelay = gridShiftActionDelayTimer;
@@ -158,10 +161,16 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	protected static int scoreMedal1 = 2500;
 	protected static int scoreMedal2 = 5000;
 	protected static int scoreMedal3 = 25000;
-	
+
 	protected static Sprite GoldStar;
 	protected static Sprite ChallengeStar;
 	protected static Sprite SilverStar;
+	
+	/**
+	 * ending condition variables
+	 */
+	protected boolean specialCond = false;
+	protected boolean standardCond = true;
 	
 	protected int[] coordinates = new int[2];
 	
@@ -319,6 +328,47 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	protected void dropNewBlocks() {
 		
 		
+	}
+	
+	protected void specialEndingConditions() {
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[0].blocks.length; j++) {
+				//if (actionDelay == 0) {
+				if (grid[i].blocks[j] == null) {
+					continue;
+				} 
+				else if (grid[i].blocks[j].type == Block.BlockType.ROCK && j == 0) {
+					//sumMoves += checkGridMovesRemain(i, j, grid, grid[i].blocks[j].colorID);
+					//while (grid[i].blocks[j].dropDistance != 0) {
+					levelComplete = true;
+					if (!endLevelDelayed) {
+						endLevelDelayed = true;
+						pauseCursorPos = 0;
+						score += remainClears >> 6;
+						//addScore += remainClears >> 6;
+						//updateScore(addScore);
+						levelMedal = scoreSystem(score);
+						if (levelMedal >= medals[level]) {
+							medals[level] = levelMedal;
+						}
+						//energy = 0;
+						//score = 0;
+						inputDelay = Global.inputReadDelayTimer * 2;
+						break;
+					}
+					//coordinates[0] = i;
+					//coordinates[1] = j;
+					//sumMoves += checkGrid(coordinates);
+					
+				} 
+			//	else {
+			//		sumMoves++;
+			//		continue;
+			//	}
+				//}
+				//}
+			}				
+		}
 	}
 	
 	@Override
@@ -536,40 +586,33 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
 				scoreMedal3 = 25000;
+				levelClears[level] = 50;
 				
 				//grid = GridColumn.loadFromFile("media/sp6.csv");
 				break;
 			case 11:
-				
-				grid = new GridColumn[20];
-				for (int i = 0; i < grid.length; i++) {
-					grid[i] = new GridColumn(20);
-					for (int k = 0; k < grid[0].blocks.length; k++) {
-						if (i % 2 == 0 && k % 2 == 0) {
-							r = 1;
-						} else {
-							r = 2;
-						}
-						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, r);
-					}
-				}
+				grid = GridColumn.loadFromFile("level6.dat");
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
 				scoreMedal3 = 25000;
+				levelClears[level] = 50;
 
 				break;
 			case 15:
-				grid = GridColumn.loadFromFile("media/sp6.csv");
+				grid = GridColumn.loadFromFile("level4.dat");
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
 				scoreMedal3 = 25000;
+				levelClears[level] = 50;
+				gridShiftDir = 0;
 
 				break;
 			case 20:
-				grid = GridColumn.loadFromFile("media/sp4.csv");
+				grid = GridColumn.loadFromFile("level6.dat");
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
 				scoreMedal3 = 25000;
+				levelClears[level] = 50;
 
 				break;
 			default:
@@ -605,12 +648,13 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 		inputDelay -= Global.delta;
 		
 		background.draw(0, 0);
-		
+
+		//Global.writeToLog( String.format("actionDelay: %d", actionDelay) , true );
 		//scoreSystem();
-		
-		if (blocksRemaining == 0 && remainClears > 0 && actionDelay == 0) {
+		specialEndingConditions();
+		if (blocksRemaining == 0 && remainClears > 0 && actionDelay <= 0) {
 			levelComplete = true;
-			Global.writeToLog( String.format("levelComplete: %b", levelComplete) , true );
+			//Global.writeToLog( String.format("levelComplete: %b", levelComplete) , true );
 			if (!endLevelDelayed) {
 				endLevelDelayed = true;
 				pauseCursorPos = 0;
@@ -641,35 +685,43 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 		//}
 		
 		//sumMoves = 0;
-		//if (actionDelay == 0 && remainClears > 0) {
+		/*if (blocksRemaining > 0 && remainClears > 0) {
+			//sumMoves = 0;
 			for (int i = 0; i < grid.length; i++) {
 				for (int j = 0; j < grid[0].blocks.length; j++) {
-					if (actionDelay == 0) {
-					if (grid[i].blocks[j] == null) {
-						continue;
-					} else {
+					if (actionDelay <= 0) {
+					//if (grid[i].blocks[j] == null) {
+					//	continue;
+					//} 
+					//if (grid[i].blocks[j].type == Block.BlockType.BLOCK) {
 						//sumMoves += checkGridMovesRemain(i, j, grid, grid[i].blocks[j].colorID);
 						//while (grid[i].blocks[j].dropDistance != 0) {
 						coordinates[0] = i;
 						coordinates[1] = j;
-						sumMoves += checkGrid(coordinates);
 						
-					}
-					}
+						sumMoves += checkGrid(coordinates);
+						Global.writeToLog( String.format("sumMoves: %d", sumMoves) , true );
+						
+					} 
+				//	else {
+				//		sumMoves++;
+				//		continue;
+				//	}
+					//}
 				//	}
 				}				
 			}
-		
+		}
 			//sumMoves = 0;
-			if ( sumMoves == 0 && actionDelay == 0 && remainClears > 0 ) {
+			if ( sumMoves <= 0 && actionDelay <= 0) {
 				noMoves = true;
 				gameOver = true;
 				pauseCursorPos = 0;
-			} else if (sumMoves > 1  && movesUpdateDelay == 0) {
+			} else if (sumMoves >= 1) {
 				sumMoves = 0;
-			}
+			}*/
 		//}
-		if (blocksRemaining == 1 && movesUpdateDelay == 0 && remainClears > 0) {
+		if (blocksRemaining == 1 && actionDelay == 0 && remainClears > 0) {
 	        // game over with one block remaining
 			noMoves = true;
 			gameOver = true;
