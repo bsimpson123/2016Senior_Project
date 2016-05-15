@@ -23,14 +23,13 @@ public class Block implements Cloneable {
 	;
 	public static final int blockColorCount = 6;
 	
-	/* Protected variables */
 	/* Define the draw space that a block will take up in the grid.
 	 * This value is independent from the texture size and will ensure
 	 * each block takes up the same space on the grid. */
 	protected static final int[] blockDrawSpace = new int[] { 32, 32 };
 	
 	public final BlockType type;
-	protected Sprite block;
+	private Sprite block;
 	protected int colorID = 0;
 	/** Collection of colors that will be used for standard blocks. */
 	
@@ -211,8 +210,6 @@ public class Block implements Cloneable {
 				break;
 		}
 	}
-	
-	
 	
 	/** 
 	 * Creates a copy of the object block with default block state values.

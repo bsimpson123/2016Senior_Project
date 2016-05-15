@@ -40,7 +40,7 @@ public class BlockBreakLevel {
 	protected int[] blockSize = new int[] { 32, 32 };
 	/** Defines which direction the grid columns should shift where there is space between them.<br>
 	 * 1 => right-shift, -1 => left-shift, 0 => do not shift grid columns */
-	private int gridShiftDir = 1;
+	protected int gridShiftDir = 1;
 	/** The amount of time the player must wait between each switch of the grid direction. */
 	private final long gridShiftActionDelayTimer = 1000;
 	private long gridShiftActionDelay = gridShiftActionDelayTimer;
@@ -54,10 +54,10 @@ public class BlockBreakLevel {
 	// grid queue variables
 	private Block[] queue;
 	/** Time delay between each 'step' for the queue, lower values will cause the queue to advance quicker */
-	private long queueStepDelayTimer = 500;
+	protected long queueStepDelayTimer = 500;
 	private long queueStepDelay = queueStepDelayTimer;
 	/** The number of 'empty' steps to take before adding a block to the queue. */
-	private int queueStepReq = 4;
+	protected int queueStepReq = 4;
 	private int queueStepCount = 0;
 	private int queueCount = 0;
 	/** The number of blocks that should be in the queue before forcibly adding to the grid */
@@ -193,12 +193,14 @@ public class BlockBreakLevel {
 		queueDisabled = false;
 		// disable energy use. the bar will not show and energy will not decrease during gameplay
 		disableEnergy = false;
+		minColors = 2;
 
 		Global.rand.setSeed(LocalDateTime.now().getNano());
 
 		
 		Block b = null;
 		int r, rx, ry;
+		int[] list;
 		// TODO: finish all level grid builds
 		/* The switch/case statements below are for building the level-dependent grids.
 		 * Variables for blocks remaining, wedge positioning, allowed block color generation, etc.,
@@ -206,14 +208,15 @@ public class BlockBreakLevel {
 		 */
 		switch (levelSelect) {
 			case 1:
+				// 2 colors, nothing special
 				grid = new GridColumn[20];
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						//grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, );
-						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK,
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(2) );
+						/* grid[i].blocks[k] = new Block(Block.BlockType.BLOCK,
 								(i % 4) | (k % 3)
-							);
+							); //*/
 					}
 				}
 				break;
@@ -311,17 +314,122 @@ public class BlockBreakLevel {
 				grid = GridColumn.loadFromFile("media/sp9.csv");
 				break;
 			case 11:
-				
+				// 4 colors, randomly selected set, slightly faster queue
+				rx = Global.rand.nextInt(6);
+				do {
+					ry = Global.rand.nextInt(6);
+				} while (ry == rx);
+				list = new int[4];
+				for (int i = 0, x = 0; i < list.length; x++) {
+					if (x == rx || x == ry) { continue; }
+					list[i] = x;
+					i++;
+				}
 				grid = new GridColumn[20];
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
-						
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(4)]);
 					}
 				}
+				queueStepDelay = 400;
+				break;
+			case 12:
+				// 3 colors, rock, queue slightly faster
+				list = new int[3];
+				list[0] = Global.rand.nextInt(6);
+				do {
+					list[1] = Global.rand.nextInt(6);
+				} while (list[0] == list[1]);
+				do {
+					list[2] = Global.rand.nextInt(6);
+				} while (list[2] == list[0] || list[2] == list[1]);
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(3)]);
+					}
+				}
+				queueStepDelay -= 100;
+				rx = Global.rand.nextInt(8) + 6;
+				grid[rx].blocks[0] = new Block(Block.BlockType.ROCK);
+				break;
+			case 13:
+				// 3 colors, rock, queue faster, fewer steps to add blocks
+				list = new int[3];
+				list[0] = Global.rand.nextInt(6);
+				do {
+					list[1] = Global.rand.nextInt(6);
+				} while (list[0] == list[1]);
+				do {
+					list[2] = Global.rand.nextInt(6);
+				} while (list[2] == list[0] || list[2] == list[1]);
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(3)]);
+					}
+				}
+				queueStepDelay -= 150;
+				queueStepReq--; // 1 fewer steps until a block is added
+				queueLimit++; // block limit +1 until forced drop
+				rx = Global.rand.nextInt(8) + 6;
+				grid[rx].blocks[0] = new Block(Block.BlockType.ROCK);
+				break;
+			case 14:
+				// 4 colors, no rock, faster queue, fewer steps to add blocks
+				rx = Global.rand.nextInt(6);
+				do {
+					ry = Global.rand.nextInt(6);
+				} while (ry == rx);
+				list = new int[4];
+				for (int i = 0, x = 0; i < list.length; x++) {
+					if (x == rx || x == ry) { continue; }
+					list[i] = x;
+					i++;
+				}
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(4)]);
+					}
+				}
+				queueStepDelay -= 150;
+				queueStepReq--; // 1 fewer steps until a block is added
+				queueLimit++; // block limit +1 until forced drop
+				
 				break;
 			case 15:
-				grid = GridColumn.loadFromFile("media/sp7.csv");
+				grid = GridColumn.loadFromFile("media/sp6.csv");
+				break;
+			case 16:
+				// 4 colors, wedge, faster queue, fewer steps to add blocks
+				rx = Global.rand.nextInt(6);
+				do {
+					ry = Global.rand.nextInt(6);
+				} while (ry == rx);
+				list = new int[4];
+				for (int i = 0, x = 0; i < list.length; x++) {
+					if (x == rx || x == ry) { continue; }
+					list[i] = x;
+					i++;
+				}
+				grid = new GridColumn[20];
+				for (int i = 0; i < grid.length; i++) {
+					grid[i] = new GridColumn(20);
+					for (int k = 0; k < grid[0].blocks.length; k++) {
+						grid[i].blocks[k] = new Block(Block.BlockType.BLOCK, list[Global.rand.nextInt(4)]);
+					}
+				}
+				queueStepDelay -= 150;
+				queueStepReq--; // 1 fewer steps until a block is added
+				queueLimit++; // block limit +1 until forced drop
+				rx = Global.rand.nextInt(8) + 6;
+				ry = Global.rand.nextInt(4) + 10;
+				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				break;
 			case 20:
 				grid = GridColumn.loadFromFile("media/sp4.csv");
@@ -709,6 +817,10 @@ public class BlockBreakLevel {
 				if (Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty
 					grid[xc].columnOffset = 0;
 					continue; 
+				}
+				if (!Global.useBlockCascading && grid[next].blocks[0] != null) { 
+					grid[xc].columnOffset = grid[next].columnOffset;
+					continue; 
 				} 
 				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 
 					grid[xc].columnOffset = 0;
@@ -753,6 +865,13 @@ public class BlockBreakLevel {
 					grid[xc].columnOffset = 0;
 					continue; 
 				} 
+				if (!Global.useBlockCascading && grid[next].blocks[0] != null) { // cascading forces each column to wait for the next to be empty 
+					grid[xc].columnOffset = grid[next].columnOffset;
+					continue; 
+				} else if (!Global.useBlockCascading && grid[next].blocks[0] != null) {
+					grid[xc].columnOffset = grid[next].columnOffset;
+					continue;
+				} 
 				if (grid[xc].blocks[0].type == Block.BlockType.ROCK) { // rock in current column, do no shift 
 					grid[xc].columnOffset = 0;
 					continue; 
@@ -796,14 +915,14 @@ public class BlockBreakLevel {
 			for (int y = 0; y < grid[0].blocks.length; y++) {
 				if (grid[x].blocks[y] != null && grid[x].blocks[y].type == Block.BlockType.STAR) {
 					// TODO: add activation call for star blocks found sharing an edge
-					if (grid[x].blocks[y].clearMark) { continue; } // block has already been processed
-					if (x + 1 < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) { 
+					// if (grid[x].blocks[y].clearMark) { continue; } // block has already been processed
+					if ( (x + 1) < grid.length && grid[x+1].blocks[y] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
 					if (x > 0 && grid[x-1].blocks[y] != null && grid[x-1].blocks[y].type == Block.BlockType.STAR) { 
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else 
-					if (y + 1 < grid[0].blocks.length && grid[x].blocks[y+1] != null && grid[x+1].blocks[y].type == Block.BlockType.STAR) {
+					if ( (y + 1) < grid[x].blocks.length && grid[x].blocks[y+1] != null && grid[x].blocks[y+1].type == Block.BlockType.STAR) {
 						clears += activateStarBlock(new int[] { x, y }, true);
 					} else
 					if (y > 0 && grid[x].blocks[y-1] != null && grid[x].blocks[y-1].type == Block.BlockType.STAR) {
@@ -1054,7 +1173,9 @@ public class BlockBreakLevel {
 						Global.getControlActive(Global.GameControl.SELECT) &&
 						grid[cursorGridPos[0]].blocks[cursorGridPos[1]] != null) {
 					int counter = processActivate();
-					if (counter > 1 || grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB) {
+					if (counter > 1 
+							|| grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.BOMB
+							|| grid[cursorGridPos[0]].blocks[cursorGridPos[1]].type == Block.BlockType.STAR ) {
 						// decrease the blocksRemaining counter after blocks are cleared
 						removeMarkedBlocks();
 					}
@@ -1271,6 +1392,7 @@ public class BlockBreakLevel {
 	 * @author John
 	 */
 	protected void removeFromQueue(int color) {
+		if (queueDisabled) { return; }
 		for (int i = 0; i < queue.length; i++) {
 			if (queue[i] != null && queue[i].type == Block.BlockType.BLOCK && queue[i].colorID == color) {
 				queue[i] = null;
@@ -1286,6 +1408,7 @@ public class BlockBreakLevel {
 	 * @param replaceType
 	 */
 	protected void removeFromQueue(int color, Block.BlockType replaceType) {
+		if (queueDisabled) { return; }
 		for (int i = 0; i < queue.length; i++) {
 			if (queue[i] != null && queue[i].type == Block.BlockType.BLOCK && queue[i].colorID == color) {
 				queue[i] = new Block(replaceType);
