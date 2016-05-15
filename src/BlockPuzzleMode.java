@@ -958,25 +958,26 @@ public class BlockPuzzleMode implements GameMode {
 		BufferedReader prefFile;
 		String line;
 		HighScoreRecord hsr;
-		//int i = 1;
+		int i = 1;
 		
 
 
 		try {
 			prefFile = new BufferedReader(new FileReader("puzzle.pref"));
 			line = prefFile.readLine();
-			while (line != null) {
-				for (int i = 1; i < medals.length; i++) {
+			while (line != null && i < medals.length) {
+				//for (int i = 1; i < medals.length; i++) {
 					//if (line != null) {
 					if (line.compareToIgnoreCase("[HighScore" + i +"]") == 0) {
 						try {
 							line = prefFile.readLine();
-							while (line != null) {
-								medals[i] = Integer.parseInt(line);
+							//while (line != null) {
+							medals[i] = Integer.parseInt(line);
 								
-								line = prefFile.readLine();
-							}
+							line = prefFile.readLine();
+							//}
 						} catch (NumberFormatException nfe) {
+							medals[i] = 0;
 							continue;
 						}
 					} else if (line.compareToIgnoreCase("[TopLevel]") == 0) {
@@ -987,8 +988,8 @@ public class BlockPuzzleMode implements GameMode {
 							maxUnlocked = 1;
 						}
 					}
-				}
-				//i++;
+				//}
+				i++;
 				line = prefFile.readLine();
 			}
 			//}
