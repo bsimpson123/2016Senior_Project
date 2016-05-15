@@ -24,7 +24,7 @@ public class BlockBreakStandard implements GameMode {
 	protected HashMap<String, Texture> localTexMap = new HashMap<String, Texture>(10);
 	protected int cursorPos = 0;
 	//protected long inputDelay = Global.inputReadDelayTimer;
-	private BlockStandardLevel playLevel;
+	private BlockBreakLevel playLevel;
 
 	// Level variables. These may be moved/removed if level play is moved to separated class object.
 	protected int[] blockOffSet = new int[] { 32, 32 };
@@ -50,21 +50,7 @@ public class BlockBreakStandard implements GameMode {
 	};
 	
 	private Sprite GameSelector_background;
-	private Sprite[] selector = new Sprite[2];
-	private Sprite optionBox;
-	private Sprite play_unselect;
-	private Sprite prac_unselect;
-	private Sprite gamemode_unselect;
-	private Sprite back_unselect;
-	
-	private Sprite play_select;
-	private Sprite prac_select;
-	private Sprite gamemode_select;
-	private Sprite back_select;
-	
-	private Sprite label_unselect[];
-	private Sprite label_select[];
-	private Sprite button_select[];
+	//private Sprite[] selector = new Sprite[2];
 	private Sprite ex_screen;
 	private final String[] menuOptions = new String[] {
 		"Play",
@@ -135,77 +121,7 @@ public class BlockBreakStandard implements GameMode {
 				new int[] {1024,768},
 				new int[] {1024,768}
 			);
-		optionBox = new Sprite(
-				Global.textureMap.get("green_ui"),
-				new int[] { 0, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
 		
-		selector[0] = new Sprite( // left-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 39, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
-		selector[1] = new Sprite( // right-side arrow
-				Global.textureMap.get("grey_ui"),
-				new int[] { 0, 478 },
-				new int[] { 38, 30 },
-				new int[] { 38, 30 }
-			);
-		
-		play_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 0 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		play_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 0 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		
-		prac_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 30 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		prac_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 30 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		
-		gamemode_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 60 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		gamemode_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 60 },
-				new int[] { 190, 27 },
-				new int[] { 190, 48 }
-			);
-		
-		back_unselect = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 0, 90 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
-		back_select = new Sprite(
-				localTexMap.get("new_test"),
-				new int[] { 190, 90 },
-				new int[] { 190, 30 },
-				new int[] { 190, 48 }
-			);
 		ex_screen = new Sprite (
 				localTexMap.get("ex_game_screen"),
 				new int[] { 0,0 },
@@ -213,50 +129,12 @@ public class BlockBreakStandard implements GameMode {
 				new int[] { 1425, 600 }
 				);
 		
+		BlockBreakLevel.buildStaticAssets(localTexMap);
 		
-		//author: Mario
-		BlockStandardLevel.nLevel = new Sprite(
-				localTexMap.get("nLevel"),
-				new int[] { 0, 0 },
-				new int[] { 190, 48 },
-				new int[] { 190, 48 }
-			);
-		// author: John
-		BlockStandardLevel.overlay = new Sprite(
-				Global.textureMap.get("overlay"),
-				new int[] { 0, 0 },
-				new int[] { 1024, 768 },
-				new int[] { 1024, 768 }
-			);		
-		BlockStandardLevel.cursor = new Sprite(
-				Global.textureMap.get("blocksheet"),
-				new int[] { 240, 0 },
-				new int[] { 32, 32 },
-				blockOffSet
-			);
-		BlockStandardLevel.shiftLR[0] = new Sprite( // left indicator
-				localTexMap.get("white_ui_controls"),
-				new int[] { 300, 600 },
-				new int[] { 100, 100 },
-				new int[] { 100, 100 }
-			);
-		BlockStandardLevel.shiftLR[1] = new Sprite( // right indicator
-				localTexMap.get("white_ui_controls"),
-				new int[] { 200, 300 },
-				new int[] { 100, 100 },
-				new int[] { 100, 100 }
-			);
-		BlockStandardLevel.emptyEnergy = new Sprite(
-				localTexMap.get("energy_empty"),
-				new int[] { 0, 0 },
-				new int[] { 512, 32 },
-				new int[] { 640, 32 }
-			);
-		BlockStandardLevel.energyBar = localTexMap.get("energybar");
 		int offset = 0;
-		for (int i = 0; i < BlockStandardLevel.numbers.length; i++) {
+		for (int i = 0; i < BlockBreakLevel.numbers.length; i++) {
 			offset = i * 24 - 1;
-			BlockStandardLevel.numbers[i] = new Sprite(
+			BlockBreakLevel.numbers[i] = new Sprite(
 					localTexMap.get("number_white"),
 					new int[] { offset, 0 },
 					new int[] { 24, 30 },
@@ -299,8 +177,6 @@ public class BlockBreakStandard implements GameMode {
 	@Override
 	public void run() {
 		currentState = LoadState.READY;
-		//movementInputDelay = Global.inputReadDelayTimer;
-
 		
 		if (playLevel != null) {
 			if (!playLevel.levelFinished) {
@@ -310,11 +186,10 @@ public class BlockBreakStandard implements GameMode {
 			} else {
 				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
-					// TODO: selectPractice = false;
 					movementInputDelay = Global.inputReadDelayTimer;
 					if (!playLevel.practice) {
 						for (int i = 9; i >= 0; i--) {
-							if (hsRecords.get(i).getScore() < BlockStandardLevel.score) {
+							if (hsRecords.get(i).getScore() < BlockBreakLevel.score) {
 								newHighScore = true;
 								showHighScore = true;
 								hsNameEntry = "";
@@ -326,15 +201,12 @@ public class BlockBreakStandard implements GameMode {
 					lastLevel = playLevel.level;
 					playLevel = null;
 				} else {
-					// load next level
-					// TODO: add test for at last level and return to menu
 					loadLevel(playLevel.level + 1);
 				}
 			}
 		} else if (showHighScore) {
 			showHighScores();
 			if (newHighScore) {
-				// TODO: get high score user data
 				if (!preClearComplete) {
 					int c = Keyboard.getNumKeyboardEvents();
 					if (c > 0) {
@@ -349,7 +221,7 @@ public class BlockBreakStandard implements GameMode {
 						new HighScoreRecord(
 							hsNameEntry,
 							LocalDateTime.now(),
-							BlockStandardLevel.score,
+							BlockBreakLevel.score,
 							lastLevel
 						)
 					);
@@ -378,7 +250,7 @@ public class BlockBreakStandard implements GameMode {
 				Global.uiBlue.draw(256, 256, 512, 376);
 				Global.drawFont24(276, 276, "Level: " + Integer.toString(lastLevel), Color.white);
 				Global.drawFont24(276, 310, "Score:", Color.white);
-				Global.drawFont24(276, 334, Integer.toString(BlockStandardLevel.score), Color.white);
+				Global.drawFont24(276, 334, Integer.toString(BlockBreakLevel.score), Color.white);
 				Global.uiBlueSel.draw(276, 360, 472, 48);
 				Global.drawFont24(282, 386, hsNameEntry + '_', Color.black);
 				
@@ -450,7 +322,6 @@ public class BlockBreakStandard implements GameMode {
 			if (Global.getControlActive(Global.GameControl.UP)) {
 				cursorPos--;
 				Global.sounds.playSoundEffect("button_click");
-				
 				if (cursorPos < 0) {
 					
 					cursorPos = 3;
@@ -468,11 +339,6 @@ public class BlockBreakStandard implements GameMode {
 			}
 			if (Global.getControlActive(Global.GameControl.CANCEL)) { // Cancel key moves the cursor to the program exit button
 				cursorPos = 3;
-					//BlockStandardLevel.gamePaused = false;
-				
-			}
-			if (Global.getControlActive(Global.GameControl.PAUSE)) {
-				//BlockStandardLevel.gamePaused = true;
 			}
 			if (cursorPos == 1) { // practice selected, not confirmed
 				inputPracMenu();
@@ -481,12 +347,12 @@ public class BlockBreakStandard implements GameMode {
 				switch (cursorPos) {
 					case 0: // normal mode
 						if (Global.getControlActive(Global.GameControl.LEFT)) {
-							playLevel = new BlockStandardLevelEx(localTexMap);
+							playLevel = new BlockStandardLevelBuilder(-1);
 							playLevel.levelTitle = "Build Mode";
 						} else {
 							loadLevel(1);
-							BlockStandardLevel.score = 0;
 						}
+						BlockBreakLevel.score = 0;
 						//activeGameMode = BlockMatchStandard;
 						break;
 					case 1: // practice mode
@@ -494,7 +360,7 @@ public class BlockBreakStandard implements GameMode {
 						loadLevel(pracLevel);
 						playLevel.practice = true;
 						movementInputDelay = Global.inputReadDelayTimer;
-						BlockStandardLevel.score = 0;
+						BlockBreakLevel.score = 0;
 						//selectPractice = true;
 						break;
 					case 2: // high score
@@ -514,74 +380,7 @@ public class BlockBreakStandard implements GameMode {
 	}
 	
 	private void loadLevel(int levelID) {
-		switch (levelID) {
-			case 1:
-				//playLevel = new BlockStandardLevelex3(localTexMap);//BlockStandardLevel01(localTexMap);
-				playLevel = new BlockStandardLevel01(localTexMap);
-				break;
-			case 2:
-				playLevel = new BlockStandardLevel02(localTexMap);
-				break;
-			case 3:
-				playLevel = new BlockStandardLevel03(localTexMap);
-				break;
-			case 4:
-				playLevel = new BlockStandardLevel04(localTexMap);
-				break;
-			case 5:
-				playLevel = new BlockStandardLevel05(localTexMap);
-				break;
-			case 6:
-				playLevel = new BlockStandardLevel06(localTexMap);
-				break;
-			case 7:
-				playLevel = new BlockStandardLevel07(localTexMap);
-				break;
-			case 8:
-				playLevel = new BlockStandardLevel08(localTexMap);
-				break;
-			case 9:
-				playLevel = new BlockStandardLevel09(localTexMap);
-				break;
-			case 10: 
-				playLevel = new BlockStandardLevel10(localTexMap);
-				break;
-			case 11:
-				playLevel = new BlockStandardLevel11(localTexMap);
-				break;
-			case 12:
-				playLevel = new BlockStandardLevel12(localTexMap);
-				break;
-			case 13:
-				playLevel = new BlockStandardLevel13(localTexMap);
-				break;
-			case 14:
-				playLevel = new BlockStandardLevel14(localTexMap);
-				break;
-			case 15:
-				playLevel = new BlockStandardLevel15(localTexMap);
-				break;
-			case 16:
-				playLevel = new BlockStandardLevel16(localTexMap);
-				break;
-			case 17:
-				playLevel = new BlockStandardLevel17(localTexMap);
-				break;
-			case 18:
-				playLevel = new BlockStandardLevel18(localTexMap);
-				break;
-			case 19:
-				playLevel = new BlockStandardLevel19(localTexMap);
-				break;
-			case 20:
-				playLevel = new BlockStandardLevel20(localTexMap);
-				break;
-			default:
-				Global.writeToLog( String.format("Attempting to load invalid standard mode play level: %d", levelID) , true );
-				return ;
-		}
-		playLevel.level = levelID;
-		playLevel.levelTitle = String.format("Level %02d", playLevel.level);
+		playLevel = new BlockBreakLevel(levelID);
 	}
 		
 	private void inputPracMenu() {
@@ -610,7 +409,7 @@ public class BlockBreakStandard implements GameMode {
 		
 		pracArrows[0].draw(pracOffset, 248);
 		pracBox.draw(pracOffset + 40, 250);
-		//BlockStandardLevel.numbers[pracLevel].draw(525, 255);
+		//BlockBreakLevel.numbers[pracLevel].draw(525, 255);
 		Global.drawNumbers24(pracOffset + 65 - numOffset, pracSelectDrop + 12, num, numCol);
 		pracArrows[1].draw(pracOffset + 80, 248);
 	}

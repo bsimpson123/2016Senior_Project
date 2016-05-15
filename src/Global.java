@@ -50,7 +50,7 @@ public class Global {
 	public static long inputReadDelayTimer = 150l;
 	public static boolean useBlockCascading = true;
 	public static boolean waitForGridMovement = true;
-	
+	public static boolean fullscreen = false;
 	
 	// End configurable variables
 	
