@@ -329,6 +329,7 @@ public class BlockPuzzleMode implements GameMode {
 				//if (playLevel.levelFinished) {
 
 				//}
+				medals = PuzzleBreakLevel.medals;
 				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
 				//	gridDisplay.get(playLevel.level).levelFinished = false;
@@ -352,15 +353,20 @@ public class BlockPuzzleMode implements GameMode {
 						//}
 					//}
 					lastLevel = playLevel.level;
-					gridDisplay.get(lastLevel).levelFinished = false;
-					gridDisplay.get(lastLevel).gamePaused = false;
-					gridDisplay.get(lastLevel).gameOver = false;
+					//gridDisplay.get(lastLevel).levelFinished = false;
+					//gridDisplay.get(lastLevel).gamePaused = false;
+					//gridDisplay.get(lastLevel).gameOver = false;
+					//gridDisplay.get(lastLevel).levelComplete = false;
+					
 					//gridDisplay.get(lastLevel).levelComplete = false;
 					//gridDispLevel.get(lastLevel) = gridDisplay.get(lastLevel).grid;
 					
-					
+					playLevel.levelFinished = false;
+					playLevel.gamePaused = false;
+					playLevel.gameOver = false;
+					playLevel.levelComplete = false;
 					//gridDisplay.get(lastLevel).buildGrid(lastLevel);
-					medals = PuzzleBreakLevel.medals;
+					
 					//gridDisplay.get(lastLevel).buildGridPuzzle(lastLevel);
 					/*if (gridDisplay.get(playLevel.level).gameOver) {
 						gridDisplay.get(lastLevel).levelFinished = false;
@@ -382,6 +388,8 @@ public class BlockPuzzleMode implements GameMode {
 					playLevel.levelFinished = false;
 					playLevel.gamePaused = false;
 					playLevel.gameOver = false;
+					playLevel.levelComplete = false;
+					
 					//playLevel.buildGrid(playLevel.level);
 					//gridDispLevel.add(playLevel.level,playLevel.grid);
 					
@@ -958,11 +966,54 @@ public class BlockPuzzleMode implements GameMode {
 		BufferedReader prefFile;
 		String line;
 		HighScoreRecord hsr;
-		int i = 1;
+		//int i = 1;
+		
+		try {
+			prefFile = new BufferedReader(new FileReader("puzzle.pref"));
+			line = prefFile.readLine();
+			while (line != null) {
+			
+				if (line.compareToIgnoreCase("[HighScore]") == 0) {
+					line = prefFile.readLine();
+					
+					for (int i = 1; line != null && i < medals.length; i++) {
+						//for (int i = 1; i < medals.length; i++) {
+							//if (line != null) {
+	
+						//if (line.compareToIgnoreCase(i + ":") == 0) {
+						if (line.compareToIgnoreCase(i + ":" + line.charAt(line.length() - 1)) == 0) {
+								try {
+	
+									medals[i] = Character.getNumericValue(line.charAt(line.length() - 1));
+	
+									line = prefFile.readLine();
+								} catch (NumberFormatException nfe) {
+									medals[i] = 0;
+									continue;
+								}
+						}
+								
+					}
+				} else if (line.compareToIgnoreCase("[TopLevel]") == 0) {
+					line = prefFile.readLine();
+					try {
+						maxUnlocked = Integer.parseInt(line);
+					} catch (NumberFormatException nfe) {
+						maxUnlocked = 1;
+					}
+							
+				}
+						
+				line = prefFile.readLine();
+			
+			}
+			prefFile.close();
+		} catch (IOException err) {
+			
+		}
 		
 
-
-		try {
+		/*try {
 			prefFile = new BufferedReader(new FileReader("puzzle.pref"));
 			line = prefFile.readLine();
 			while (line != null && i < medals.length) {
@@ -996,7 +1047,7 @@ public class BlockPuzzleMode implements GameMode {
 			prefFile.close();
 		} catch (IOException err) {
 			
-		} /*finally {
+		}/* /*finally {
 			Collections.sort(hsRecords);
 			while (hsRecords.size() > 10) {
 				hsRecords.remove(10);
@@ -1015,10 +1066,13 @@ public class BlockPuzzleMode implements GameMode {
 			prefFile.newLine();
 			prefFile.write(Integer.toString(maxUnlocked));
 			prefFile.newLine();
+			prefFile.write("[HighScore]");
+			prefFile.newLine();
 			for (int i = 1; i < pracMax + 1; i++) {
-				prefFile.write("[HighScore" + i +"]");
+				
+				prefFile.write(i +":");
 				//if (maxUnlocked == playLevel.level) {
-					prefFile.newLine();
+					//prefFile.newLine();
 					///for(HighScoreRecord hsr : hsRecords) {
 					//	prefFile.write(hsr.toString());
 					if (i < medals.length) {
