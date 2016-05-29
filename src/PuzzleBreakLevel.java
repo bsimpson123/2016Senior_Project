@@ -162,6 +162,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	protected static int scoreMedal2 = 5000;
 	protected static int scoreMedal3 = 25000;
 
+
+	
 	protected static Sprite GoldStar;
 	protected static Sprite ChallengeStar;
 	protected static Sprite SilverStar;
@@ -179,6 +181,11 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	protected static int nLevels = 20;
 	protected static int[] levelClears = new int[nLevels + 1];
 	protected static int[] medals = new int[nLevels + 1];
+	
+	protected static int[] scoreMedal1st = new int[nLevels + 1];// = 2500;
+	protected static int[] scoreMedal2nd = new int[nLevels + 1];// = 5000;
+	protected static int[] scoreMedal3rd = new int[nLevels + 1];// = 25000;
+	
 	
 	private int addScore = 0;
 	
@@ -264,7 +271,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 		
 		//levelClears = levelClears;//new int[nLevels + 1];
 		medals = BlockPuzzleMode.medals;//new int[nLevels + 1];
-		
+		//scoreMedal1st = new int[nLevels + 1];// = 2500;
+		//scoreMedal2nd = new int[nLevels + 1];// = 5000;
+		//scoreMedal3rd = new int[nLevels + 1];// = 25000;
 		
 	}
 	
@@ -286,7 +295,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 		return GridColumn.loadFromFile(source);
 	}
 	
-	protected int scoreSystem(int level) {
+	protected int scoreSystem(int levelScore) {
 		//if (useScore) {
 			/*if (score <= scoreMedal1) {
 				//medals[level] = 1;
@@ -305,13 +314,13 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				levelMedal = 4;
 			}*/
 			
-			if (level <= scoreMedal1) {
+			if (levelScore <= scoreMedal1st[level]) {
 				//medals[level] = 1;
 				levelMedals = 1;
-			} else if (level > scoreMedal1 && level <= scoreMedal2) {
+			} else if (levelScore > scoreMedal1st[level] && levelScore <= scoreMedal2nd[level]) {
 				//medals[level] = 2;
 				levelMedals = 2;
-			} else if (level > scoreMedal2) {
+			} else if (levelScore > scoreMedal2nd[level]) {
 				//medals[level] = 3;
 				levelMedals = 3;
 			}
@@ -424,9 +433,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 						
 					}
 				}
-				scoreMedal1 = 56000;
-				scoreMedal2 = 56200;
-				scoreMedal3 = 25000;
+				scoreMedal1st[level] = 56000;
+				scoreMedal2nd[level] = 56200;
+				scoreMedal3rd[level] = 25000;
 				
 				break;
 			case 2:
@@ -451,9 +460,13 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				}
 				levelClears[level] = 31;
 				
-				scoreMedal1 = 5000;
-				scoreMedal2 = 14000;
-				scoreMedal3 = 152000;
+				scoreMedal1st[level] = 5000;
+				scoreMedal2nd[level] = 14000;
+				scoreMedal3rd[level] = 25000;
+				
+				//scoreMedal1 = 5000;
+				//scoreMedal2 = 14000;
+				//scoreMedal3 = 152000;
 
 				//levelClears[levelSelect] = 30;
 				break;
@@ -816,7 +829,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			noMoves = false;
 			noRemainClears = false;
 			buildGrid(level);
-			
+			pauseCursorPos = 0;
 			score = 0;
 			cursorGridPos[0] = grid.length / 2;
 			cursorGridPos[1] = grid[0].blocks.length / 2;
@@ -1178,6 +1191,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 						levelFinished = true;
 						gameOver = true;
 						buildGrid(level);
+						remainClears = -1;
+						score = 0;
 						inputDelay = Global.inputReadDelayTimer;
 						break;
 				}
@@ -1276,6 +1291,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 					case 2:
 						gameOver = true;
 						levelFinished = true;
+						buildGrid(level);
+						remainClears = -1;
+						score = 0;
 						//buildGrid(level);
 						inputDelay = 10 * Global.inputReadDelayTimer;
 				}
