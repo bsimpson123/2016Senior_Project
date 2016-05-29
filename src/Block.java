@@ -46,8 +46,9 @@ public class Block implements Cloneable {
 		this.type = type;
 		if ( (colorID >= blockColorCount || colorID < 0) && type == BlockType.BLOCK) {
 			colorID = 0; 
-		} else if ( (colorID < 2 || colorID > 9) && type == BlockType.BOMB ) {
-			colorID = 2; // default,minimum bomb radius, used if set value is out of range
+		} else if ( type == BlockType.BOMB ) {
+			// default and minimum bomb radius is 2, used if set value is out of range
+			this.colorID = (colorID < 2 || colorID > 9) ? 2 : colorID;
 		} else { // colorID may hold state or data information for other block types
 			this.colorID = colorID;
 		}
@@ -264,6 +265,9 @@ public class Block implements Cloneable {
 				break;
 			case TRASH:
 				blockID = "TRASH";
+				break;
+			case BOMB:
+				blockID = "BOMB";
 				break;
 			default:
 				blockID = "UNKOWN";
