@@ -49,7 +49,7 @@ public class BlockBreakLevel {
 	private final long blockDropDelayTimer = 16l; // 32 is approx. 30 times/sec
 	private long blockDropDelay = blockDropDelayTimer;
 	private final int blockMoveRate = 8;
-	private boolean blocksMoving = false;
+	protected boolean blocksMoving = false;
 	
 	// grid queue variables
 	protected Block[] queue;
