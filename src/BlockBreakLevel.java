@@ -52,16 +52,16 @@ public class BlockBreakLevel {
 	private boolean blocksMoving = false;
 	
 	// grid queue variables
-	private Block[] queue;
+	protected Block[] queue;
 	/** Time delay between each 'step' for the queue, lower values will cause the queue to advance quicker */
 	protected long queueStepDelayTimer = 500;
-	private long queueStepDelay = queueStepDelayTimer;
+	protected long queueStepDelay = queueStepDelayTimer;
 	/** The number of 'empty' steps to take before adding a block to the queue. */
 	protected int queueStepReq = 4;
 	private int queueStepCount = 0;
 	private int queueCount = 0;
 	/** The number of blocks that should be in the queue before forcibly adding to the grid */
-	private int queueLimit = 5;
+	protected int queueLimit = 5;
 	private final long queueManualShiftDelayTimer = 200;
 	private long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
