@@ -431,6 +431,12 @@ public class BlockBreakLevel {
 				ry = Global.rand.nextInt(4) + 10;
 				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				break;
+			case 17:
+				break;
+			case 18:
+				break;
+			case 19:
+				break;
 			case 20:
 				grid = GridColumn.loadFromFile("media/sp4.csv");
 				break;
@@ -458,7 +464,7 @@ public class BlockBreakLevel {
 				pauseCursorPos = 0;
 				score += energy >> 6;
 				energy = 0;
-				inputDelay = Global.inputReadDelayTimer;
+				inputDelay = 1000l;
 			}
 		} else if (energy == 0 && !gameOver && !disableEnergy) {
 			// game over
