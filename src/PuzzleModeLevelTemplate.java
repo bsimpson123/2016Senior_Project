@@ -11,9 +11,11 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		level = 1;
 		
 		/**
-		 * totalMoves is the total number of clears the user is given for the level.
+		 * totalClears is the total number of clears the user is given for the level.
 		 */
+		remainClears = -1;
 		totalClears = 31;
+		//remainClears = totalClears = 31;
 		
 		/**
 		 * 1 = shift right
@@ -25,9 +27,17 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 		 * set score for medal 1, 2, and 3
 		 * 
 		 */
-		scoreMedal1 = 5000;
-		scoreMedal2 = 10000;
-		scoreMedal3 = 21000;
+		scoreMedal1 = 8000;
+		scoreMedal2 = 21000;
+		//scoreMedal3 = 21000;
+		
+		/**
+		 * boolean values for scoring system
+		 */
+		useScore = true;
+		useTime = true;
+		
+		standCond = true;
 		
 		// TODO: [CUSTOM] set background and user interface sprites
 				// if these sprite must be defined or the game will crash at runtime
@@ -67,9 +77,17 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 				cursorGridPos[0] = grid.length / 2;
 				cursorGridPos[1] = grid[0].blocks.length / 2;
 				// set energy max if not default
-				energy = energyMax = 200000;	
+				energy = energyMax = 20000;	
 		
 		
+	}
+	
+	public PuzzleModeLevelTemplate() {
+		blockSize = new int[] { 32, 32 }; // default block size is { 32, 32 }
+		gridSize = new int[] { 20, 20 }; // default grid size is { 20, 20 }
+		grid = new GridColumn[gridSize[0]];
+		buildGrid();
+		gridBasePos = new int[] { 375 + 82, 700 };
 	}
 	
 	
@@ -82,7 +100,7 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 			grid[i] = new GridColumn(gridSize[1]);
 			for (int k = 0; k < grid[0].blocks.length; k++) {
 				// TODO: [CUSTOM] define the randomly generated blocks rate of appearance
-				//r = 1;//Global.rand.nextInt(2);
+				r = 2;//Global.rand.nextInt(2);
 				
 				/*if (((i + k) % 2 == 0)) {
 					r = 4;
@@ -98,6 +116,12 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 					r = 3;
 				}*/
 				
+				/*if (i % 2 == 0 && k % 2 == 0) {
+					r = 1;
+				} else {
+					r = 2;
+				}*/
+				
 				if (i % 2 == 0) {
 					r = 1;
 				} else if (k % 2 == 0) {
@@ -110,7 +134,7 @@ public class PuzzleModeLevelTemplate extends PuzzleModeLevel{
 			}
 		}
 		
-		grid[grid.length / 2].blocks[grid[0].blocks.length / 2] = new Block(Block.BlockType.BLOCK, 1);
+		//grid[grid.length / 2].blocks[grid[0].blocks.length / 2] = new Block(Block.BlockType.BLOCK, 1);
 		//grid[0].blocks[0] = new Block(Block.BlockType.BLOCK, 2);
 		//grid[0].blocks[1] = new Block(Block.BlockType.BLOCK, 3);
 		//grid[0].blocks[2] = new Block(Block.BlockType.BLOCK, 2);
