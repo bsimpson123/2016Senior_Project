@@ -36,6 +36,7 @@ public class BlockPuzzleMode implements GameMode {
 	protected int[] blockOffSet = new int[] { 32, 32 };
 	private long movementInputDelay = Global.inputReadDelayTimer;
 	private long actionDelay = Global.inputReadDelayTimer;
+	private long soundDelay = Global.inputReadDelayTimer;
 	
 	//protected int[] levelArray = new int[3];
 	//private HighScoreRecord[] hsLevelArray = new HighScoreRecord[3];
@@ -67,6 +68,13 @@ public class BlockPuzzleMode implements GameMode {
 		new String[] { "ex_game_screen", "media/game_screen.png"},
 		new String[] { "Chall_Star", "media/star_bronze.png"}
 	};
+	
+	protected String[][] MusicList = new String[][] {
+		new String[] { "stan_music", "media/Space Cadet.ogg" }
+	};	
+	
+	private boolean playSound = true;
+	
 	public GridColumn[] puzzleGrids;
 	private Sprite GameSelector_background;
 	private Sprite gridOverLay;
@@ -104,6 +112,8 @@ public class BlockPuzzleMode implements GameMode {
 
 	//protected List<PuzzleModeLevel> gridDisplay = new ArrayList<PuzzleModeLevel>();
 	protected List<PuzzleBreakLevel> gridDisplay = new ArrayList<PuzzleBreakLevel>();
+	
+	protected GameSounds backMusic;
 	
 	public BlockPuzzleMode() {
 		
@@ -148,6 +158,8 @@ public class BlockPuzzleMode implements GameMode {
 // author Brock
 		//moveClick = new GameSounds(GameSounds.soundType.SOUND, "media/click3.ogg");
 
+		backMusic = new GameSounds(GameSounds.soundType.MUSIC, MusicList);
+		
 		//for (int i = 0; i < PuzzleModeLevel.nLevels; i++) {
 
 		for (int i = 0; i <= pracMax; i++) {
@@ -312,6 +324,7 @@ public class BlockPuzzleMode implements GameMode {
 		//Yellow_star.draw(medalOffset * j + 500, 250);
 		//medalOffset -= 5;
 
+		
 		//playLevel = gridDisplay.get(1);
 		if (playLevel != null) {
 
@@ -320,7 +333,10 @@ public class BlockPuzzleMode implements GameMode {
 				//gridDisplay.get(playLevel.level).run();
 				//playLevel.remainClears = -1;
 				//playLevel.remainClears = gridDisplay.get(playLevel.level).totalClears;
+				
 				playLevel.run();
+				
+				
 			} else if (playLevel.level == 0){
 				playLevel = null;
 			}
@@ -329,6 +345,7 @@ public class BlockPuzzleMode implements GameMode {
 				//if (playLevel.levelFinished) {
 
 				//}
+				
 				medals = PuzzleBreakLevel.medals;
 				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
 				if (playLevel.gameOver || playLevel.practice) {
@@ -418,6 +435,7 @@ public class BlockPuzzleMode implements GameMode {
 				showHighScore = false;
 			} else {
 				movementInputDelay -= Global.delta;
+				
 			}
 			
 			
