@@ -43,18 +43,18 @@ public class BlockBreakLevel {
 	private int gridShiftDir = 1;
 	/** The amount of time the player must wait between each switch of the grid direction. */
 	private final long gridShiftActionDelayTimer = 1000;
-	private long gridShiftActionDelay = gridShiftActionDelayTimer;
+	protected long gridShiftActionDelay = gridShiftActionDelayTimer;
 	protected int blocksRemaining = 0;
 	protected int[] wedgePos = new int[] { -1, -1 };
 	private final long blockDropDelayTimer = 16l; // 32 is approx. 30 times/sec
 	private long blockDropDelay = blockDropDelayTimer;
 	private final int blockMoveRate = 8;
-	private boolean blocksMoving = false;
+	protected boolean blocksMoving = false;
 	
 	// grid queue variables
 	protected Block[] queue;
 	/** Time delay between each 'step' for the queue, lower values will cause the queue to advance quicker */
-	protected long queueStepDelayTimer = 500;
+	protected long queueStepDelayTimer = 500; 
 	protected long queueStepDelay = queueStepDelayTimer;
 	/** The number of 'empty' steps to take before adding a block to the queue. */
 	protected int queueStepReq = 4;
@@ -63,17 +63,17 @@ public class BlockBreakLevel {
 	/** The number of blocks that should be in the queue before forcibly adding to the grid */
 	protected int queueLimit = 5;
 	private final long queueManualShiftDelayTimer = 200;
-	private long queueManualShiftDelay = queueManualShiftDelayTimer;
+	protected long queueManualShiftDelay = queueManualShiftDelayTimer;
 	private boolean queueHold = false;
 	/** If <code>true</code>, no queue processing will be done. */
 	protected boolean queueDisabled = false;
 	
-	private boolean heartSpecialActive = false;
+	protected boolean heartSpecialActive = false;
 	protected int[] cursorGridPos = new int[] { 0, 0 };
 	private int heartCursorPos = 0;
-	private boolean gamePaused = false;
-	private long inputDelay = Global.inputReadDelayTimer;
-	private long actionDelay = Global.inputReadDelayTimer * 2;
+	protected boolean gamePaused = false;
+	protected long inputDelay = Global.inputReadDelayTimer;
+	protected long actionDelay = Global.inputReadDelayTimer * 2;
 	protected String levelTitle;
 	protected final int level;
 	
@@ -95,14 +95,14 @@ public class BlockBreakLevel {
 	private boolean endLevelDelayed = false;
 
 	private int heartSelectColor = 0;
-	private boolean clearColor;
+	protected boolean clearColor;
 	private Block[] heartMenuBlocks = new Block[Block.blockColorCount];
 	
-	private int pauseCursorPos = 0;
+	protected int pauseCursorPos = 0;
 	
-	private int[] blockCounts = new int[Block.blockColorCount];
-	private int allowedColors = 0;
-	private int totalColors = 0;
+	protected int[] blockCounts = new int[Block.blockColorCount];
+	protected int allowedColors = 0;
+	protected int totalColors = 0;
 	protected int minColors = 2;
 	private int heartGenChance = 20;
 	private int bombGenChance = 20;
@@ -224,7 +224,7 @@ public class BlockBreakLevel {
 					grid[i] = new GridColumn(20);
 					for (int k = 0; k < grid[0].blocks.length; k++) {
 						r = Global.rand.nextInt(256);
-						if (r > 16) { 
+						if (r > 16) {
 							b = new Block(Block.BlockType.BLOCK, Global.rand.nextInt(3));
 						} else {
 							b = new Block(Block.BlockType.BOMB, Global.rand.nextInt(3) + 2);
@@ -1099,7 +1099,7 @@ public class BlockBreakLevel {
 	 */
 	protected int addToGrid() {
 		int overflow = 0;
-		int yMax = grid[0].blocks.length - 1;
+		int yMax = grid[0].blocks.length-1;
 		for (int x = 0; x < grid.length; x++) {
 			if (queue[x] != null) {
 				if (grid[x].blocks[yMax] == null) {
@@ -1130,7 +1130,7 @@ public class BlockBreakLevel {
 		if (r < heartGenChance) {
 			b = new Block(Block.BlockType.HEART);
 		} else if (r < (heartGenChance + bombGenChance)) {
-			b = new Block(Block.BlockType.BOMB, Global.rand.nextInt(4)); // 75% chance for size 2 bomb, 25% size 3
+			b = new Block(Block.BlockType.BOMB, Global.rand.nextInt(4));//4 // 75% chance for size 2 bomb, 25% size 3
 		} else {
 			int[] list = new int[Block.blockColorCount];
 			int bsc, count = 0;
@@ -1551,9 +1551,6 @@ public class BlockBreakLevel {
 				allowedColors = allowedColors | (1 << i);
 				totalColors++;
 			}
-		}
-		
-		
+		}	
 	}
-
 }
