@@ -429,10 +429,13 @@ public class BlockBreakLevel {
 				grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
 				break;
 			case 17:
+				grid = GridColumn.loadFromFile("eastergrow.dat");
 				break;
 			case 18:
+				grid = GridColumn.loadFromFile("modernart.dat");
 				break;
 			case 19:
+				grid = GridColumn.loadFromFile("tictactoe.dat");
 				break;
 			case 20:
 				grid = GridColumn.loadFromFile("media/sp4.csv");
