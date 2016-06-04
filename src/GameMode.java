@@ -1,6 +1,3 @@
-import java.util.HashMap;
-import org.newdawn.slick.opengl.Texture;
-
 public interface GameMode {
 	public enum LoadState {
 		NOT_LOADED, LOADING_ASSETS, LOADING_DONE, READY, FINALIZED 
@@ -11,6 +8,7 @@ public interface GameMode {
 	 * before transferring control to the game mode.
 	 * @param textureMap parent texture map containing referencing already loaded textures.
 	 */
+	
 	public void initialize();
 	/**
 	 * Gets the current operating state of the game mode. 
