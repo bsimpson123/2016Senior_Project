@@ -235,7 +235,6 @@ public class Global {
 	
 	private static void initFonts() {
 		TextureImpl.bindNone();
-        //Font awtFont = new Font("SketchFlow Print", Font.BOLD, 20);
 		Font awtFont = new Font("Lucida Console", Font.BOLD, 24);
 		Font awtFontSized = awtFont.deriveFont(24f);
 		numbers24 = new TrueTypeFont(awtFontSized, false);
@@ -254,10 +253,6 @@ public class Global {
         } catch (Exception e) {
             e.printStackTrace();
         }   
-
-        
-        //font = new TrueTypeFont(awtFont, true);
-
 	}
 	
 	public static void buildStandardUIBoxes() {
