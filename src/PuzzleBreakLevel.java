@@ -321,6 +321,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			// 3 colors, no bombs
 			
 			levelClears[level] = 50;
+			scoreMedal1st[level] = 5000;
+			scoreMedal2nd[level] = 14000;
+			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
 			scoreMedal3 = 25000;
@@ -330,6 +333,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			// 3 colors (2 new)
 
 			levelClears[level] = 50;
+			scoreMedal1st[level] = 5000;
+			scoreMedal2nd[level] = 14000;
+			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
 			scoreMedal3 = 25000;
@@ -337,6 +343,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			break;
 		case 5:
 			//grid = GridColumn.loadFromFile("media/sp6.csv");
+			scoreMedal1st[level] = 5000;
+			scoreMedal2nd[level] = 14000;
+			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
 			scoreMedal3 = 25000;
@@ -350,6 +359,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			//rx = Global.rand.nextInt(10) + 5;
 			//ry = Global.rand.nextInt(4) + 8;
 			//grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
+			scoreMedal1st[level] = 5000;
+			scoreMedal2nd[level] = 14000;
+			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
 			scoreMedal3 = 25000;
@@ -361,6 +373,9 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			//rx = Global.rand.nextInt(10) + 5;
 			//ry = Global.rand.nextInt(4) + 8;
 			//grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
+			scoreMedal1st[level] = 5000;
+			scoreMedal2nd[level] = 14000;
+			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
 			scoreMedal3 = 25000;
@@ -368,6 +383,10 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			break;
 		case 8:
 			// 3 colors (last 3), wedge
+			levelClears[level] = 40;
+			scoreMedal1st[level] = 5000;
+			scoreMedal2nd[level] = 14000;
+			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
 			scoreMedal3 = 25000;
@@ -375,6 +394,11 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			break;
 		case 9:
 			// 4 colors, no wedge
+
+			levelClears[level] = 40;
+			scoreMedal1st[level] = 5000;
+			scoreMedal2nd[level] = 14000;
+			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
 			scoreMedal3 = 25000;
@@ -685,6 +709,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				break;
 			case 8:
 				// 3 colors (last 3), wedge
+				levelClears[level] = 40;
 				grid = new GridColumn[20];
 				for (int i = 0; i < grid.length; i++) {
 					grid[i] = new GridColumn(20);
@@ -1043,6 +1068,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 		userInterface.draw(0,0);
 		Global.drawFont48(710, 25, levelTitle, Color.white);
 		Global.drawFont48(710, 80, "Score", Color.white);
+		Global.drawFont48(730, 400, "Clears left", Color.white);
+		Global.uiGreen.draw(800, 445, 80, 44);
 		/*int offsetX = 860;
 		int yPos = 16;
 		int[] numResize = new int[] { 30, 40 }; //*/
