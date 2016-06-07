@@ -184,7 +184,9 @@ public class BlockBreakStandard implements GameMode {
 			} else if (playLevel.level == 0) { 
 				playLevel = null;
 			} else {
-				if (maxUnlocked < playLevel.level) { maxUnlocked = playLevel.level; }
+				int currLevel = playLevel.level;
+				if (!playLevel.gameOver) { currLevel++; }
+				if (maxUnlocked < currLevel) { maxUnlocked = currLevel; }
 				if (playLevel.gameOver || playLevel.practice || playLevel.level == this.pracMax) {
 					movementInputDelay = Global.inputReadDelayTimer;
 					if (!playLevel.practice) {
