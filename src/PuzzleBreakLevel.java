@@ -322,7 +322,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			
 			levelClears[level] = 50;
 			scoreMedal1st[level] = 5000;
-			scoreMedal2nd[level] = 14000;
+			scoreMedal2nd[level] = 6000;
 			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
@@ -333,8 +333,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			// 3 colors (2 new)
 
 			levelClears[level] = 50;
-			scoreMedal1st[level] = 5000;
-			scoreMedal2nd[level] = 14000;
+			scoreMedal1st[level] = 2500;
+			scoreMedal2nd[level] = 5000;
 			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
@@ -359,8 +359,8 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 			//rx = Global.rand.nextInt(10) + 5;
 			//ry = Global.rand.nextInt(4) + 8;
 			//grid[rx].blocks[ry] = new Block(Block.BlockType.WEDGE);
-			scoreMedal1st[level] = 5000;
-			scoreMedal2nd[level] = 14000;
+			scoreMedal1st[level] = 2225;
+			scoreMedal2nd[level] = 2228;
 			scoreMedal3rd[level] = 25000;
 			scoreMedal1 = 2500;
 			scoreMedal2 = 5000;
@@ -673,7 +673,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				scoreMedal3 = 25000;
 				levelClears[level] = 50;
 				break;
-			case 6:
+			case 9:
 				// 3 colors, first show of the wedge block, with heart block
 				grid = GridColumn.loadFromFile("level9-1.dat");
 				
@@ -687,7 +687,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				scoreMedal3 = 25000;
 
 				break;
-			case 7:
+			case 6:
 				levelClears[level] = 40;
 				// 3 colors, wedge, no starter heart block
 				grid = new GridColumn[20];
@@ -707,7 +707,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				scoreMedal3 = 25000;
 
 				break;
-			case 8:
+			case 15:
 				// 3 colors (last 3), wedge
 				levelClears[level] = 40;
 				grid = new GridColumn[20];
@@ -725,7 +725,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				scoreMedal3 = 25000;
 
 				break;
-			case 9:
+			case 10:
 				// 4 colors, no wedge
 				grid = new GridColumn[20];
 				for (int i = 0; i < grid.length; i++) {
@@ -739,7 +739,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				scoreMedal3 = 25000;
 
 				break;
-			case 10:
+			case 7:
 				grid = GridColumn.loadFromFile("level10-3.dat");
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
@@ -756,7 +756,7 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 				levelClears[level] = 50;
 
 				break;
-			case 15:
+			case 8:
 				grid = GridColumn.loadFromFile("level4.dat");
 				scoreMedal1 = 2500;
 				scoreMedal2 = 5000;
