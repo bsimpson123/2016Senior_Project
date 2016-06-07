@@ -109,6 +109,49 @@ public class PuzzleBreakLevel extends BlockBreakLevel {
 	//protected int minColors = 2;
 	//private int heartGenChance = 20;
 	//private int bombGenChance = 20;
+
+	private int levelMedals = 0;
+
+	protected int scoreSystem(int levelScore) {
+		//if (useScore) {
+			/*if (score <= scoreMedal1) {
+				//medals[level] = 1;
+				levelMedal = 1;
+			} else if (score > scoreMedal1 && score <= scoreMedal2) {
+				//medals[level] = 2;
+				levelMedal = 2;
+			} else if (score >= scoreMedal2) {
+				//medals[level] = 3;
+				levelMedal = 3;
+			}
+		//} 
+		//if (useTime) {
+			if (energy > 0 && levelMedal == 3) {
+				//medals[level] = 4;
+				levelMedal = 4;
+			}*/
+			
+			if (levelScore <= scoreMedal1st[level]) {
+				//medals[level] = 1;
+				levelMedals = 1;
+			} else if (levelScore > scoreMedal1st[level] && levelScore <= scoreMedal2nd[level]) {
+				//medals[level] = 2;
+				levelMedals = 2;
+			} else if (levelScore > scoreMedal2nd[level]) {
+				//medals[level] = 3;
+				levelMedals = 3;
+			}
+		//} 
+		//if (useTime) {
+			if (energy > 0 && levelMedals == 3) {
+				//medals[level] = 4;
+				levelMedals = 4;
+			}
+			return levelMedals;
+		//}
+	}
+	
+
 	//private int levelMedals = 0;
 	
 	
