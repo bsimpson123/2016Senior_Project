@@ -23,14 +23,13 @@ public class Block implements Cloneable {
 	;
 	public static final int blockColorCount = 6;
 	
-	/* Protected variables */
 	/* Define the draw space that a block will take up in the grid.
 	 * This value is independent from the texture size and will ensure
 	 * each block takes up the same space on the grid. */
 	protected static final int[] blockDrawSpace = new int[] { 32, 32 };
 	
 	public final BlockType type;
-	protected Sprite block;
+	private Sprite block;
 	protected int colorID = 0;
 	/** Collection of colors that will be used for standard blocks. */
 	
@@ -47,8 +46,9 @@ public class Block implements Cloneable {
 		this.type = type;
 		if ( (colorID >= blockColorCount || colorID < 0) && type == BlockType.BLOCK) {
 			colorID = 0; 
-		} else if ( (colorID < 2 || colorID > 9) && type == BlockType.BOMB ) {
-			colorID = 2; // default,minimum bomb radius, used if set value is out of range
+		} else if ( type == BlockType.BOMB ) {
+			// default and minimum bomb radius is 2, used if set value is out of range
+			this.colorID = (colorID < 2 || colorID > 9) ? 2 : colorID;
 		} else { // colorID may hold state or data information for other block types
 			this.colorID = colorID;
 		}
@@ -212,8 +212,6 @@ public class Block implements Cloneable {
 		}
 	}
 	
-	
-	
 	/** 
 	 * Creates a copy of the object block with default block state values.
 	 */
@@ -267,6 +265,9 @@ public class Block implements Cloneable {
 				break;
 			case TRASH:
 				blockID = "TRASH";
+				break;
+			case BOMB:
+				blockID = "BOMB";
 				break;
 			default:
 				blockID = "UNKOWN";

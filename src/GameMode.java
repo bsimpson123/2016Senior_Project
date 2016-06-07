@@ -1,6 +1,3 @@
-import java.util.HashMap;
-import org.newdawn.slick.opengl.Texture;
-
 public interface GameMode {
 	public enum LoadState {
 		NOT_LOADED, LOADING_ASSETS, LOADING_DONE, READY, FINALIZED 

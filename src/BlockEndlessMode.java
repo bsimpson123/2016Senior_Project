@@ -99,9 +99,9 @@ public class BlockEndlessMode implements GameMode{
 		BlockBreakLevel.buildStaticAssets(localTexMap);
 		
 		int offset = 0;
-		for (int i = 0; i < BlockStandardLevel.numbers.length; i++) {
+		for (int i = 0; i < BlockEndlessLevel.numbers.length; i++) {
 			offset = i * 24 - 1;
-			BlockStandardLevel.numbers[i] = new Sprite(
+			BlockEndlessLevel.numbers[i] = new Sprite(
 					localTexMap.get("number_white"),
 					new int[] { offset, 0 },
 					new int[] { 24, 30 },
