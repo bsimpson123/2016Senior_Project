@@ -19,7 +19,6 @@ public class Configuration implements GameMode {
 	private final Color shader = Global.menuButtonShader;
 	private final Color reset = Color.white;
 	private final Sprite background;
-	private final Sprite[] sensBar = new Sprite[3];
 	
 	private final String[] menus = new String[] {
 		"Input Sensitivity",
@@ -31,7 +30,7 @@ public class Configuration implements GameMode {
 		};
 	
 	private final String[][] options = new String[][] {
-		new String[] { "", "" }, //new String[] { "Fast", "Slow" }, // sensitivity
+		new String[] { "Fast", "Slow" }, // sensitivity
 		new String[] { "ON", "OFF" }, // cascading
 		new String[] { "Wait", "No Wait" }, // grid wait
 		new String[] { "Fullscreen", "Window" }, // fullscreen
@@ -105,28 +104,6 @@ public class Configuration implements GameMode {
 		currentState = LoadState.LOADING_ASSETS;
 		// TODO Auto-generated method stub
 
-		sensBar[0] = new Sprite(
-				Global.textureMap.get("blocksheet"),
-				new int[] { 0, 100 },
-				new int[] { 24, 24 },
-				new int[] { 24, 24 }
-			);
-		sensBar[1] = new Sprite(
-				Global.textureMap.get("blocksheet"),
-				new int[] { 25, 100 },
-				new int[] { 24, 24 },
-				new int[] { 24, 24 }
-			);
-		sensBar[2] = new Sprite(
-				Global.textureMap.get("blocksheet"),
-				new int[] { 79, 100 },
-				new int[] { 24, 24 },
-				new int[] { 24, 24 }
-			);
-		
-		
-		
-		
 		currentState = LoadState.LOADING_DONE;
 		return;
 		
@@ -154,11 +131,12 @@ public class Configuration implements GameMode {
 			}
 			if (i == 0) {
 				// TODO: slider for sensitivity adjustment
-				reset.bind();
-				sensBar[0].draw(spacing[0][1], ys + 12);
+				//reset.bind();
+				Global.uiTransWhite.draw(spacing[0][1], ys, barW, 54);
+				/*sensBar[0].draw(spacing[0][1], ys + 12);
 				sensBar[1].draw(spacing[0][1] + 24, ys + 12, new int[] { barW, 24 });
-				sensBar[2].draw(spacing[0][1] + barW + 24, ys + 12);
-				shader.bind();
+				sensBar[2].draw(spacing[0][1] + barW + 24, ys + 12); //*/
+				//shader.bind();
 			} else {
 				Global.uiTransWhite.draw(spacing[0][1], ys, spacing[1][1], 54);
 				Global.uiTransWhite.draw(spacing[0][2], ys, spacing[1][2], 54);
