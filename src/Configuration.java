@@ -15,7 +15,6 @@ public class Configuration implements GameMode {
 	private LoadState currentState = LoadState.NOT_LOADED;
 	
 	private final String title = "Configuration";
-	private final int titleOffset;
 	private final Color shader = Global.menuButtonShader;
 	private final Color reset = Color.white;
 	private final Sprite background;
@@ -54,6 +53,8 @@ public class Configuration implements GameMode {
 	private final int delayMax = 50;
 	private final int delayStep = 10;
 	
+	private final int inputSelectLevel = 4;
+	
 	/** Holds the original settings at screen load. This values will be set back if the user cancels from the screen.
 	 * Does not affect keyboard/gamepad configuration. */
 	private final int originalSettings[];
@@ -69,24 +70,24 @@ public class Configuration implements GameMode {
 	
 	
 	public Configuration() {
-		titleOffset = Global.getFont48DrawSize(title) / 2;
 		settings = new int[] {
 			(int)Global.inputReadDelayTimer / 10,
-			Global.fullscreen ? 1 : 0, // fullscreen
 			Global.useBlockCascading ? 1 : 0,
 			Global.waitForGridMovement ? 1 : 0,
+			Global.fullscreen ? 1 : 0, // fullscreen
 			0, // input config
 			0 // accept/cancel
 		};
 		
-		originalSettings = new int[] {
+		originalSettings = settings.clone(); 
+				/*new int[] {
 				(int)Global.inputReadDelayTimer / 10,
 				Global.fullscreen ? 1 : 0, // fullscreen
 				Global.useBlockCascading ? 1 : 0,
 				Global.waitForGridMovement ? 1 : 0,
 				0, // input config
 				0 // accept/cancel
-			};
+			}; //*/
 		
 		
 		background = new Sprite(
@@ -120,7 +121,7 @@ public class Configuration implements GameMode {
 		currentState = LoadState.READY;
 		// TODO Auto-generated method stub
 		background.draw(0, 0);
-		Global.drawFont48(512 - titleOffset, 80, title, Color.gray);
+		Global.drawFont48(512, 80, title, Color.gray, true);
 		
 		int barW = ( (settings[0] * 100) / delayMax ) * 5;
 		
@@ -130,13 +131,10 @@ public class Configuration implements GameMode {
 				Global.uiTransWhite.draw(spacing[0][0], ys, spacing[1][0], 54);
 			}
 			if (i == 0) {
-				// TODO: slider for sensitivity adjustment
-				//reset.bind();
-				Global.uiTransWhite.draw(spacing[0][1], ys, barW, 54);
-				/*sensBar[0].draw(spacing[0][1], ys + 12);
-				sensBar[1].draw(spacing[0][1] + 24, ys + 12, new int[] { barW, 24 });
-				sensBar[2].draw(spacing[0][1] + barW + 24, ys + 12); //*/
-				//shader.bind();
+				Global.uiTransWhite.draw(spacing[0][1], ys, 522, 54);
+				Color.green.bind();
+				Global.uiTransWhite.draw(spacing[0][1] + 10, ys + 12, barW, 32);
+				shader.bind();
 			} else {
 				Global.uiTransWhite.draw(spacing[0][1], ys, spacing[1][1], 54);
 				Global.uiTransWhite.draw(spacing[0][2], ys, spacing[1][2], 54);
@@ -147,7 +145,10 @@ public class Configuration implements GameMode {
 			} else {
 				Global.drawFont48(spacing[2][0], ys + 10, menus[i], Color.black, true);
 			}
-			if (i > 0 && (settings[i] % 2) == 1) {
+			if (i == 0) {
+				Global.drawFont48(spacing[2][1], ys + 10, options[i][0], Color.yellow, true);
+				Global.drawFont48(spacing[2][2], ys + 10, options[i][1], Color.yellow, true);
+			} else if ( settings[i] == 1 ) {
 				Global.drawFont48(spacing[2][1], ys + 10, options[i][0], Color.cyan, true);
 				Global.drawFont48(spacing[2][2], ys + 10, options[i][1], Color.gray, true);
 			} else {
@@ -195,7 +196,7 @@ public class Configuration implements GameMode {
 					
 					break;
 				case 5: // accept/cancel and leave screen
-					if (settings[select] % 2 == 0) {
+					if (settings[select] == 1) {
 						commitSettings();
 					} else {
 						resetSettings();
@@ -209,34 +210,35 @@ public class Configuration implements GameMode {
 		
 		int action = 0;
 		if (Global.getControlActive(Global.GameControl.LEFT)) {
-			action = -1;
+			action = 1;
 			inputDelay = inputReadDelayTimer;
 		} else
 		if (Global.getControlActive(Global.GameControl.RIGHT)) {
-			action = 1;
+			action = -1;
 			inputDelay = inputReadDelayTimer;
 		}		
 		if (action != 0) {
-			if (select > 0) {
-				settings[select] += action;
-			} else {
-				settings[0] += action;
+			if (select == 0) {
+				settings[0] -= action;
 				if (settings[0] < delayMin) {
 					settings[0] = delayMin;
 				} else if (settings[0] > delayMax) {
 					settings[0] = delayMax;
 				}
+			} else {
+				settings[select] += action;
+				settings[select] = (settings[select] > 1) ? 1 : settings[select];
+				settings[select] = (settings[select] < 0) ? 0 : settings[select];
 			}
-			
 		}
 		
 	}
 	
 	private void commitSettings() {
 		Global.inputReadDelayTimer = (long)settings[0] * delayStep;
-		Global.useBlockCascading = settings[1] % 2 == 1 ? true : false;
-		Global.waitForGridMovement = settings[2] % 2 == 1 ? true : false;
-		boolean fc = settings[3] % 2 == 1 ? true : false;
+		Global.useBlockCascading = settings[1] == 1 ? true : false;
+		Global.waitForGridMovement = settings[2] == 1 ? true : false;
+		boolean fc = settings[3] == 1 ? true : false;
 		if (Global.fullscreen != fc) {
 			Global.fullscreen = fc;
 			try {
@@ -273,8 +275,22 @@ public class Configuration implements GameMode {
 		}
 	}
 	
-	public static void saveSettings() {
-		
+	public void saveSettings() {
+		String filename = "game.conf";
+		try {
+			BufferedWriter of = new BufferedWriter( new FileWriter(filename) );
+			of.write(String.format("Sensitivity=%d", settings[0]));
+			of.newLine();
+			of.write(String.format("Cascade=%d", settings[1]));
+			of.newLine();
+			of.write(String.format("Wait=%d", settings[2]));
+			of.newLine();
+			of.write(String.format("Fullscreen=%d", settings[3]));
+			of.newLine();
+			of.close();
+		} catch (IOException err) {
+			Global.writeToLog(String.format("Unable to write game preferences.\nError message %s\n", err.getMessage()));
+		}
 	}
 
 	public static void setupDefaultValues() {
