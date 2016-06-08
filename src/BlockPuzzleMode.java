@@ -169,7 +169,7 @@ public class BlockPuzzleMode implements GameMode {
 			//if (gridDispLevel.size() <= 0) {
 			
 			gridDispLevel.add(GridColumn.copyGrid(playLevel.grid));
-			Global.writeToLog(String.format("init grid: %d", i),true );
+			
 			playLevel = null;
 		//	preloadLevel(i);
 		//}

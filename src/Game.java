@@ -398,7 +398,7 @@ public class Game {
 								game = new BlockPuzzleMode();
 								break;
 							case 2: 
-								//game = new BlockEndlessMode();
+								game = new BlockEndlessMode();
 							default:
 								break;
 						}
